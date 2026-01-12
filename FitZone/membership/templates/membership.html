@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FitZone | Membership</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'membership.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+{%include 'navbar.html'%}
+<br>
+<div class="container1">
+    <h1>Choose Your Membership</h1>
+    <p class="subtitle">Flexible plans designed to fit your fitness goals</p>
+
+    <div class="membership-grid">
+
+        <!-- AI Membership -->
+        <div class="card-membership">
+            <img src="{% static '' %}" alt="AI Membership" class="card-img">
+            <h2>AI Membership</h2>
+            <p class="price">$45 / month</p>
+            <ul>
+                <li>AI-Powered Workout Plans</li>
+                <li>Personalized Diet Suggestions</li>
+                
+            </ul>
+            <a href="#" class="btn-active">Activate AI Plan</a>
+        </div>
+
+       <!-- AI Membership -->
+        <div class="card-membership">
+            <img src="{% static '' %}" alt="AI Membership" class="card-img">
+            <h2>AI Membership</h2>
+            <p class="price">$45 / month</p>
+            <ul>
+                <li>AI-Powered Workout Plans</li>
+                <li>Personalized Diet Suggestions</li>
+                
+            </ul>
+            <a href="#" class="btn-active">Activate AI Plan</a>
+        </div>
+
+
+</div>
+
+</body>
+</html>

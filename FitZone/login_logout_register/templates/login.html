@@ -1,0 +1,49 @@
+{% extends 'base1.html' %}
+
+
+{% block content %}
+<style>
+    .message.success {
+    margin-bottom: 2px;
+    padding: 5px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: green;}
+
+    .message.error {
+    margin-bottom: 2px;
+    padding: 5px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: red;
+}
+</style>
+<div class="login-wrapper">
+    <div class="login-container">
+        <h2>Login</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p class="register-text">
+            Don't have an account? <a href="{% url 'register' %}">Register</a>
+        </p>
+    </div>
+</div>
+{% endblock content %}
