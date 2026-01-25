@@ -5,45 +5,63 @@
     <meta charset="UTF-8">
     <title>FitZone | Membership</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="{% static 'membership.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
-{%include 'navbar.html'%}
+
+{% include 'navbar.html' %}
 <br>
+
 <div class="container1">
     <h1>Choose Your Membership</h1>
     <p class="subtitle">Flexible plans designed to fit your fitness goals</p>
 
     <div class="membership-grid">
 
-        <!-- AI Membership -->
+        {% for plan in plans %}
         <div class="card-membership">
-            <img src="{% static '' %}" alt="AI Membership" class="card-img">
-            <h2>AI Membership</h2>
-            <p class="price">$45 / month</p>
-            <ul>
-                <li>AI-Powered Workout Plans</li>
-                <li>Personalized Diet Suggestions</li>
-                
+
+            {% if plan.image %}
+                <img src="{{ plan.image.url }}" alt="{{ plan.name }}" class="card-img">
+            {% else %}
+                <img src="{% static 'images/default-membership.png' %}" alt="Membership" class="card-img">
+            {% endif %}
+
+            <h2>{{ plan.name }}</h2>
+
+            <p class="price">
+                ${{ plan.price }} /
+                <span>{{ plan.get_duration_display }}</span>
+            </p>
+
+            <ul class="features">
+                <li>{{ plan.feature_1 }}</li>
+                <li>{{ plan.feature_2 }}</li>
+                {% if plan.feature_3 %}
+                    <li>{{ plan.feature_3 }}</li>
+                {% endif %}
             </ul>
-            <a href="#" class="btn-active">Activate AI Plan</a>
+
+        
+            {% if user.is_authenticated %}
+                <a href="{% url 'checkout' plan.id %}" class="btn-active">
+                    Buy Now
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-active">
+                    Login to Buy
+                </a>
+            {% endif %}
+
         </div>
+        {% empty %}
+            <p>No membership plans available.</p>
+        {% endfor %}
 
-       <!-- AI Membership -->
-        <div class="card-membership">
-            <img src="{% static '' %}" alt="AI Membership" class="card-img">
-            <h2>AI Membership</h2>
-            <p class="price">$45 / month</p>
-            <ul>
-                <li>AI-Powered Workout Plans</li>
-                <li>Personalized Diet Suggestions</li>
-                
-            </ul>
-            <a href="#" class="btn-active">Activate AI Plan</a>
-        </div>
-
-
+    </div>
 </div>
 
 </body>

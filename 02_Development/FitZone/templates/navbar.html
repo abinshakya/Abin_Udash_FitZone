@@ -49,10 +49,26 @@
             </form>
          
             {% if request.user.is_authenticated %}
-                <span class="navbar-text text-white ms-3">
-                    <i class="fas fa-user-circle"></i> Welcome, {{ request.user.first_name|default:request.user.username }}!
-                </span>
-                <a href="{% url 'userdashboard' %}" class="Login-btn">Dashboard</a>
+                
+                    {% if request.user.is_superuser %}
+                        <a href="/admin/" class="Login-btn">Admin Panel</a>
+                    {% elif request.user.userprofile.role == 'member' %}
+                        <a href="{% url 'user_dashboard' %}" class="Login-btn">Dashboard</a>
+                    {% elif request.user.userprofile.role == 'trainer' %}
+                        <a href="{% url 'trainer_dashboard' %}" class="Login-btn">Dashboard</a>
+                    {% else %}
+                        <a href="/membership/" class="Login-btn">Subscribe</a>
+                    {% endif %}
+                    <div class="dropdown ms-3">
+                    <button class="btn navbar-text text-white dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--primary-orange); border-color: var(--primary-orange); margin-left: 0;">
+                        <i class="fas fa-user-circle"></i> Welcome, {{ request.user.username|default:request.user.username }}!
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{% url 'edit_profile' %}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </div>
             {% else %}
                 <a href="{% url 'login' %}" class="Login-btn">Login</a>
             {% endif %}
