@@ -36,6 +36,3 @@ def trainer_dashboard(request):
         return redirect('/')
     
     return render(request, 'trainer/trainer_dashboard.html')
-@login_required
-def trainerregestration(request):
-    return render(request, 'trainer/trainerregestration.html')

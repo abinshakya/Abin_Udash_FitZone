@@ -6,110 +6,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FitZone - Premium Fitness</title>
 
-<!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <link rel="stylesheet" href="{% static 'Navbar.css' %}">
+
+<style>
+</style>
 </head>
-<style></style>
+
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="#"><i class="fas fa-dumbbell"></i> FitZone</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top fz-navbar">
+  <div class="container-fluid px-4">
+    <!-- Brand (LEFT) -->
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <i class="fas fa-dumbbell"></i>
+      <span class="fw-bold">FitZone</span>
+    </a>
 
-        <div class="collapse navbar-collapse" id="navbarContent">
-            <!-- Close button for mobile -->
-            <span class="navbar-close">&times;</span>
-            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/trainer/' %}active{% endif %}" href="/trainer">Trainers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/membership/' %}active{% endif %}" href="/membership">Membership</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="/about">About</a>
-                </li>
+    <!-- Toggler -->
+    <button class="navbar-toggler border-0 shadow-none"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#fzOffcanvas"
+            aria-controls="fzOffcanvas">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Desktop collapse -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Center links -->
+      <ul class="navbar-nav mx-auto gap-lg-2">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/trainer/' %}active{% endif %}" href="/trainer">Trainers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/membership/' %}active{% endif %}" href="/membership">Membership</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="/about">About</a>
+        </li>
+      </ul>
+
+      <!-- Right side -->
+      <div class="d-flex align-items-center gap-2">
+        <form class="fz-search d-none d-lg-flex" role="search">
+          <input class="form-control fz-search-input" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn fz-search-btn" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline d-none d-lg-inline-flex">
+            Become a Trainer
+          </a>
+
+          <div class="dropdown">
+            <button class="btn fz-btn fz-btn-primary dropdown-toggle"
+                    type="button"
+                    id="userDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-user-circle me-1"></i>
+              <span class="d-none d-xl-inline">Welcome, {{ request.user.username }}!</span>
+              <span class="d-xl-none">Account</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end fz-dropdown" aria-labelledby="userDropdown">
+              <li>
+                <a class="dropdown-item" href="{% if request.user.userprofile.role == 'member' %}{% url 'user_dashboard' %}{% elif request.user.userprofile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/membership/{% endif %}">
+                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'edit_profile' %}">
+                  <i class="fas fa-user-edit me-2"></i>Edit Profile
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+              </li>
             </ul>
-
-            <form class="search-btn" role="search">
-                <input class="input-search" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
-            </form>
-         
-            {% if request.user.is_authenticated %}
-                
-                    {% if request.user.is_superuser %}
-                        <a href="/admin/" class="Login-btn">Admin Panel</a>
-                    {% elif request.user.userprofile.role == 'member' %}
-                        <a href="{% url 'user_dashboard' %}" class="Login-btn">Dashboard</a>
-                    {% elif request.user.userprofile.role == 'trainer' %}
-                        <a href="{% url 'trainer_dashboard' %}" class="Login-btn">Dashboard</a>
-                    {% else %}
-                        <a href="/membership/" class="Login-btn">Subscribe</a>
-                    {% endif %}
-                    <div class="dropdown ms-3">
-                    <button class="btn navbar-text text-white dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--primary-orange); border-color: var(--primary-orange); margin-left: 0;">
-                        <i class="fas fa-user-circle"></i> Welcome, {{ request.user.username|default:request.user.username }}!
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="{% url 'edit_profile' %}"><i class="fas fa-edit"></i> Edit Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                    </ul>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="Login-btn">Login</a>
-            {% endif %}
-
-        </div>
+          </div>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary">Login</a>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </nav>
 
-<!-- Bootstrap JS -->
+<!-- Mobile Offcanvas -->
+<div class="offcanvas offcanvas-start fz-offcanvas" tabindex="-1" id="fzOffcanvas" aria-labelledby="fzOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title d-flex align-items-center gap-2" id="fzOffcanvasLabel">
+      <i class="fas fa-dumbbell"></i> FitZone
+    </h5>
+    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column gap-3">
+    <form class="fz-search d-flex" role="search">
+      <input class="form-control fz-search-input" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn fz-search-btn" type="submit"><i class="fas fa-search"></i></button>
+    </form>
+
+    <div class="fz-mobile-links">
+      <a class="fz-mobile-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+      <a class="fz-mobile-link {% if request.path == '/trainer/' %}active{% endif %}" href="/trainer">Trainers</a>
+      <a class="fz-mobile-link {% if request.path == '/membership/' %}active{% endif %}" href="/membership">Membership</a>
+      <a class="fz-mobile-link {% if request.path == '/about/' %}active{% endif %}" href="/about">About</a>
+    </div>
+
+    <!-- ✅ FIXED: Edit Profile ADDED HERE -->
+    <div class="mt-auto d-grid gap-2">
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline">
+          <i class="fas fa-chalkboard-teacher"></i> Become a Trainer
+        </a>
+
+        <a href="{% url 'edit_profile' %}" class="btn fz-btn fz-btn-outline">
+          <i class="fas fa-user-edit"></i> Edit Profile
+        </a>
+
+        <a href="{% if request.user.userprofile.role == 'member' %}{% url 'user_dashboard' %}{% elif request.user.userprofile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/membership/{% endif %}"
+           class="btn fz-btn fz-btn-primary">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <a href="{% url 'logout' %}" class="btn fz-btn fz-btn-danger">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Auto-close navbar on mobile when clicking outside & add overlay
-const navbar = document.querySelector('.navbar-collapse');
-const toggler = document.querySelector('.navbar-toggler');
-const closeBtn = document.querySelector('.navbar-close');
-
-document.addEventListener('click', function(e) {
-    if (navbar.classList.contains('show') &&
-        !navbar.contains(e.target) &&
-        !toggler.contains(e.target)) {
-        new bootstrap.Collapse(navbar).hide();
-        document.body.classList.remove('drawer-open');
-    }
-});
-
-
-{% comment %} toggler.addEventListener('click', function() {
-    setTimeout(() => {
-        if (navbar.classList.contains('show')) {
-            document.body.classList.add('drawer-open');
-        } else {
-            document.body.classList.remove('drawer-open');
-        }
-    }, 200);
-}); {% endcomment %}
-
-// Close button functionality
-closeBtn.addEventListener('click', function() {
-    new bootstrap.Collapse(navbar).hide();
-    document.body.classList.remove('drawer-open');
-});
-</script>
 </body>
 </html>

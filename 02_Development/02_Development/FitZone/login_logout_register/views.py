@@ -59,20 +59,22 @@ def register(request):
                 birth_year = current_year - int(age)
                 dob = datetime(birth_year, 1, 1).date()
 
-            # Create profile (do not pass username, only valid fields)
+            # Create profile
             UserProfile.objects.create(
                 user=user,
+                username=username,
                 phone=phone,
                 age=int(age) if age else None,
                 dob=dob,
                 gender=gender,
+                
             )
             messages.success(request, "Registration successful! Please login.")
             return redirect('login')
 
         except Exception as e:
-            print("Registration error:", e)  # This will show the real error in your server log
-            messages.error(request, f"Registration failed: {e}")
+            print(e)  
+            messages.error(request, "Registration failed: Please try again")
             return render(request, 'register.html')
 
     return render(request, 'register.html')
@@ -117,9 +119,9 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    list(messages.get_messages(request))
     messages.success(request, "You have been logged out successfully")
     return redirect('login')
+
 @login_required
 def edit_profile(request):
     try:
