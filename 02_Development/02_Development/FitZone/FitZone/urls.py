@@ -29,8 +29,6 @@ urlpatterns = [
     path('', include('login_logout_register.urls')),
     path('', include('membership.urls')),
     path('', include('payment.urls')),
-    path('trainerregestration/', views.trainerregestration, name='trainerregestration'),  
-  
 ]
 
 if settings.DEBUG:

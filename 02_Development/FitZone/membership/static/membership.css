@@ -1,88 +1,232 @@
+:root{
+  --bg0:#0b0b0c;
+  --bg1:#141416;
 
-        .container1 {
-            
-            max-width: 1200px;
-            margin: auto;
-            padding: 60px 20px;
-        }
+  --cardTop: rgba(30,30,30,0.95);
+  --cardBot: rgba(14,14,14,0.95);
 
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
+  --text: #f4f4f4;
+  --muted: rgba(255,255,255,0.68);
+  --border: rgba(255,255,255,0.10);
 
-        .subtitle {
-            text-align: center;
-            color: #cccccc;
-            margin-bottom: 50px;
-        }
+  --orange:#ff7a18;
+  --orange2:#ff9a3c;
+}
 
-        .membership-grid {
-            display: flex;
-            justify-content: center;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        .card-membership .card-img {
-            width: 100%;          
-            height: 280px;         
-            object-fit: cover;     
-            border-radius: 8px;
-        }
+*{ box-sizing: border-box; }
 
-        .card-membership {
-            background: #1a1a1a;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            transition: transform 0.3s ease;
-        }
+body{
+  margin: 0;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
+    radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+    linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+}
 
-        .card-membership:hover {
-            transform: translateY(-10px);
-        }
+.page{ padding: 30px 0 80px; }
 
-        .card-membership h2 {
-            color: #ff7a18;
-            margin-bottom: 15px;
-        }
+.container1{
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
-        .price {
-            font-size: 2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
+/* Header */
+.page-head{
+  text-align: center;
+  margin: 18px 0 60px;
+}
+.page-head h1{
+  margin: 0 0 12px;
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  background: linear-gradient(135deg, #ffffff, var(--orange2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.page-head .subtitle{
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
 
-        ul {
-            list-style: none;
-            margin-bottom: 25px;
-        }
+/* Grid */
+.membership-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  align-items: stretch;
+}
+@media (max-width: 992px){
+  .membership-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px){
+  .membership-grid{ grid-template-columns: 1fr; }
+}
 
-        ul li {
-            margin-bottom: 10px;
-            color: #dddddd;
-        }
+/* Card */
+.card-membership{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
+  box-shadow: 0 18px 55px rgba(0,0,0,0.65);
+  transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+  min-height: 560px;
+}
+.card-membership:hover{
+  transform: translateY(-10px) scale(1.01);
+  border-color: rgba(255,122,24,0.45);
+  box-shadow:
+    0 35px 95px rgba(0,0,0,0.85),
+    0 0 55px rgba(255,122,24,0.14);
+}
 
-        .btn-active {
-            display: inline-block;
-            padding: 12px 25px;
-            background: #ff7a18;
-            color: #ffffff;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s ease;
-        }
+/* Featured */
+.card-membership.featured{
+  transform: scale(1.04);
+  border-color: rgba(255,122,24,0.65);
+  box-shadow:
+    0 40px 110px rgba(0,0,0,0.9),
+    0 0 70px rgba(255,122,24,0.22);
+}
+@media (max-width: 992px){
+  .card-membership.featured{ transform: none; }
+}
 
-        .btn-active:hover {
-            background: #ff9a3c;
-        }
-        
-          .card-img {
-             width: 100%;
-             height: 180px;
-             object-fit: cover;
-             border-radius: 14px;
-             margin-bottom: 20px;
+/* Image */
+.img-wrap{ position: relative; }
+.card-img{
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.03);
+}
+.img-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.00) 35%, rgba(0,0,0,0.78) 100%);
+  pointer-events:none;
+}
+
+/* Pills */
+.pill{
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 5;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(255,122,24,0.18);
+  border: 1px solid rgba(255,122,24,0.35);
+  backdrop-filter: blur(10px);
+}
+.pill-best{
+  left: auto;
+  right: 16px;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #141416;
+  border: none;
+}
+
+/* ✅ MAIN FIX: strong padding so content NEVER touches edges */
+.card-membership .card-content{
+  padding: 26px 28px 14px; /* LEFT/RIGHT increased */
+  flex: 1;
+}
+
+/* ✅ Force correct color (your screenshot shows it dark) */
+.card-membership .plan-title{
+  margin: 0 0 10px;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #ffffff !important;   /* fixes dark title issue */
+}
+
+/* Price */
+.card-membership .price{
+  margin: 0 0 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.card-membership .amount{
+  font-size: 2.45rem;
+  font-weight: 900;
+  color: var(--orange);
+  letter-spacing: 0.3px;
+}
+.card-membership .duration{
+  font-size: .95rem;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+}
+
+/* Features */
+.card-membership .features{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.card-membership .features li{
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: rgba(255,255,255,0.88);
+  line-height: 1.35;
+}
+.card-membership .features i{
+  color: var(--orange);
+  margin-top: 3px;
+}
+
+/* ✅ Footer padding (button not touching edges) */
+.card-membership .card-footer{
+  padding: 16px 28px 26px; /* same as body left/right */
+}
+
+/* Button */
+.btn-active{
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 18px;
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  border: 1px solid rgba(255,122,24,0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.btn-active:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 22px 45px rgba(255,122,24,0.35);
+  filter: brightness(1.08);
+}
+
+/* Empty */
+.empty{
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 30px 0;
 }

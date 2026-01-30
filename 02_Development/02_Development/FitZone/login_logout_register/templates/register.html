@@ -1,0 +1,97 @@
+{% extends 'base1.html' %}
+
+{% block content %}
+<style>
+    .message {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.message.error {
+    background-color: #ffe6e6;
+    color: #d8000c;
+}
+
+.message.success {
+    background-color: #e6ffe6;
+    color: #2e7d32;
+}
+
+</style>
+<div class="register-wrapper">
+    <div class="register-container">
+        <h2>Register</h2>
+
+       {% if messages %}
+    {% for message in messages %}
+        <p class="message {{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Full Name -->
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <!-- Username -->
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            </div>
+
+            <!-- Email -->
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <!-- Age -->
+            <div class="input-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="input-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+            </div>
+
+            <!-- Gender -->
+            <div class="input-group">
+                <label>Gender</label>
+                <div class="gender-options">
+                    <label><input type="radio" name="gender" value="male" required> Male</label>
+                    <label><input type="radio" name="gender" value="female"> Female</label>
+                    <label><input type="radio" name="gender" value="other"> Other</label>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="input-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm password" required>
+            </div>
+
+            <button type="submit" class="register-btn">Register</button>
+
+            <p class="login-text">
+                Already have an account? <a href="{% url 'login' %}">Login</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

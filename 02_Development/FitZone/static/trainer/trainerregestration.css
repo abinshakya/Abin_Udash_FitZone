@@ -1,0 +1,117 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Page wrapper */
+.page-wrapper {
+    min-height: 100vh;
+    background: #f4f6f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Card */
+.form-card {
+    background: #fff;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.form-title {
+    text-align: center;
+    color: #f05c18;
+    margin-bottom: 24px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 18px;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+/* Inputs */
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    transition: 0.3s ease;
+}
+
+/* Focus */
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f05c18;
+    box-shadow: 0 0 0 3px rgba(240, 92, 24, 0.2);
+}
+
+/* File input */
+.form-group input[type="file"] {
+    padding: 6px;
+}
+
+/* Help text */
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #777;
+}
+
+/* Textarea */
+textarea {
+    resize: none;
+}
+
+/* Button */
+.submit-btn {
+    width: 100%;
+    background: #f05c18;
+    color: #fff;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+/* Button hover */
+.submit-btn:hover {
+    background: #d94e14;
+    box-shadow: 0 8px 20px rgba(240, 92, 24, 0.35);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .form-card {
+        padding: 24px;
+    }
+
+    .form-title {
+        font-size: 22px;
+    }
+}
