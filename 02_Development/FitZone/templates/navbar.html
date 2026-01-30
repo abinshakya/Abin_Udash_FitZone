@@ -78,7 +78,8 @@
             <ul class="dropdown-menu dropdown-menu-end fz-dropdown" aria-labelledby="userDropdown">
               <li>
                 <a class="dropdown-item" href="{% if request.user.userprofile.role == 'member' %}{% url 'user_dashboard' %}{% elif request.user.userprofile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/membership/{% endif %}">
-                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                  <i class="fas fa-tachometer-alt me-2"></i>
+                  {% if request.user.userprofile.role == 'member' %}Dashboard{% elif request.user.userprofile.role == 'trainer' %}Dashboard{% else %}Join Membership{% endif %}
                 </a>
               </li>
               <li>
