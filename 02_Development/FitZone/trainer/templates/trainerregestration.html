@@ -1,312 +1,19 @@
 {% extends 'base.html' %}
+
 {% block content %}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-  :root{
-    --bg0:#0b0b0c;
-    --bg1:#141416;
-
-    --cardTop: rgba(30,30,30,0.92);
-    --cardBot: rgba(14,14,14,0.92);
-
-    --text:#f4f4f4;
-    --muted: rgba(255,255,255,0.68);
-    --border: rgba(255,255,255,0.10);
-
-    --orange:#ff7a18;
-    --orange2:#ff9a3c;
-
-    --shadow: 0 22px 70px rgba(0,0,0,0.65);
-  }
-
-  *{ box-sizing: border-box; }
-
-  .page-wrapper{
-    min-height: calc(100vh - 80px);
-    display: grid;
-    place-items: center;
-    padding: 38px 16px 70px;
-    background:
-      radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
-      radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
-      linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
-    font-family: "Poppins", system-ui, sans-serif;
-    color: var(--text);
-  }
-
-  .form-container{ width: min(980px, 100%); margin: 0 auto; }
-
-  .form-card{
-    position: relative;
-    border-radius: 22px;
-    border: 1px solid rgba(255,255,255,0.10);
-    background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-
-  .form-card::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius: 22px;
-    padding: 1px;
-    background: linear-gradient(135deg,
-      rgba(255,122,24,0.22),
-      rgba(255,255,255,0.08),
-      rgba(255,154,60,0.18)
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    pointer-events:none;
-    opacity: 0.85;
-  }
-
-  .form-header{
-    padding: 22px 24px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    background: rgba(255,255,255,0.02);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-  }
-
-  .form-title{
-    margin: 0;
-    font-size: 1.55rem;
-    font-weight: 950;
-    letter-spacing: 0.2px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #ffffff, var(--orange2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .form-subtitle{
-    margin: 0;
-    color: rgba(255,255,255,0.65);
-    font-weight: 600;
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
-
-  .secure-pill{
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(255,122,24,0.14);
-    border: 1px solid rgba(255,122,24,0.28);
-    color: #fff;
-    font-weight: 900;
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-
-  .form-body{ padding: 22px 24px 26px; }
-
-  form{
-    display: grid;
-    gap: 16px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .grid-2{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  @media (max-width: 860px){
-    .grid-2{ grid-template-columns: 1fr; }
-    .form-header{ flex-direction: column; align-items: flex-start; }
-  }
-
-  .form-group{ display: grid; gap: 8px; }
-
-  .form-group label{
-    font-size: 0.92rem;
-    color: rgba(255,255,255,0.78);
-    font-weight: 800;
-  }
-
-  .form-group input[type="text"],
-  .form-group input[type="number"],
-  .form-group textarea{
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.10);
-    background: rgba(255,255,255,0.04);
-    color: #fff;
-    outline: none;
-    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
-    font-size: 0.98rem;
-  }
-
-  .form-group textarea{ resize: vertical; min-height: 110px; }
-
-  .form-group input::placeholder,
-  .form-group textarea::placeholder{ color: rgba(255,255,255,0.45); }
-
-  .form-group input:focus,
-  .form-group textarea:focus{
-    border-color: rgba(255,122,24,0.75);
-    box-shadow: 0 0 0 0.22rem rgba(255,122,24,0.18);
-    background: rgba(255,255,255,0.06);
-  }
-
-  .help{
-    margin-top: -2px;
-    color: rgba(255,255,255,0.55);
-    font-size: 0.88rem;
-    line-height: 1.35;
-  }
-
-  /* ---------- File Upload Blocks ---------- */
-  .file-block{
-    padding: 16px 16px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .file-head{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-
-  .file-tag{
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(255,122,24,0.14);
-    border: 1px solid rgba(255,122,24,0.22);
-    color: #fff;
-    font-weight: 900;
-    font-size: 0.78rem;
-    white-space: nowrap;
-  }
-
-  /* Hide default file input */
-  .file-block input[type="file"]{ display: none; }
-
-  .file-ui{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 6px;
-  }
-
-  .file-btn{
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.92);
-    font-weight: 900;
-    cursor: pointer;
-    transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-    user-select: none;
-    white-space: nowrap;
-  }
-
-  .file-btn:hover{
-    transform: translateY(-1px);
-    background: rgba(255,255,255,0.09);
-    border-color: rgba(255,122,24,0.28);
-    box-shadow: 0 14px 30px rgba(0,0,0,0.25);
-  }
-
-  .file-btn i{ color: var(--orange); }
-
-  .file-name{
-    color: rgba(255,255,255,0.70);
-    font-weight: 700;
-    font-size: 0.92rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-    min-width: 0;
-  }
-
-  /* ✅ multiple preview grid */
-  .preview-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(46px, 46px));
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .thumb{
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04);
-    overflow: hidden;
-    box-shadow: 0 12px 26px rgba(0,0,0,0.35);
-  }
-
-  .thumb img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .form-actions{ display: grid; gap: 10px; margin-top: 6px; }
-
-  .submit-btn{
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,122,24,0.35);
-    background: linear-gradient(135deg, var(--orange), var(--orange2));
-    color: #fff;
-    font-size: 1.02rem;
-    font-weight: 950;
-    cursor: pointer;
-    transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .submit-btn:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 20px 45px rgba(255,122,24,0.30);
-    filter: brightness(1.06);
-  }
-
-  .fineprint{
-    margin: 0;
-    color: rgba(255,255,255,0.60);
-    font-size: 0.9rem;
-    line-height: 1.4;
-    text-align: center;
-  }
 </style>
+
+{% if messages %}
+  <div class="fz-alert-wrap">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
 
 <div class="page-wrapper">
   <div class="form-container">
@@ -346,7 +53,7 @@
           </div>
 
           <div class="grid-2">
-            <!-- ✅ Certification (multiple) -->
+            <!-- Certification -->
             <div class="file-block" id="block-certification">
               <div class="file-head">
                 <label for="certification" style="margin:0;">Certification</label>
@@ -366,7 +73,7 @@
               <div class="help">Upload certificate images or PDF files (multiple allowed).</div>
             </div>
 
-            <!-- ✅ Profile Picture (multiple images) -->
+            <!-- Profile Pictures -->
             <div class="file-block" id="block-profile_pic">
               <div class="file-head">
                 <label for="profile_pic" style="margin:0;">Profile Pictures</label>
@@ -388,7 +95,7 @@
           </div>
 
           <div class="grid-2">
-            <!-- ✅ Identity Proof (multiple) -->
+            <!-- Identity Proof -->
             <div class="file-block" id="block-identity_proof">
               <div class="file-head">
                 <label for="identity_proof" style="margin:0;">Identity Proof</label>
@@ -408,7 +115,7 @@
               <div class="help">Upload government-issued ID (multiple allowed).</div>
             </div>
 
-            <!-- ✅ Experience Verification (multiple) -->
+            <!-- Experience Verification -->
             <div class="file-block" id="block-experience_verification">
               <div class="file-head">
                 <label for="experience_verification" style="margin:0;">Experience Verification</label>
@@ -466,10 +173,8 @@
         return;
       }
 
-      // show "x files selected"
       nameEl.textContent = files.length === 1 ? files[0].name : `${files.length} files selected`;
 
-      // show previews only for image files
       files.forEach((file) => {
         if (file.type && file.type.startsWith("image/")) {
           const url = URL.createObjectURL(file);

@@ -23,14 +23,12 @@ from FitZone import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('trainer/', views.trainer),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
-    path('trainer/dashboard/', views.trainer_dashboard, name='trainer_dashboard'),
     path('', include('login_logout_register.urls')),
     path('', include('membership.urls')),
     path('', include('payment.urls')),
-    path('trainerregestration/', views.trainerregestration, name='trainerregestration'),  
-  
+    path('', include('trainer.urls')),
+
 ]
 
 if settings.DEBUG:

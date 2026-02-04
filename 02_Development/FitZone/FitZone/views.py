@@ -19,23 +19,3 @@ def user_dashboard(request):
         return redirect('/membership/')
     
     return render(request, 'member/user_dashboard.html')
-
-def trainer(request):
-    return render(request,'trainer/trainer.html')
-
-@login_required
-def trainer_dashboard(request):
-    # Check if user is a trainer
-    try:
-        profile = request.user.userprofile
-        if profile.role != 'trainer':
-            messages.warning(request, "Access denied. Trainers only!")
-            return redirect('/')
-    except:
-        messages.warning(request, "Access denied. Trainers only!")
-        return redirect('/')
-    
-    return render(request, 'trainer/trainer_dashboard.html')
-@login_required
-def trainerregestration(request):
-    return render(request, 'trainer/trainerregestration.html')

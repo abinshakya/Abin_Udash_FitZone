@@ -1,11 +1,593 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - FitZone</title>
-    <body>
-    <h1>User Dashboard</h1>
-    </body>
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Member Dashboard - FitZone</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg0:#0b0b0c;
+      --bg1:#141416;
+
+      --cardTop: rgba(30,30,30,0.92);
+      --cardBot: rgba(14,14,14,0.92);
+
+      --text:#f4f4f4;
+      --muted: rgba(255,255,255,0.68);
+      --border: rgba(255,255,255,0.10);
+
+      --orange:#ff7a18;
+      --orange2:#ff9a3c;
+
+      --shadow: 0 22px 70px rgba(0,0,0,0.65);
+      --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: "Poppins", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
+        radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+        linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+      min-height: 100vh;
+    }
+
+    /* ---------- Layout ---------- */
+    .dash{
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar{
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      background: rgba(14,14,14,0.55);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px 14px;
+      margin-bottom: 14px;
+    }
+
+    .brand-badge{
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      display: grid;
+      place-items: center;
+      color: #141416;
+      font-weight: 1000;
+      box-shadow: 0 14px 30px rgba(255,122,24,0.15);
+    }
+
+    .brand-title{
+      font-weight: 1000;
+      letter-spacing: 0.2px;
+      font-size: 1.15rem;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .brand-sub{
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.62);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .nav{
+      display: grid;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .nav a{
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.85);
+      font-weight: 800;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .nav a i{
+      width: 18px;
+      text-align: center;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .nav a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,122,24,0.22);
+      color: #fff;
+    }
+
+    .nav a.active{
+      background: rgba(255,122,24,0.10);
+      border-color: rgba(255,122,24,0.45);
+      color: #fff;
+    }
+
+    .nav a.active i{
+      color: var(--orange2);
+    }
+
+    .sidebar-footer{
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .logout{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(220,53,69,0.35);
+      background: rgba(220,53,69,0.12);
+      color: #ffb3bd;
+      font-weight: 950;
+      text-decoration: none;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .logout:hover{
+      transform: translateY(-1px);
+      background: rgba(220,53,69,0.18);
+      color: #ffd2d8;
+    }
+
+    /* ---------- Main ---------- */
+    .main{
+      padding: 26px 26px 60px;
+    }
+
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .hello h1{
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #fff, var(--orange2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hello p{
+      margin: 6px 0 0;
+      color: rgba(255,255,255,0.65);
+      font-weight: 600;
+    }
+
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.85);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .pill i{ color: var(--orange2); }
+
+    .grid{
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 980px){
+      .dash{ grid-template-columns: 1fr; }
+      .sidebar{ position: relative; height: auto; }
+      .sidebar-footer{ position: relative; left: 0; right: 0; bottom: 0; }
+      .main{ padding: 18px 16px 50px; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    /* ---------- Cards ---------- */
+    .card{
+      position: relative;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
+      box-shadow: var(--shadowSoft);
+      overflow: hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: 22px;
+      padding: 1px;
+      background: linear-gradient(135deg,
+        rgba(255,122,24,0.20),
+        rgba(255,255,255,0.08),
+        rgba(255,154,60,0.16)
+      );
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events:none;
+      opacity: 0.7;
+    }
+
+    .card-head{
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-head h2{
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 1000;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .card-body{ padding: 18px; position: relative; z-index: 1; }
+
+    /* Membership summary */
+    .membership-title{
+      font-size: 1.4rem;
+      font-weight: 1000;
+      margin: 0 0 10px;
+      color: #fff;
+    }
+
+    .meta{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,122,24,0.12);
+      border: 1px solid rgba(255,122,24,0.22);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .chip.gray{
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.86);
+    }
+
+    .progress-wrap{
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-top{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: rgba(255,255,255,0.70);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .bar{
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      overflow: hidden;
+    }
+
+    .bar > div{
+      height: 100%;
+      width: 55%; /* demo */
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      border-radius: 999px;
+      box-shadow: 0 14px 30px rgba(255,122,24,0.25);
+    }
+
+    /* Quick actions */
+    .actions{
+      display: grid;
+      gap: 10px;
+    }
+
+    .action{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      text-decoration: none;
+      color: rgba(255,255,255,0.88);
+      font-weight: 900;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .action:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,122,24,0.26);
+      color: #fff;
+    }
+
+    .action .left{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .icon{
+      width: 40px;
+      height: 40px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,122,24,0.12);
+      border: 1px solid rgba(255,122,24,0.22);
+      color: var(--orange2);
+      flex: 0 0 auto;
+    }
+
+    .action small{
+      display: block;
+      color: rgba(255,255,255,0.62);
+      font-weight: 700;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .action .chev{
+      color: rgba(255,255,255,0.55);
+      flex: 0 0 auto;
+    }
+
+    /* Mobile sidebar toggle */
+    .mobile-top{
+      display: none;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(14,14,14,0.55);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .mobile-top button{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 980px){
+      .mobile-top{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .sidebar{ display: none; }
+      .sidebar.open{ display: block; }
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'navbar.html' %}
+
+  <!-- Mobile Top -->
+  <div class="mobile-top">
+    <div class="pill"><i class="fa-solid fa-gauge"></i> Dashboard</div>
+    <button type="button" id="toggleSidebar">
+      <i class="fa-solid fa-bars"></i> Menu
+    </button>
+  </div>
+
+  <div class="dash">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-badge">FZ</div>
+        <div>
+          <div class="brand-title">FitZone</div>
+          <div class="brand-sub">Member Panel</div>
+        </div>
+      </div>
+
+      <!-- NOTE: replace href with your real URLs -->
+      <nav class="nav">
+        <a href="#" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="#"><i class="fa-solid fa-robot"></i> Chat with AI Trainer</a>
+        <a href="#"><i class="fa-solid fa-bowl-food"></i> AI Food Recommender</a>
+        <a href="#"><i class="fa-solid fa-comments"></i> Chat with Trainer</a>
+        <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <!-- replace with your logout url -->
+        <a class="logout" href="{% url 'logout' %}">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="topbar">
+        <div class="hello">
+          <h1>Welcome, {{ request.user.username }}!</h1>
+          <p>Here’s your membership and quick actions.</p>
+        </div>
+
+        <div class="pill">
+          <i class="fa-solid fa-shield"></i> Secure Member Area
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Membership Card -->
+        <section class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-id-card" style="color:var(--orange2)"></i> Membership Status</h2>
+            <span class="chip gray"><i class="fa-regular fa-circle-check" style="color:var(--orange2)"></i> Active</span>
+          </div>
+          <div class="card-body">
+            <!-- Replace the placeholders below with dynamic membership values -->
+            <h3 class="membership-title">{{ membership.plan_name|default:"No Active Plan" }}</h3>
+
+            <div class="meta">
+              <span class="chip"><i class="fa-solid fa-calendar-days"></i> Duration: {{ membership.duration|default:"-" }}</span>
+              <span class="chip gray"><i class="fa-solid fa-clock"></i> Ends: {{ membership.end_date|default:"-" }}</span>
+              <span class="chip gray"><i class="fa-solid fa-money-bill-wave"></i> Paid: ${{ membership.price|default:"0" }}</span>
+            </div>
+
+            <div class="progress-wrap">
+              <div class="progress-top">
+                <span>Membership Period</span>
+                <span>{{ membership.days_left|default:"-" }} days left</span>
+              </div>
+              <!-- demo bar; in backend you can set style width dynamically -->
+              <div class="bar"><div></div></div>
+              <div class="progress-top">
+                <span>Start: {{ membership.start_date|default:"-" }}</span>
+                <span>End: {{ membership.end_date|default:"-" }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Actions Card -->
+        <aside class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-bolt" style="color:var(--orange2)"></i> Quick Actions</h2>
+          </div>
+          <div class="card-body">
+            <div class="actions">
+              <!-- Replace href with your URLs -->
+              <a class="action" href="#">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-robot"></i></div>
+                  <div>
+                    Chat with AI Trainer
+                    <small>Ask workout plans & guidance</small>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+
+              <a class="action" href="#">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-bowl-food"></i></div>
+                  <div>
+                    AI Food Recommender
+                    <small>Get meal suggestions for goals</small>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+
+              <a class="action" href="#">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-comments"></i></div>
+                  <div>
+                    Chat with Trainer
+                    <small>Message your assigned trainer</small>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+
+              <a class="action" href="#">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-gear"></i></div>
+                  <div>
+                    Settings
+                    <small>Profile, password, preferences</small>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Mobile sidebar toggle
+    const btn = document.getElementById("toggleSidebar");
+    const sidebar = document.getElementById("sidebar");
+    if (btn && sidebar) {
+      btn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
+    }
+  </script>
+</body>
 </html>
