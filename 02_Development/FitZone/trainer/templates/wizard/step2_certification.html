@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* Layout */
+.wizard-container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+/* Progress bar */
+.wizard-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.progress-step {
+    text-align: center;
+    flex: 1;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #222;
+    border: 2px solid #444;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+}
+
+.progress-step.completed .step-circle {
+    background: #22c55e;
+    color: #fff;
+    border-color: #22c55e;
+}
+
+.progress-step.active .step-circle {
+    background: #ff7a18;
+    color: #fff;
+    border-color: #ff7a18;
+}
+
+.step-label {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.progress-step.active .step-label {
+    color: #ff7a18;
+}
+
+/* Card */
+.wizard-card {
+    background: #111;
+    border-radius: 10px;
+    padding: 30px;
+    border: 1px solid #333;
+}
+
+/* Header */
+.wizard-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.wizard-header h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.wizard-header p {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    color: #eee;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* Upload box */
+.file-upload-box {
+    background: #1a1a1a;
+    border: 2px dashed #444;
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.file-upload-box i {
+    font-size: 32px;
+    color: #ff7a18;
+    margin-bottom: 10px;
+}
+
+.file-upload-box p {
+    margin: 0;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.file-upload-box:hover {
+    border-color: #ff7a18;
+}
+
+/* Hide file input */
+input[type="file"] {
+    display: none;
+}
+
+.file-selected {
+    margin-top: 10px;
+    color: #22c55e;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Help & errors */
+.help-text {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+}
+
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin-top: 6px;
+}
+
+.errorlist li {
+    background: #2a1111;
+    color: #fca5a5;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* Buttons */
+.wizard-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-wizard {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-back {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+}
+
+.btn-next {
+    background: #ff7a18;
+    color: #fff;
+}
+
+.btn-wizard:hover {
+    opacity: 0.9;
+}
+</style>
+
+<div class="wizard-container">
+
+    <!-- Progress -->
+    <div class="wizard-progress">
+        <div class="progress-step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>
+            <div class="step-label">Basic Info</div>
+        </div>
+
+        <div class="progress-step active">
+            <div class="step-circle"><i class="fas fa-certificate"></i></div>
+            <div class="step-label">Certifications</div>
+        </div>
+
+        <div class="progress-step">
+            <div class="step-circle"><i class="fas fa-file"></i></div>
+            <div class="step-label">Documents</div>
+        </div>
+    </div>
+
+    <!-- Card -->
+    <div class="wizard-card">
+        <div class="wizard-header">
+            <h2><i class="fas fa-certificate" style="color:#ff7a18;"></i> Certifications & Photo</h2>
+            <p>Upload your credentials and profile picture</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ wizard.management_form }}
+
+            <!-- Certification -->
+            <div class="form-group">
+                <label>Certification Documents *</label>
+
+                <label for="{{ form.certification.id_for_label }}" class="file-upload-box">
+                    <i class="fas fa-file"></i>
+                    <p>Click to upload certifications</p>
+                    <div class="file-selected" id="cert-selected"></div>
+                </label>
+
+                {{ form.certification }}
+                {{ form.certification.errors }}
+            </div>
+
+            <!-- Profile picture -->
+            <div class="form-group">
+                <label>Profile Picture *</label>
+
+                <label for="{{ form.profile_pic.id_for_label }}" class="file-upload-box">
+                    <i class="fas fa-camera"></i>
+                    <p>Click to upload your photo</p>
+                    <div class="file-selected" id="pic-selected"></div>
+                </label>
+
+                {{ form.profile_pic }}
+                {{ form.profile_pic.errors }}
+            </div>
+
+            <!-- Buttons -->
+            <div class="wizard-actions">
+                <button type="submit"
+                        name="wizard_goto_step"
+                        value="{{ wizard.steps.prev }}"
+                        class="btn-wizard btn-back">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+
+                <button type="submit" class="btn-wizard btn-next">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('{{ form.certification.id_for_label }}')
+  .addEventListener('change', function(e) {
+    const count = e.target.files.length;
+    document.getElementById('cert-selected').textContent =
+      count ? `✓ ${count} file(s) selected` : '';
+});
+
+document.getElementById('{{ form.profile_pic.id_for_label }}')
+  .addEventListener('change', function(e) {
+    const name = e.target.files[0]?.name || '';
+    document.getElementById('pic-selected').textContent =
+      name ? `✓ ${name}` : '';
+});
+</script>
+
+{% endblock content %}

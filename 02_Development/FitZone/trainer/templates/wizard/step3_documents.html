@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* Layout */
+.wizard-container{
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+/* Progress steps */
+.wizard-progress{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.progress-step{
+  flex: 1;
+  text-align: center;
+}
+
+.step-circle{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #222;
+  border: 2px solid #444;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
+.progress-step.completed .step-circle{
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #fff;
+}
+
+.progress-step.active .step-circle{
+  background: #ff7a18;
+  border-color: #ff7a18;
+  color: #fff;
+}
+
+.step-label{
+  font-size: 13px;
+  color: #aaa;
+}
+
+.progress-step.active .step-label{
+  color: #ff7a18;
+}
+
+/* Card */
+.wizard-card{
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 30px;
+}
+
+/* Header */
+.wizard-header{
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.wizard-header h2{
+  color: #fff;
+  font-size: 24px;
+  margin: 0 0 6px;
+}
+
+.wizard-header p{
+  color: #aaa;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Security note */
+.security-note{
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.security-note i{
+  color: #60a5fa;
+  margin-top: 2px;
+}
+
+.security-note p{
+  margin: 0;
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Form */
+.form-group{
+  margin-bottom: 22px;
+}
+
+.form-group label{
+  display: block;
+  color: #eee;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Upload box */
+.file-upload-box{
+  background: #1a1a1a;
+  border: 2px dashed #444;
+  border-radius: 8px;
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.file-upload-box:hover{
+  border-color: #ff7a18;
+}
+
+.file-upload-box i{
+  font-size: 32px;
+  color: #ff7a18;
+  margin-bottom: 10px;
+}
+
+.file-upload-box p{
+  margin: 0;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.file-selected{
+  margin-top: 10px;
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Hide file inputs */
+input[type="file"]{
+  display: none;
+}
+
+/* Help and errors */
+.help-text{
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
+}
+
+.errorlist{
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+}
+
+.errorlist li{
+  background: #2a1111;
+  color: #fca5a5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Buttons */
+.wizard-actions{
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-wizard{
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-back{
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+.btn-next{
+  background: #22c55e;
+  color: #fff;
+}
+
+.btn-wizard:hover{
+  opacity: 0.9;
+}
+</style>
+
+<div class="wizard-container">
+
+  <div class="wizard-progress">
+    <div class="progress-step completed">
+      <div class="step-circle"><i class="fas fa-check"></i></div>
+      <div class="step-label">Basic Info</div>
+    </div>
+
+    <div class="progress-step completed">
+      <div class="step-circle"><i class="fas fa-check"></i></div>
+      <div class="step-label">Certifications</div>
+    </div>
+
+    <div class="progress-step active">
+      <div class="step-circle"><i class="fas fa-file-shield"></i></div>
+      <div class="step-label">Documents</div>
+    </div>
+  </div>
+
+  <div class="wizard-card">
+    <div class="wizard-header">
+      <h2><i class="fas fa-file-shield" style="color:#ff7a18;"></i> Verification Documents</h2>
+      <p>Final step - Upload your identity and experience proof</p>
+    </div>
+
+    <div class="security-note">
+      <i class="fas fa-shield-check"></i>
+      <p><strong>Privacy &amp; Security:</strong> All documents are encrypted and reviewed only by authorized staff.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ wizard.management_form }}
+
+      <div class="form-group">
+        <label>Identity Proof *</label>
+
+        <label for="{{ form.identity_proof.id_for_label }}" class="file-upload-box">
+          <i class="fas fa-id-card"></i>
+          <p>Click to upload ID documents</p>
+          <p style="font-size:12px; color:#888; margin-top:6px;">License, Passport, etc. (Multiple files allowed)</p>
+          <div class="file-selected" id="id-selected"></div>
+        </label>
+
+        {{ form.identity_proof }}
+        {{ form.identity_proof.errors }}
+      </div>
+
+      <div class="form-group">
+        <label>Experience Verification *</label>
+
+        <label for="{{ form.experience_verification.id_for_label }}" class="file-upload-box">
+          <i class="fas fa-briefcase"></i>
+          <p>Click to upload experience proof</p>
+          <p style="font-size:12px; color:#888; margin-top:6px;">Employment letters, references (Multiple files allowed)</p>
+          <div class="file-selected" id="exp-selected"></div>
+        </label>
+
+        {{ form.experience_verification }}
+        {{ form.experience_verification.errors }}
+      </div>
+
+      <div class="wizard-actions">
+        <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn-wizard btn-back">
+          <i class="fas fa-arrow-left"></i> Previous
+        </button>
+
+        <button type="submit" class="btn-wizard btn-next">
+          <i class="fas fa-check-circle"></i> Submit Registration
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById('{{ form.identity_proof.id_for_label }}').addEventListener('change', function(e) {
+  const count = e.target.files.length;
+  document.getElementById('id-selected').textContent = count ? `✓ ${count} file(s) selected` : '';
+});
+
+document.getElementById('{{ form.experience_verification.id_for_label }}').addEventListener('change', function(e) {
+  const count = e.target.files.length;
+  document.getElementById('exp-selected').textContent = count ? `✓ ${count} file(s) selected` : '';
+});
+</script>
+
+{% endblock content %}

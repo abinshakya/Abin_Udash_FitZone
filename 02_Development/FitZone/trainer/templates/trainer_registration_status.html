@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* Page layout */
+.status-container {
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+/* Main card */
+.status-card {
+  background: #111;
+  border-radius: 12px;
+  padding: 30px;
+  border: 1px solid #333;
+}
+
+/* Header */
+.status-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.status-header h2 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.status-verified {
+  background: #22c55e;
+  color: #fff;
+}
+
+.status-pending {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.status-rejected {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Info grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Info box */
+.info-box {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.info-box label {
+  font-size: 12px;
+  color: #aaa;
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.info-box .value {
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Bio section */
+.bio-box {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.bio-box label {
+  font-size: 12px;
+  color: #aaa;
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.bio-box p {
+  color: #ddd;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Remarks */
+.remarks-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.remarks-box h3 {
+  font-size: 15px;
+  color: #60a5fa;
+  margin: 0 0 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.remarks-box p {
+  color: #ddd;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Info message */
+.info-message {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 25px;
+  color: #ddd;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  line-height: 1.5;
+}
+
+/* Button */
+.action-btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 24px;
+  background: #ff7a18;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+</style>
+
+<div class="status-container">
+  <div class="status-card">
+
+    <div class="status-header">
+      <h2>
+        <i class="fas fa-clipboard-check" style="color:#ff7a18;"></i>
+        Trainer Registration Status
+      </h2>
+
+      {% if registration.is_verified %}
+        <span class="status-badge status-verified">
+          <i class="fas fa-check-circle"></i> Verified
+        </span>
+      {% else %}
+        <span class="status-badge status-pending">
+          <i class="fas fa-clock"></i> Pending Verification
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <label>Experience</label>
+        <div class="value">{{ registration.experience }} Years</div>
+      </div>
+
+      <div class="info-box">
+        <label>Specialization</label>
+        <div class="value">{{ registration.specialization }}</div>
+      </div>
+
+      <div class="info-box">
+        <label>Submitted On</label>
+        <div class="value">{{ registration.submitted_at|date:"M d, Y" }}</div>
+      </div>
+
+      <div class="info-box">
+        <label>Status</label>
+        <div class="value">
+          {% if registration.is_verified %}
+            <span style="color:#22c55e;">Approved</span>
+          {% else %}
+            <span style="color:#f59e0b;">Under Review</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if registration.bio %}
+      <div class="bio-box">
+        <label>Professional Bio</label>
+        <p>{{ registration.bio }}</p>
+      </div>
+    {% endif %}
+
+    {% if registration.remarks %}
+      <div class="remarks-box">
+        <h3><i class="fas fa-comment-dots"></i> Admin Remarks</h3>
+        <p>{{ registration.remarks }}</p>
+      </div>
+    {% endif %}
+
+    {% if not registration.is_verified %}
+      <div class="info-message" style="border-color:#f59e0b;">
+        <i class="fas fa-info-circle" style="color:#f59e0b; font-size:18px;"></i>
+        <p style="margin:0;">
+          Your application is currently under review. We will verify your credentials and notify you once the process is complete.
+        </p>
+      </div>
+    {% else %}
+      <div class="info-message" style="border-color:#22c55e;">
+        <i class="fas fa-check-circle" style="color:#22c55e; font-size:18px;"></i>
+        <p style="margin:0;">
+          Congratulations! Your trainer registration has been verified. You can now access the trainer dashboard.
+        </p>
+      </div>
+
+      <a href="{% url 'trainer_dashboard' %}" class="action-btn">
+        <i class="fas fa-tachometer-alt"></i> Go to Trainer Dashboard
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock content %}

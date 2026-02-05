@@ -11,6 +11,7 @@ class TrainerRegistration(models.Model):
 
     # approval system
     is_verified = models.BooleanField(default=False)
+    remarks = models.TextField(blank=True, null=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
