@@ -1,0 +1,269 @@
+{% extends 'base1.html' %}
+
+{% block content %}
+<style>
+.verify-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.verify-container {
+  background: linear-gradient(135deg, rgba(30,30,30,0.95), rgba(14,14,14,0.95));
+  padding: 45px;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.verify-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 25px;
+  background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 15px 35px rgba(255,122,24,0.25);
+}
+
+.verify-container h2 {
+  color: #f4f4f4;
+  margin-bottom: 12px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.verify-container p {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.email-display {
+  background: rgba(255,122,24,0.08);
+  padding: 12px;
+  border-radius: 8px;
+  color: #ff9a3c;
+  font-weight: 600;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255,122,24,0.2);
+}
+
+.otp-input-group {
+  margin-bottom: 30px;
+}
+
+.otp-input-group label {
+  display: block;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.otp-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  color: #f4f4f4;
+  font-size: 24px;
+  letter-spacing: 8px;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #ff7a18;
+  background: rgba(255,122,24,0.08);
+  box-shadow: 0 0 0 3px rgba(255,122,24,0.15);
+}
+
+.verify-btn, .send-otp-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+  border: none;
+  color: #141416;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 30px rgba(255,122,24,0.25);
+}
+
+.verify-btn:hover, .send-otp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(255,122,24,0.35);
+}
+
+.verify-btn:active, .send-otp-btn:active {
+  transform: translateY(0);
+}
+
+.back-text {
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.back-text a {
+  color: #ff7a18;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.back-text a:hover {
+  color: #ff9a3c;
+  text-decoration: underline;
+}
+
+.message {
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.message.success {
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #86efac;
+}
+
+.message.error {
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5;
+}
+
+.message.info {
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.3);
+  color: #93c5fd;
+}
+
+.info-box {
+  background: rgba(59,130,246,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.info-box i {
+  color: #60a5fa;
+  margin-right: 8px;
+}
+</style>
+
+<div class="verify-wrapper">
+  <div class="verify-container">
+    <div class="verify-icon">
+      ✉️
+    </div>
+    
+    <h2>Verify Your Email</h2>
+    
+    {% if messages %}
+      {% for message in messages %}
+        <p class="message {{ message.tags }}">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    {% if not otp_sent %}
+      <!-- Step 1: Send OTP -->
+      <p>Click the button below to receive a verification code at your email address</p>
+      
+      <div class="email-display">
+        {{ user.email }}
+      </div>
+
+      <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        You will receive a 6-digit OTP code. The code is valid for 10 minutes.
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="send_otp" class="send-otp-btn">
+          <i class="fas fa-paper-plane"></i> Send OTP to My Email
+        </button>
+      </form>
+
+    {% else %}
+      <!-- Step 2: Enter OTP -->
+      <p>We've sent a 6-digit verification code to your email</p>
+      
+      <div class="email-display">
+        {{ user.email }}
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="otp-input-group">
+          <label for="otp">Enter OTP Code</label>
+          <input 
+            class="otp-input" 
+            type="text" 
+            id="otp" 
+            name="otp" 
+            placeholder="000000" 
+            maxlength="6" 
+            pattern="[0-9]{6}"
+            required
+            autofocus>
+        </div>
+
+        <button type="submit" name="verify_otp" class="verify-btn">
+          <i class="fas fa-check"></i> Verify Email
+        </button>
+      </form>
+
+      <form method="post" style="margin-top: 15px;">
+        {% csrf_token %}
+        <p class="back-text">
+          Didn't receive the code? 
+          <button type="submit" name="send_otp" style="background: none; border: none; color: #ff7a18; font-weight: 600; cursor: pointer; text-decoration: underline; font-size: 14px; padding: 0;">
+            Send Again
+          </button>
+        </p>
+      </form>
+    {% endif %}
+
+    <p class="back-text">
+      <a href="{% url 'edit_profile' %}">← Back to Profile</a>
+    </p>
+  </div>
+</div>
+
+<script>
+// Auto-format OTP input
+const otpInput = document.getElementById('otp');
+if (otpInput) {
+  otpInput.addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+}
+</script>
+{% endblock content %}

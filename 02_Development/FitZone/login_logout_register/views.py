@@ -5,6 +5,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
 from datetime import datetime
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+import random
+import string
 
 def register(request):
     if request.method == "POST":
@@ -66,12 +71,13 @@ def register(request):
                 age=int(age) if age else None,
                 dob=dob,
                 gender=gender,
+                email_verified=False  
             )
-            messages.success(request, "Registration successful! Please login.")
+            messages.success(request, "Registration successful! Please login and verify your email.")
             return redirect('login')
 
         except Exception as e:
-            print("Registration error:", e)  # This will show the real error in your server log
+            print("Registration error:", e) 
             messages.error(request, f"Registration failed: {e}")
             return render(request, 'register.html')
 
@@ -164,3 +170,120 @@ def edit_profile(request):
         'profile': profile
     }
     return render(request, 'edit_profile.html', context)
+
+def generate_otp():
+    return ''.join(random.choices(string.digits, k=6))
+
+def send_otp_email(user_email, otp):
+    subject = 'FitZone - Email Verification OTP'
+    message = f"""
+    Hello,
+    
+    Your OTP for email verification is: {otp}
+    
+    This OTP will expire in 10 minutes.
+    
+    If you didn't request this, please ignore this email.
+    
+    Best regards,
+    FitZone Team
+    """
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [user_email],
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"============ EMAIL ERROR ============")
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Details: {str(e)}")
+        print(f"From: {settings.EMAIL_HOST_USER}")
+        print(f"To: {user_email}")
+        print(f"SMTP Host: {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
+        print(f"====================================")
+        return False
+
+@login_required
+def send_verification_otp(request):
+    return redirect('verify_otp')
+
+@login_required
+def verify_otp_view(request):
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        
+        if profile.email_verified:
+            messages.info(request, "Your email is already verified!")
+            return redirect('edit_profile')
+        
+        # Handle otp sending (when user clicks "Send OTP" button)
+        if request.method == "POST" and 'send_otp' in request.POST:
+            # Generate otp
+            otp = generate_otp()
+            
+            # Save otp to profile
+            profile.otp = otp
+            profile.otp_created_at = timezone.now()
+            profile.save()
+            
+            # Send otp email
+            if send_otp_email(request.user.email, otp):
+                # Check if using console backend
+                if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+                    messages.success(request, f"✅ OTP Generated: {otp} (Check your terminal/console for the full email)")
+                else:
+                    messages.success(request, f"OTP has been sent to {request.user.email}")
+            else:
+                messages.error(request, "Failed to send OTP. Check terminal for details.")
+            
+            return render(request, 'verify_otp.html', {'otp_sent': True})
+        
+        # Handle otp verification (when user submits otp)
+        if request.method == "POST" and 'verify_otp' in request.POST:
+            entered_otp = request.POST.get('otp')
+            
+            if not profile.otp or not profile.otp_created_at:
+                messages.error(request, "No OTP found. Please request a new one.")
+                return render(request, 'verify_otp.html')
+            
+            # Check if otp is expired (10 minutes)
+            time_diff = timezone.now() - profile.otp_created_at
+            if time_diff.total_seconds() > 600:  # 10 minutes
+                messages.error(request, "OTP has expired. Please request a new one.")
+                profile.otp = None
+                profile.otp_created_at = None
+                profile.save()
+                return render(request, 'verify_otp.html')
+            
+            # Verify OTP
+            if entered_otp == profile.otp:
+                profile.email_verified = True
+                profile.otp = None
+                profile.otp_created_at = None
+                profile.save()
+                messages.success(request, "Email verified successfully!")
+                return redirect('edit_profile')
+            else:
+                messages.error(request, "Invalid OTP. Please try again.")
+                return render(request, 'verify_otp.html', {'otp_sent': True})
+        
+        # Check if OTP was already sent (to show the input field)
+        otp_sent = profile.otp is not None and profile.otp_created_at is not None
+        if otp_sent:
+            # Check if OTP expired
+            time_diff = timezone.now() - profile.otp_created_at
+            if time_diff.total_seconds() > 600:
+                otp_sent = False
+                profile.otp = None
+                profile.otp_created_at = None
+                profile.save()
+        
+        return render(request, 'verify_otp.html', {'otp_sent': otp_sent})
+        
+    except UserProfile.DoesNotExist:
+        messages.error(request, "Profile not found!")
+        return redirect('/')

@@ -60,9 +60,15 @@
         </form>
 
         {% if request.user.is_authenticated %}
-          <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline d-none d-lg-inline-flex">
-            Become a Trainer
-          </a>
+          {% if request.user.userprofile.email_verified %}
+            <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline d-none d-lg-inline-flex">
+              Become a Trainer
+            </a>
+          {% else %}
+            <a href="{% url 'verify_otp' %}" class="btn fz-btn fz-btn-warning d-none d-lg-inline-flex" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #1a1a1a; border: none;">
+              <i class="fas fa-envelope-circle-check me-1"></i> Verify Email
+            </a>
+          {% endif %}
 
           <div class="dropdown">
             <button class="btn fz-btn fz-btn-primary dropdown-toggle"
@@ -76,6 +82,14 @@
             </button>
 
             <ul class="dropdown-menu dropdown-menu-end fz-dropdown" aria-labelledby="userDropdown">
+              {% if not request.user.userprofile.email_verified %}
+              <li>
+                <a class="dropdown-item text-warning fw-bold" href="{% url 'verify_otp' %}">
+                  <i class="fas fa-envelope-circle-check me-2"></i>Verify Email
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              {% endif %}
               <li>
                 <a class="dropdown-item" href="{% if request.user.userprofile.role == 'member' %}{% url 'user_dashboard' %}{% elif request.user.userprofile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/membership/{% endif %}">
                   <i class="fas fa-tachometer-alt me-2"></i>
@@ -128,9 +142,15 @@
     <!-- ✅ FIXED: Edit Profile ADDED HERE -->
     <div class="mt-auto d-grid gap-2">
       {% if request.user.is_authenticated %}
-        <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline">
-          <i class="fas fa-chalkboard-teacher"></i> Become a Trainer
-        </a>
+        {% if request.user.userprofile.email_verified %}
+          <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline">
+            <i class="fas fa-chalkboard-teacher"></i> Become a Trainer
+          </a>
+        {% else %}
+          <a href="{% url 'verify_otp' %}" class="btn fz-btn" style="background: linear-gradient(135deg, #ffc107, #ff9800); color: #1a1a1a; border: none; font-weight: 700;">
+            <i class="fas fa-envelope-circle-check"></i> Verify Email
+          </a>
+        {% endif %}
 
         <a href="{% url 'edit_profile' %}" class="btn fz-btn fz-btn-outline">
           <i class="fas fa-user-edit"></i> Edit Profile

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
@@ -28,6 +29,9 @@ class UserProfile(models.Model):
         choices=ROLE_CHOICES,
         default='user'
     )
+    email_verified = models.BooleanField(default=False)
+    otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_created_at = models.DateTimeField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.user.username} - {self.role}"
