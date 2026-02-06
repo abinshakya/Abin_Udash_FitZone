@@ -14,6 +14,10 @@ class TrainerRegistration(models.Model):
     remarks = models.TextField(blank=True, null=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
+    def get_profile_picture(self):
+        """Get the profile picture document if it exists"""
+        return self.documents.filter(doc_type='profile_pic').first()
+
     def __str__(self):
         return f"{self.user.username} - Trainer Registration"
 

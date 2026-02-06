@@ -148,3 +148,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'abinudash12@gmail.com'
 EMAIL_HOST_PASSWORD = 'lgpp lesm zxnm ncmi'  
 DEFAULT_FROM_EMAIL = 'abinudash12@gmail.com'
+# Khalti Payment Gateway Configuration
+KHALTI_API_URL = 'https://a.khalti.com/api/v2' # Base URL for Khalti API
+KHALTI_PUBLIC_KEY = '77f76dcb11fe4cb9ab0690a78a87f30b'
+KHALTI_SECRET_KEY = 'a9ed876ef6c948a3818f0be195c001d0'  

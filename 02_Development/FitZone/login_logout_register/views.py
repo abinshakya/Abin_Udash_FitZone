@@ -157,7 +157,7 @@ def edit_profile(request):
         
         # Redirect based on role
         if profile.role == 'member':
-            return redirect('userdashboard')
+            return redirect('user_dashboard')
         elif profile.role == 'trainer':
             return redirect('trainer_dashboard')
         elif profile.role == 'admin':

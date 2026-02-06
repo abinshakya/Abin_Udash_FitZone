@@ -546,16 +546,13 @@ body{
               </div>
             </div>
 
-            <!-- ✅ Payment Method -->
+            <!--Payment Method -->
             <div class="pm-title">
               <i class="fa-solid fa-credit-card" style="color:var(--orange)"></i>
               Select Payment Method
             </div>
 
-            <form method="post">
-              {% csrf_token %}
-              <input type="hidden" name="plan_id" value="{{ plan.id }}">
-
+            <form action="{% url 'initiate_payment' plan.id %}" method="get">
               <div class="pm-grid">
                 <label class="pm-option">
                   <input type="radio" name="payment_method" value="khalti" checked>
@@ -568,22 +565,10 @@ body{
                   </div>
                   <i class="fa-solid fa-wallet" style="color:rgba(255,255,255,0.7)"></i>
                 </label>
-
-                <label class="pm-option">
-                  <input type="radio" name="payment_method" value="nepalpay">
-                  <div class="pm-left">
-                    <div class="pm-radio"></div>
-                    <div style="min-width:0;">
-                      <div class="pm-name">NepalPay</div>
-                      <div class="pm-note">Pay using NepalPay supported banks</div>
-                    </div>
-                  </div>
-                  <i class="fa-solid fa-building-columns" style="color:rgba(255,255,255,0.7)"></i>
-                </label>
               </div>
 
               <button type="submit" class="btn-pay">
-                Pay ${{ plan.price }} Now <i class="fa-solid fa-arrow-right"></i>
+                Pay NPR {{ plan.price }} Now <i class="fa-solid fa-arrow-right"></i>
               </button>
             </form>
 

@@ -15,7 +15,15 @@ from .models import TrainerRegistrationDocument, TrainerRegistration
 
 
 def trainer(request):
-    return render(request,'trainer.html')
+    # Get all verified trainers with their profile pictures
+    verified_trainers = TrainerRegistration.objects.filter(
+        is_verified=True
+    ).select_related('user').prefetch_related('documents').order_by('-submitted_at')
+    
+    context = {
+        'trainers': verified_trainers
+    }
+    return render(request, 'trainer.html', context)
 
 @login_required
 def trainer_dashboard(request):

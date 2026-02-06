@@ -280,7 +280,7 @@
                     <button type="submit" class="btn-save">
                         <i class="fas fa-save"></i> Save Changes
                     </button>
-                    <a href="{% if profile.role == 'member' %}{% url 'userdashboard' %}{% elif profile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/{% endif %}" class="btn-cancel">
+                    <a href="{% if profile.role == 'member' %}{% url 'user_dashboard' %}{% elif profile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}/{% endif %}" class="btn-cancel">
                         <i class="fas fa-times"></i> Cancel
                     </a>
                 </div>

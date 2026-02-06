@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful | FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg0: #0b0b0c;
+      --bg1: #141416;
+      --text: #f4f4f4;
+      --green: #22c55e;
+      --orange: #ff7a18;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .success-container {
+      max-width: 600px;
+      background: linear-gradient(180deg, rgba(30,30,30,0.92), rgba(14,14,14,0.92));
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 22px;
+      padding: 50px 40px;
+      text-align: center;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.65);
+    }
+
+    .success-icon {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+      animation: scaleIn 0.5s ease;
+    }
+
+    .success-icon i {
+      font-size: 45px;
+      color: white;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    h1 {
+      margin: 0 0 15px;
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.7);
+      font-size: 1.1rem;
+      margin: 0 0 35px;
+    }
+
+    .payment-details {
+      background: rgba(10,10,10,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 25px;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.95rem;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, var(--orange), #ff9a3c);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 30px rgba(255,122,24,0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255,122,24,0.4);
+    }
+
+    .btn i {
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="success-icon">
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <h1>Payment Successful!</h1>
+    <p class="subtitle">Your membership has been activated successfully</p>
+
+    <div class="payment-details">
+      <div class="detail-row">
+        <span class="detail-label">Transaction ID</span>
+        <span class="detail-value">{{ payment.transaction_id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Plan</span>
+        <span class="detail-value">{{ payment.purchase_order_name }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Amount Paid</span>
+        <span class="detail-value">NPR {{ payment.amount_in_rupees }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Payment Method</span>
+        <span class="detail-value">Khalti</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value" style="color: var(--green);">{{ payment.status }}</span>
+      </div>
+    </div>
+
+    <a href="{% url 'user_dashboard' %}" class="btn">
+      Go to Dashboard <i class="fa-solid fa-arrow-right"></i>
+    </a>
+  </div>
+</body>
+</html>
