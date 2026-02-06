@@ -19,20 +19,20 @@
     <div class="container1">
       {% if messages %}
         {% for message in messages %}
-          <div style="padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; {% if message.tags == 'error' %}background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5;{% elif message.tags == 'success' %}background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #86efac;{% else %}background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd;{% endif %}">
+          <div class="alert-message {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
             {{ message }}
           </div>
         {% endfor %}
       {% endif %}
       
       {% if user.is_authenticated and not email_verified %}
-      <div style="background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,152,0,0.12)); border: 1.5px solid rgba(255,193,7,0.35); border-radius: 12px; padding: 16px 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 14px;">
-        <i class="fa-solid fa-exclamation-triangle" style="color: #ffc107; font-size: 24px;"></i>
-        <div style="flex: 1;">
-          <strong style="color: #ffc107; font-weight: 700;">Email Verification Required</strong>
-          <p style="margin: 4px 0 0; color: rgba(255,255,255,0.85); font-size: 14px;">Please verify your email address to purchase a membership plan.</p>
+      <div class="verification-warning">
+        <i class="fa-solid fa-exclamation-triangle icon"></i>
+        <div class="content">
+          <strong class="title">Email Verification Required</strong>
+          <p class="description">Please verify your email address to purchase a membership plan.</p>
         </div>
-        <a href="{% url 'verify_otp' %}" style="padding: 10px 20px; background: linear-gradient(135deg, #ffc107, #ff9800); border: none; border-radius: 8px; color: #1a1a1a; font-weight: 700; text-decoration: none; white-space: nowrap;">
+        <a href="{% url 'verify_otp' %}" class="btn-verify">
           Verify Now
         </a>
       </div>
@@ -65,7 +65,7 @@
               <h2 class="plan-title">{{ plan.name }}</h2>
 
               <p class="price">
-                <span class="amount">${{ plan.price }}</span>
+                <span class="amount">Rs {{ plan.price }}</span>
                 <span class="duration">/ {{ plan.get_duration_display }}</span>
               </p>
 
@@ -85,7 +85,7 @@
                     Buy Now <i class="fa-solid fa-arrow-right"></i>
                   </a>
                 {% else %}
-                  <a href="{% url 'verify_otp' %}" class="btn-active" style="background: linear-gradient(135deg, #ffc107, #ff9800);">
+                  <a href="{% url 'verify_otp' %}" class="btn-active btn-verify-email">
                     Verify Email to Buy <i class="fa-solid fa-envelope-circle-check"></i>
                   </a>
                 {% endif %}

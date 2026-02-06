@@ -132,7 +132,7 @@ def initiate_khalti_payment(request, plan_id):
 
 @csrf_exempt
 def payment_callback(request):
-    """Handle Khalti payment callback"""
+    # Handle Khalti payment callback
     pidx = request.GET.get('pidx')
     status = request.GET.get('status')
     transaction_id = request.GET.get('transaction_id')
@@ -167,7 +167,7 @@ def payment_callback(request):
 
 @login_required
 def verify_payment(request, pidx):
-    """Verify payment with Khalti lookup API"""
+    # Verify payment with Khalti lookup API
     payment = get_object_or_404(KhaltiPayment, pidx=pidx, user=request.user)
     
     # Prepare lookup request

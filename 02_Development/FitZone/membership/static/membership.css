@@ -140,19 +140,18 @@ body{
   border: none;
 }
 
-/* ✅ MAIN FIX: strong padding so content NEVER touches edges */
 .card-membership .card-content{
-  padding: 26px 28px 14px; /* LEFT/RIGHT increased */
+  padding: 26px 28px 14px;
   flex: 1;
 }
 
-/* ✅ Force correct color (your screenshot shows it dark) */
+
 .card-membership .plan-title{
   margin: 0 0 10px;
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: .2px;
-  color: #ffffff !important;   /* fixes dark title issue */
+  color: #ffffff !important;   
 }
 
 /* Price */
@@ -194,9 +193,8 @@ body{
   margin-top: 3px;
 }
 
-/* ✅ Footer padding (button not touching edges) */
 .card-membership .card-footer{
-  padding: 16px 28px 26px; /* same as body left/right */
+  padding: 16px 28px 26px; 
 }
 
 /* Button */
@@ -229,4 +227,77 @@ body{
   text-align: center;
   color: var(--muted);
   padding: 30px 0;
+}
+
+/* Alert Messages */
+.alert-message{
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.alert-error{
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5;
+}
+
+.alert-success{
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #86efac;
+}
+
+.alert-info{
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.3);
+  color: #93c5fd;
+}
+
+/* Email Verification Warning */
+.verification-warning{
+  background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,152,0,0.12));
+  border: 1.5px solid rgba(255,193,7,0.35);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.verification-warning .icon{
+  color: #ffc107;
+  font-size: 24px;
+}
+
+.verification-warning .content{
+  flex: 1;
+}
+
+.verification-warning .title{
+  color: #ffc107;
+  font-weight: 700;
+}
+
+.verification-warning .description{
+  margin: 4px 0 0;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+}
+
+.verification-warning .btn-verify{
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  border: none;
+  border-radius: 8px;
+  color: #1a1a1a;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-active.btn-verify-email{
+  background: linear-gradient(135deg, #ffc107, #ff9800);
 }
