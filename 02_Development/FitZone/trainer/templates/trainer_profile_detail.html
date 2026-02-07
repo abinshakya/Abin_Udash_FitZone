@@ -1,0 +1,736 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ trainer.user.get_full_name|default:trainer.user.username }} - Trainer Profile</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0b 0%, #141416 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f4f4f4;
+            min-height: 100vh;
+        }
+
+        .profile-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Header Section */
+        .profile-header {
+            background: linear-gradient(135deg, rgba(255,122,24,0.15), rgba(255,154,60,0.08));
+            border: 2px solid rgba(255,122,24,0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .profile-image-section {
+            flex-shrink: 0;
+        }
+
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 3px solid #ff7a18;
+            box-shadow: 0 10px 30px rgba(255,122,24,0.4);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ff7a18;
+            margin-bottom: 10px;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(34,197,94,0.2);
+            border: 1px solid rgba(34,197,94,0.4);
+            border-radius: 20px;
+            color: #22c55e;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff7a18;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+
+        /* Bio Section */
+        .bio-section {
+            background: rgba(20,20,22,0.9);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff7a18;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bio-text {
+            color: rgba(255,255,255,0.85);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        /* Specializations */
+        .specializations-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .spec-badge {
+            padding: 10px 18px;
+            background: rgba(255,122,24,0.15);
+            border: 1.5px solid rgba(255,122,24,0.3);
+            border-radius: 25px;
+            color: #ff7a18;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Certificates Section */
+        .certificates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .cert-card {
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cert-card:hover {
+            border-color: rgba(255,122,24,0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .cert-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .cert-info {
+            padding: 15px;
+        }
+
+        .cert-title {
+            font-size: 14px;
+            color: #f4f4f4;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .cert-link {
+            color: #ff7a18;
+            font-size: 13px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cert-link:hover {
+            color: #ff9a3c;
+        }
+
+        /* Availability Card */
+        .availability-card {
+            background: rgba(34,197,94,0.08);
+            border: 1.5px solid rgba(34,197,94,0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .availability-text {
+            color: #22c55e;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Price Card */
+        .price-card {
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            color: #141416;
+        }
+
+        .price-amount {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .price-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 15px;
+            background: #141416;
+            color: #ff7a18;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .back-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.05);
+            color: #f4f4f4;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,122,24,0.5);
+            color: #ff7a18;
+        }
+
+        /* Photo Carousel */
+        .photo-carousel-section {
+            margin: 30px 0;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(255,122,24,0.3);
+            background: linear-gradient(135deg, rgba(255,122,24,0.1), rgba(255,154,60,0.05));
+        }
+
+        .carousel-inner {
+            border-radius: 18px;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 18px;
+        }
+
+        .carousel-caption {
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 40px 20px 20px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 0 0 18px 18px;
+        }
+
+        .carousel-caption h5 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: rgba(255,122,24,0.8);
+            border-radius: 50%;
+            padding: 20px;
+        }
+
+        .carousel-control-prev:hover .carousel-control-prev-icon,
+        .carousel-control-next:hover .carousel-control-next-icon {
+            background-color: rgba(255,122,24,1);
+        }
+
+        .carousel-indicators [data-bs-target] {
+            background-color: #ff7a18;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-item img {
+                height: 220px;
+            }
+        }
+
+        /* Certificate & Experience Carousels */
+        .cert-carousel-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .cert-card-carousel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cert-card-carousel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .cert-image-carousel {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.05);
+        }
+
+        #certCarousel .carousel-control-prev-icon,
+        #certCarousel .carousel-control-next-icon {
+            background-color: rgba(255,122,24,0.8);
+            border-radius: 50%;
+            padding: 15px;
+        }
+
+        #expCarousel .carousel-control-prev-icon,
+        #expCarousel .carousel-control-next-icon {
+            background-color: rgba(59,130,246,0.8);
+            border-radius: 50%;
+            padding: 15px;
+        }
+
+        #certCarousel .carousel-indicators [data-bs-target] {
+            background-color: #ff7a18;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        #expCarousel .carousel-indicators [data-bs-target] {
+            background-color: #3b82f6;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* Booking Modal */
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20,20,22,0.98), rgba(30,30,35,0.95));
+            border: 2px solid rgba(255,122,24,0.3);
+            color: #f4f4f4;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title {
+            color: #ff7a18;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <a href="{% url 'trainer' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Trainers
+        </a>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-image-section">
+                {% if profile_pic %}
+                    <img src="{{ profile_pic.file.url }}" alt="{{ trainer.user.get_full_name|default:trainer.user.username }}" class="profile-avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=400&background=ff7a18&color=fff" alt="Profile" class="profile-avatar">
+                {% endif %}
+            </div>
+
+            <div class="profile-info">
+                <h1 class="profile-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</h1>
+                <span class="profile-role">
+                    <i class="fas fa-check-circle"></i> Verified Trainer
+                </span>
+
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">{{ trainer.experience }}</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-value">5.0</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Active Clients</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Carousel & About Me Section -->
+        <div class="row g-4" style="margin-top: 10px;">
+            <!-- Photo Carousel -->
+            {% if photos %}
+            <div class="col-lg-6">
+                <div class="photo-carousel-section" style="margin: 0;">
+                    <div id="trainerPhotoCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            {% for photo in photos %}
+                                <button type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
+                            {% endfor %}
+                        </div>
+                        <div class="carousel-inner">
+                            {% for photo in photos %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <img src="{{ photo.photo.url }}" alt="{{ photo.caption }}">
+                                    {% if photo.caption %}
+                                        <div class="carousel-caption d-md-block">
+                                            <h5>{{ photo.caption }}</h5>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- About Me Section -->
+            <div class="{% if photos %}col-lg-6{% else %}col-lg-12{% endif %}">
+                {% if trainer.bio %}
+                <div class="bio-section" style="margin-top: 0; height: 100%;">
+                    <h2 class="section-title">
+                        <i class="fas fa-quote-left"></i> About Me
+                    </h2>
+                    <p class="bio-text">{{ trainer.bio }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+
+                <!-- Specializations -->
+                <div class="bio-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-dumbbell"></i> Areas of Expertise
+                    </h2>
+                    <div class="specializations-grid">
+                        {% for spec in specializations %}
+                            <div class="spec-badge">
+                                <i class="fas fa-check"></i> {{ spec }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Certifications & Experience Documents -->
+                {% if certifications or experience_docs %}
+                <div class="bio-section">
+                    <div class="row g-4">
+                        <!-- Certifications -->
+                        {% if certifications %}
+                        <div class="col-lg-6">
+                            <h2 class="section-title">
+                                <i class="fas fa-certificate"></i> Certifications
+                            </h2>
+                            
+                            <!-- Certifications Carousel -->
+                            <div class="cert-carousel-wrapper">
+                                <div id="certCarousel" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-indicators">
+                                        {% for cert in certifications %}
+                                            <button type="button" data-bs-target="#certCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Certificate {{ forloop.counter }}"></button>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="carousel-inner">
+                                        {% for cert in certifications %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <div class="cert-card-carousel" onclick="window.open('{{ cert.file.url }}', '_blank')">
+                                                    {% if cert.file.url|slice:"-4:" == '.pdf' %}
+                                                        <div class="cert-image-carousel" style="display: flex; align-items: center; justify-content: center; background: rgba(255,122,24,0.1);">
+                                                            <i class="fas fa-file-pdf" style="font-size: 64px; color: #ff7a18;"></i>
+                                                        </div>
+                                                    {% else %}
+                                                        <img src="{{ cert.file.url }}" alt="Certificate" class="cert-image-carousel">
+                                                    {% endif %}
+                                                    <div class="cert-info">
+                                                        <div class="cert-title">Certification Document {{ forloop.counter }}</div>
+                                                        <a href="{{ cert.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
+                                                            <i class="fas fa-external-link-alt"></i> View Document
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#certCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#certCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Experience Documents -->
+                        {% if experience_docs %}
+                        <div class="col-lg-6">
+                            <h2 class="section-title">
+                                <i class="fas fa-briefcase"></i> Experience Verification
+                            </h2>
+                            
+                            <!-- Experience Carousel -->
+                            <div class="cert-carousel-wrapper">
+                                <div id="expCarousel" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-indicators">
+                                        {% for doc in experience_docs %}
+                                            <button type="button" data-bs-target="#expCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Experience {{ forloop.counter }}"></button>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="carousel-inner">
+                                        {% for doc in experience_docs %}
+                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                <div class="cert-card-carousel" onclick="window.open('{{ doc.file.url }}', '_blank')">
+                                                    {% if doc.file.url|slice:"-4:" == '.pdf' %}
+                                                        <div class="cert-image-carousel" style="display: flex; align-items: center; justify-content: center; background: rgba(59,130,246,0.1);">
+                                                            <i class="fas fa-file-pdf" style="font-size: 64px; color: #3b82f6;"></i>
+                                                        </div>
+                                                    {% else %}
+                                                        <img src="{{ doc.file.url }}" alt="Experience Document" class="cert-image-carousel">
+                                                    {% endif %}
+                                                    <div class="cert-info">
+                                                        <div class="cert-title">Experience Document {{ forloop.counter }}</div>
+                                                        <a href="{{ doc.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
+                                                            <i class="fas fa-external-link-alt"></i> View Document
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#expCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#expCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Pricing -->
+                <div class="price-card">
+                    <div class="price-label">Monthly Training Fee</div>
+                    <div class="price-amount">
+                        {% if trainer.monthly_price %}
+                            ₹{{ trainer.monthly_price }}
+                        {% else %}
+                            Contact
+                        {% endif %}
+                    </div>
+                    <div class="price-label">per month</div>
+                    <button class="book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                        <i class="fas fa-calendar-check"></i> Book Training Session
+                    </button>
+                </div>
+
+                <!-- Availability -->
+                {% if trainer.available_time %}
+                <div class="bio-section" style="margin-top: 20px;">
+                    <h2 class="section-title" style="font-size: 18px;">
+                        <i class="fas fa-clock"></i> Availability
+                    </h2>
+                    <div class="availability-card">
+                        <div class="availability-text">
+                            <i class="fas fa-calendar-week"></i>
+                            {{ trainer.available_time }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Contact Info -->
+                <div class="bio-section" style="margin-top: 20px;">
+                    <h2 class="section-title" style="font-size: 18px;">
+                        <i class="fas fa-envelope"></i> Contact
+                    </h2>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 14px;">
+                        <p><i class="fas fa-user" style="color: #ff7a18; margin-right: 8px;"></i> {{ trainer.user.username }}</p>
+                        <p><i class="fas fa-envelope" style="color: #ff7a18; margin-right: 8px;"></i> {{ trainer.user.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">
+                        <i class="fas fa-calendar-check"></i> Book Training with {{ trainer.user.get_full_name|default:trainer.user.username }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="bio-section" style="margin-bottom: 20px;">
+                        <h6 style="color: #ff7a18; margin-bottom: 10px;"><i class="fas fa-rupee-sign"></i> Pricing</h6>
+                        <p style="font-size: 24px; font-weight: 700; color: #f4f4f4;">
+                            {% if trainer.monthly_price %}
+                                ₹{{ trainer.monthly_price }}
+                                <span style="font-size: 14px; color: rgba(255,255,255,0.6);">/ month</span>
+                            {% else %}
+                                Contact for pricing
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if trainer.available_time %}
+                    <div class="bio-section">
+                        <h6 style="color: #ff7a18; margin-bottom: 10px;"><i class="fas fa-clock"></i> Available Times</h6>
+                        <div class="availability-card">
+                            <div class="availability-text">
+                                {{ trainer.available_time }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #f4f4f4;" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn" style="background: linear-gradient(135deg, #ff7a18, #ff9a3c); color: #141416; font-weight: 700;" disabled>
+                        <i class="fas fa-calendar-plus"></i> Confirm Booking 
+                    </button>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

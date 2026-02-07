@@ -213,6 +213,76 @@ input[type="file"]{
 .btn-wizard:hover{
   opacity: 0.9;
 }
+
+/* Image Preview Styles */
+.preview-container {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.preview-item {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #333;
+    background: #222;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-item .file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-direction: column;
+    color: #888;
+}
+
+.preview-item .file-icon i {
+    font-size: 32px;
+    color: #ff7a18;
+    margin-bottom: 8px;
+}
+
+.preview-item .file-name {
+    font-size: 10px;
+    color: #aaa;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-all;
+}
+
+.remove-file {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239,68,68,0.9);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.remove-file:hover {
+    background: #ef4444;
+    transform: scale(1.1);
+}
 </style>
 
 <div class="wizard-container">
@@ -261,6 +331,8 @@ input[type="file"]{
 
         {{ form.identity_proof }}
         {{ form.identity_proof.errors }}
+        
+        <div class="preview-container" id="id-preview"></div>
       </div>
 
       <div class="form-group">
@@ -275,6 +347,8 @@ input[type="file"]{
 
         {{ form.experience_verification }}
         {{ form.experience_verification.errors }}
+        
+        <div class="preview-container" id="exp-preview"></div>
       </div>
 
       <div class="wizard-actions">
@@ -291,15 +365,117 @@ input[type="file"]{
 </div>
 
 <script>
+// Store selected files
+let identityFiles = [];
+let experienceFiles = [];
+
+// Preview image function
+function createImagePreview(file, container, filesArray, updateFunction, renderFunction) {
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'preview-item';
+    
+    const isImage = file.type.startsWith('image/');
+    
+    if (isImage) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        previewDiv.appendChild(img);
+    } else {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'file-icon';
+        iconDiv.innerHTML = `
+            <i class="fas fa-file-pdf"></i>
+            <div class="file-name">${file.name}</div>
+        `;
+        previewDiv.appendChild(iconDiv);
+    }
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-file';
+    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+    removeBtn.onclick = () => {
+        const index = filesArray.indexOf(file);
+        if (index > -1) {
+            filesArray.splice(index, 1);
+            updateFunction();
+            renderFunction();
+        }
+    };
+    previewDiv.appendChild(removeBtn);
+    
+    container.appendChild(previewDiv);
+}
+
+// Identity Proof handlers
+function updateIdentityInput() {
+    const input = document.getElementById('{{ form.identity_proof.id_for_label }}');
+    const dataTransfer = new DataTransfer();
+    identityFiles.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+}
+
+function renderIdentityPreviews() {
+    const container = document.getElementById('id-preview');
+    container.innerHTML = '';
+    identityFiles.forEach(file => 
+        createImagePreview(file, container, identityFiles, updateIdentityInput, renderIdentityPreviews)
+    );
+    const countEl = document.getElementById('id-selected');
+    countEl.textContent = identityFiles.length ? `✓ ${identityFiles.length} file(s) selected` : '';
+}
+
 document.getElementById('{{ form.identity_proof.id_for_label }}').addEventListener('change', function(e) {
-  const count = e.target.files.length;
-  document.getElementById('id-selected').textContent = count ? `✓ ${count} file(s) selected` : '';
+    const newFiles = Array.from(e.target.files);
+    newFiles.forEach(file => {
+        if (!identityFiles.some(f => f.name === file.name && f.size === file.size)) {
+            identityFiles.push(file);
+        }
+    });
+    updateIdentityInput();
+    renderIdentityPreviews();
 });
 
+// Experience Verification handlers
+function updateExperienceInput() {
+    const input = document.getElementById('{{ form.experience_verification.id_for_label }}');
+    const dataTransfer = new DataTransfer();
+    experienceFiles.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+}
+
+function renderExperiencePreviews() {
+    const container = document.getElementById('exp-preview');
+    container.innerHTML = '';
+    experienceFiles.forEach(file => 
+        createImagePreview(file, container, experienceFiles, updateExperienceInput, renderExperiencePreviews)
+    );
+    const countEl = document.getElementById('exp-selected');
+    countEl.textContent = experienceFiles.length ? `✓ ${experienceFiles.length} file(s) selected` : '';
+}
+
 document.getElementById('{{ form.experience_verification.id_for_label }}').addEventListener('change', function(e) {
-  const count = e.target.files.length;
-  document.getElementById('exp-selected').textContent = count ? `✓ ${count} file(s) selected` : '';
+    const newFiles = Array.from(e.target.files);
+    newFiles.forEach(file => {
+        if (!experienceFiles.some(f => f.name === file.name && f.size === file.size)) {
+            experienceFiles.push(file);
+        }
+    });
+    updateExperienceInput();
+    renderExperiencePreviews();
 });
+
+// Make Previous button work without validation
+const prevButton = document.querySelector('button[name="wizard_goto_step"]');
+if (prevButton) {
+  prevButton.addEventListener('click', function(e) {
+    // Remove required attributes temporarily to allow navigation
+    const form = this.closest('form');
+    const requiredInputs = form.querySelectorAll('[required]');
+    requiredInputs.forEach(input => input.removeAttribute('required'));
+  });
+}
 </script>
 
 {% endblock content %}

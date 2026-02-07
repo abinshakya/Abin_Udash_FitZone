@@ -140,6 +140,10 @@ def edit_profile(request):
         request.user.email = request.POST.get('email', request.user.email)
         request.user.save()
         
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+        
         # Update profile information
         profile.phone = request.POST.get('phone', profile.phone)
         profile.gender = request.POST.get('gender', profile.gender)
@@ -155,15 +159,8 @@ def edit_profile(request):
         profile.save()
         messages.success(request, "Profile updated successfully!")
         
-        # Redirect based on role
-        if profile.role == 'member':
-            return redirect('user_dashboard')
-        elif profile.role == 'trainer':
-            return redirect('trainer_dashboard')
-        elif profile.role == 'admin':
-            return redirect('/admin/')
-        else:
-            return redirect('/')
+        # Redirect back to edit profile page
+        return redirect('edit_profile')
     
     context = {
         'user': request.user,

@@ -18,11 +18,15 @@
   <main class="page">
     <div class="container1">
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert-message {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
+        <div id="messages-container">
+          {% for message in messages %}
+            <div class="alert-message {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}" data-message-id="{{ forloop.counter }}">
+              <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+              <span>{{ message }}</span>
+              <button class="message-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
       
       {% if user.is_authenticated and not email_verified %}
@@ -102,5 +106,21 @@
       </section>
     </div>
   </main>
+
+  <script>
+    // Auto-dismiss messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const messages = document.querySelectorAll('.alert-message');
+      messages.forEach(function(message) {
+        setTimeout(function() {
+          message.style.opacity = '0';
+          message.style.transform = 'translateX(100%)';
+          setTimeout(function() {
+            message.remove();
+          }, 300);
+        }, 5000);
+      });
+    });
+  </script>
 </body>
 </html>

@@ -52,13 +52,8 @@
         </li>
       </ul>
 
-      <!-- Right side -->
-      <div class="d-flex align-items-center gap-2">
-        <form class="fz-search d-none d-lg-flex" role="search">
-          <input class="form-control fz-search-input" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn fz-search-btn" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-
+      <!-- Right side actions -->
+      <div class="d-flex align-items-center gap-3">
         {% if request.user.is_authenticated %}
           {% if request.user.userprofile.email_verified %}
             <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline d-none d-lg-inline-flex">
@@ -75,8 +70,15 @@
                     type="button"
                     id="userDropdown"
                     data-bs-toggle="dropdown"
-                    aria-expanded="false">
-              <i class="fas fa-user-circle me-1"></i>
+                    aria-expanded="false"
+                    style="display: flex; align-items: center; gap: 8px;">
+              {% if request.user.userprofile.profile_picture %}
+                <img src="{{ request.user.userprofile.profile_picture.url }}" 
+                     alt="{{ request.user.username }}" 
+                     style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #ff7a18;">
+              {% else %}
+                <i class="fas fa-user-circle"></i>
+              {% endif %}
               <span class="d-none d-xl-inline">Welcome, {{ request.user.username }}!</span>
               <span class="d-xl-none">Account</span>
             </button>
@@ -110,7 +112,7 @@
             </ul>
           </div>
         {% else %}
-          <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary">Login</a>
+          <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary" style="padding: 0.6rem 1.8rem; font-size: 1.05rem; font-weight: 600;">Login</a>
         {% endif %}
       </div>
     </div>
@@ -127,11 +129,6 @@
   </div>
 
   <div class="offcanvas-body d-flex flex-column gap-3">
-    <form class="fz-search d-flex" role="search">
-      <input class="form-control fz-search-input" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn fz-search-btn" type="submit"><i class="fas fa-search"></i></button>
-    </form>
-
     <div class="fz-mobile-links">
       <a class="fz-mobile-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
       <a class="fz-mobile-link {% if request.path == '/trainer/' %}active{% endif %}" href="/trainer">Trainers</a>
@@ -139,7 +136,6 @@
       <a class="fz-mobile-link {% if request.path == '/about/' %}active{% endif %}" href="/about">About</a>
     </div>
 
-    <!-- ✅ FIXED: Edit Profile ADDED HERE -->
     <div class="mt-auto d-grid gap-2">
       {% if request.user.is_authenticated %}
         {% if request.user.userprofile.email_verified %}
@@ -165,7 +161,7 @@
           <i class="fas fa-sign-out-alt"></i> Logout
         </a>
       {% else %}
-        <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary">
+        <a href="{% url 'login' %}" class="btn fz-btn fz-btn-primary" style="padding: 0.75rem 1.5rem; font-size: 1.1rem; font-weight: 600;">
           <i class="fas fa-sign-in-alt"></i> Login
         </a>
       {% endif %}

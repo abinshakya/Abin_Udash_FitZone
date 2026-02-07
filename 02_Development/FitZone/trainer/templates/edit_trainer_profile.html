@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - FitZone</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'trainer_dashboard.css' %}">
+    <style>
+        .edit-form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, rgba(255,122,24,0.1), rgba(255,154,60,0.05));
+            border: 1.5px solid rgba(255,122,24,0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .form-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff7a18;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .edit-form {
+            background: linear-gradient(135deg, rgba(20,20,22,0.9), rgba(30,30,35,0.7));
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1.5px solid rgba(255,255,255,0.08);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff7a18;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #f4f4f4;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-label i {
+            color: #ff7a18;
+            margin-right: 6px;
+        }
+        
+        .form-input,
+        .form-textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #f4f4f4;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff7a18' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 45px;
+        }
+        
+        select option {
+            background: #1a1a1c !important;
+            color: #f4f4f4;
+            padding: 12px;
+        }
+        
+        select option:hover,
+        select option:checked {
+            background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(255,154,60,0.15)) !important;
+            color: #ff7a18;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #ff7a18;
+            background: rgba(255,122,24,0.08);
+            box-shadow: 0 0 0 3px rgba(255,122,24,0.15);
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .errorlist {
+            list-style: none;
+            padding: 10px 15px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        /* Tag styles for specialization and time slots */
+        .tag-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .tag-item {
+            display: inline-block;
+        }
+        
+        .tag-checkbox {
+            display: none;
+        }
+        
+        .tag-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 25px;
+            color: #f4f4f4;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tag-label:hover {
+            background: rgba(255,122,24,0.15);
+            border-color: rgba(255,122,24,0.4);
+        }
+        
+        .tag-checkbox:checked + .tag-label {
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+            border-color: #ff7a18;
+            color: #141416;
+        }
+        
+        /* Day range selector */
+        .day-range-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .day-dropdown {
+            flex: 1;
+        }
+        
+        .range-arrow {
+            color: #ff7a18;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-form-container">
+        <!-- Form Header -->
+        <div class="form-header">
+            <h1>
+                <i class="fas fa-user-edit"></i> Edit Trainer Profile
+            </h1>
+            <a href="{% url 'trainer_dashboard' %}" class="btn-action btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="messages" id="messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 450px;">
+                {% for message in messages %}
+                    <div class="alert-box alert-{{ message.tags }}" style="margin-bottom: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transition: all 0.3s ease;">
+                        <div class="alert-icon">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        </div>
+                        <div class="alert-content">
+                            <p>{{ message }}</p>
+                        </div>
+                        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 20px; cursor: pointer; padding: 5px 10px; margin-left: 10px;">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <script>
+                setTimeout(function() {
+                    document.querySelectorAll('.alert-box').forEach(function(msg) {
+                        msg.style.opacity = '0';
+                        msg.style.transform = 'translateX(100%)';
+                        setTimeout(function() { msg.remove(); }, 300);
+                    });
+                }, 5000);
+            </script>
+        {% endif %}
+
+        <!-- Edit Form -->
+        <div class="edit-form">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_experience">
+                            <i class="fas fa-certificate"></i> {{ form.experience.label }}
+                        </label>
+                        {{ form.experience }}
+                        {{ form.experience.errors }}
+                        {% if form.experience.help_text %}
+                            <p class="help-text">{{ form.experience.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-dumbbell"></i> {{ form.specialization.label }}
+                        </label>
+                        {{ form.specialization.errors }}
+                        <div class="tag-options">
+                            {% for choice in form.specialization %}
+                                <div class="tag-item">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}" class="tag-label">
+                                        <i class="fas fa-check-circle"></i> {{ choice.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.specialization.help_text %}
+                            <p class="help-text">{{ form.specialization.help_text }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_bio">
+                            <i class="fas fa-quote-left"></i> {{ form.bio.label }}
+                        </label>
+                        {{ form.bio }}
+                        {{ form.bio.errors }}
+                        {% if form.bio.help_text %}
+                            <p class="help-text">{{ form.bio.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-rupee-sign"></i> Pricing
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="id_monthly_price">
+                            <i class="fas fa-rupee-sign"></i> {{ form.monthly_price.label }}
+                        </label>
+                        {{ form.monthly_price }}
+                        {{ form.monthly_price.errors }}
+                        {% if form.monthly_price.help_text %}
+                            <p class="help-text">{{ form.monthly_price.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Availability Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-clock"></i> Availability
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar"></i> Available Days
+                        </label>
+                        <div class="day-range-group">
+                            <div class="day-dropdown">
+                                <label style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; display: block;">From</label>
+                                {{ form.available_days_from }}
+                            </div>
+                            <div class="range-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                            <div class="day-dropdown">
+                                <label style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; display: block;">To</label>
+                                {{ form.available_days_to }}
+                            </div>
+                        </div>
+                        {{ form.available_days_from.errors }}
+                        {{ form.available_days_to.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-clock"></i> {{ form.available_time_slots.label }}
+                        </label>
+                        {{ form.available_time_slots.errors }}
+                        <div class="tag-options">
+                            {% for choice in form.available_time_slots %}
+                                <div class="tag-item">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}" class="tag-label">
+                                        <i class="fas fa-clock"></i> {{ choice.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.available_time_slots.help_text %}
+                            <p class="help-text">{{ form.available_time_slots.help_text }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{% url 'trainer_dashboard' %}" class="btn-action btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-action btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

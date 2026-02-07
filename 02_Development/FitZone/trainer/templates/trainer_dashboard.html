@@ -1,11 +1,465 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainer Dashboard - FitZone</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'trainer_dashboard.css' %}">
+</head>
 <body>
-    <h1>Trainer Dashboard</h1>
-</body>
+    <div class="dashboard-wrapper">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                {% if registration and registration.get_profile_picture %}
+                    <img src="{{ registration.get_profile_picture.file.url }}" alt="Profile" class="profile-avatar">
+                {% else %}
+                    <img src="https://via.placeholder.com/90/ff7a18/141416?text={{ user.username.0|upper }}" alt="Profile" class="profile-avatar">
+                {% endif %}
+                
+                <div class="header-info">
+                    <h1>Welcome, {{ user.username }}!</h1>
+                    <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                    
+                    {% if registration %}
+                        {% if registration.is_verified %}
+                            <span class="verification-badge badge-verified">
+                                <i class="fas fa-check-circle"></i> Verified Trainer
+                            </span>
+                        {% else %}
+                            <span class="verification-badge badge-pending">
+                                <i class="fas fa-clock"></i> Pending Verification
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="verification-badge badge-pending">
+                            <i class="fas fa-exclamation-triangle"></i> Incomplete Registration
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <a href="{% url 'home' %}" class="btn-action btn-secondary">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{% url 'edit_profile' %}" class="btn-action btn-primary">
+                    <i class="fas fa-user-edit"></i> Edit Profile
+                </a>
+                <a href="{% url 'logout' %}" class="btn-action btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
 
+        <!-- Messages Container -->
+        {% if messages %}
+        <div id="messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;">
+            {% for message in messages %}
+                <div class="alert-message alert-{{ message.tags }}" style="margin-bottom: 15px; padding: 15px 20px; background: {% if message.tags == 'success' %}rgba(34,197,94,0.15){% elif message.tags == 'error' %}rgba(239,68,68,0.15){% elif message.tags == 'warning' %}rgba(251,191,36,0.15){% else %}rgba(59,130,246,0.15){% endif %}; border-left: 4px solid {% if message.tags == 'success' %}#22c55e{% elif message.tags == 'error' %}#ef4444{% elif message.tags == 'warning' %}#fbbf24{% else %}#3b82f6{% endif %}; border-radius: 8px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out;">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}" style="font-size: 20px; color: {% if message.tags == 'success' %}#22c55e{% elif message.tags == 'error' %}#ef4444{% elif message.tags == 'warning' %}#fbbf24{% else %}#3b82f6{% endif %};"></i>
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; opacity: 0.7; transition: opacity 0.3s;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            // Auto-dismiss messages after 5 seconds
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert-message');
+                alerts.forEach(function(alert) {
+                    alert.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(function() { alert.remove(); }, 300);
+                });
+            }, 5000);
+        </script>
+        <style>
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        </style>
+        {% endif %}
+
+        {% if not registration %}
+            <!-- No Registration Alert -->
+            <div class="alert-box alert-warning">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <h4>Complete Your Trainer Registration</h4>
+                    <p>You haven't completed your trainer registration yet. Please complete the registration process to start training clients.</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; padding: 40px;">
+                <a href="{% url 'trainerregestration' %}" class="btn-action btn-primary" style="display: inline-flex;">
+                    <i class="fas fa-clipboard-check"></i> Complete Registration
+                </a>
+            </div>
+        {% else %}
+            <!-- Verification Status Alert -->
+            {% if not registration.is_verified %}
+                <div class="alert-box alert-info">
+                    <div class="alert-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>Verification Pending</h4>
+                        <p>Your trainer application is under review. You'll be notified once your profile is verified.</p>
+                        {% if registration.remarks %}
+                            <p style="margin-top: 8px;"><strong>Admin Remarks:</strong> {{ registration.remarks }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert-box alert-success" id="verifiedAlert" style="display: none;">
+                    <div class="alert-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>Profile Verified!</h4>
+                        <p>Congratulations! Your trainer profile has been verified and is now visible to potential clients.</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: rgba(34,197,94,0.8); font-size: 20px; cursor: pointer; transition: all 0.3s;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <script>
+                    // Show verified alert only on first visit after verification
+                    (function() {
+                        const verifiedAlert = document.getElementById('verifiedAlert');
+                        const hasSeenAlert = sessionStorage.getItem('hasSeenVerifiedAlert');
+                        
+                        if (!hasSeenAlert && verifiedAlert) {
+                            verifiedAlert.style.display = 'flex';
+                            sessionStorage.setItem('hasSeenVerifiedAlert', 'true');
+                            
+                            // Auto-dismiss after 5 seconds
+                            setTimeout(function() {
+                                verifiedAlert.style.transition = 'all 0.3s ease-out';
+                                verifiedAlert.style.opacity = '0';
+                                verifiedAlert.style.transform = 'translateY(-20px)';
+                                setTimeout(function() { verifiedAlert.remove(); }, 300);
+                            }, 5000);
+                        }
+                    })();
+                </script>
+            {% endif %}
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-orange">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Active Clients</div>
+                    <div class="stat-change stat-up">
+                        <i class="fas fa-arrow-up"></i> Coming Soon
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-green">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">₹{{ registration.monthly_price|default:"0" }}</div>
+                    <div class="stat-label">Monthly Rate</div>
+                    <div class="stat-change">
+                        <i class="fas fa-info-circle"></i> Per client
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Total Sessions</div>
+                    <div class="stat-change stat-up">
+                        <i class="fas fa-arrow-up"></i> Coming Soon
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-purple">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ registration.experience }}</div>
+                    <div class="stat-label">Years Experience</div>
+                    <div class="stat-change">
+                        <i class="fas fa-trophy"></i> Professional
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Profile Details -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-user-circle"></i> Profile Details
+                        </h2>
+                        <a href="{% url 'edit_trainer_profile' %}" class="card-action">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-certificate"></i> Experience
+                            </span>
+                            <span class="detail-value">{{ registration.experience }} Years</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-dumbbell"></i> Specialization
+                            </span>
+                            <div class="specialization-tags">
+                                {% for spec in specializations %}
+                                    <span class="spec-tag">{{ spec }}</span>
+                                {% empty %}
+                                    <span class="detail-value">Not specified</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-rupee-sign"></i> Monthly Price
+                            </span>
+                            <span class="detail-value">₹{{ registration.monthly_price|default:"Not Set" }}</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-info-circle"></i> Bio
+                            </span>
+                            <span class="detail-value">{{ registration.bio|default:"No bio added"|truncatewords:20 }}</span>
+                        </div>
+
+                        <div class="detail-row">
+                            <span class="detail-label">
+                                <i class="fas fa-calendar-check"></i> Registered On
+                            </span>
+                            <span class="detail-value">{{ registration.submitted_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+
+                    {% if registration.bio %}
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1.5px solid rgba(255,255,255,0.08);">
+                        <h4 style="color: #ff7a18; font-size: 16px; margin-bottom: 12px;">
+                            <i class="fas fa-quote-left"></i> About Me
+                        </h4>
+                        <p style="color: rgba(255,255,255,0.8); line-height: 1.7; font-size: 14px;">
+                            {{ registration.bio }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Right Sidebar -->
+                <div>
+                    <!-- Availability -->
+                    <div class="dashboard-card" style="margin-bottom: 20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-clock"></i> Availability
+                            </h2>
+                            <a href="{% url 'edit_trainer_profile' %}" class="card-action">
+                                <i class="fas fa-edit"></i> Update
+                            </a>
+                        </div>
+                        
+                        {% if registration.available_time %}
+                            <div class="availability-list">
+                                <div class="availability-item">
+                                    <div class="availability-icon">
+                                        <i class="fas fa-calendar-week"></i>
+                                    </div>
+                                    <div class="availability-info">
+                                        <h4>{{ registration.available_time|slice:":20" }}...</h4>
+                                        <p>{{ registration.available_time|slice:"20:" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="empty-state" style="padding: 30px 10px;">
+                                <div class="empty-icon">
+                                    <i class="fas fa-calendar-times"></i>
+                                </div>
+                                <h3>No Availability Set</h3>
+                                <p>Add your available time slots</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Photos Gallery -->
+                    <div class="dashboard-card" style="margin-bottom: 20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-images"></i> Photo Gallery
+                            </h2>
+                        </div>
+                        
+                        <!-- Upload Form -->
+                        <form method="post" action="{% url 'upload_trainer_photo' %}" enctype="multipart/form-data" style="padding: 20px; border-bottom: 1.5px solid rgba(255,255,255,0.08);">
+                            {% csrf_token %}
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; color: rgba(255,255,255,0.7); margin-bottom: 8px; font-size: 13px;">
+                                    <i class="fas fa-image"></i> Select Photo
+                                </label>
+                                <input type="file" name="photo" accept="image/*" required id="photoFileInput" style="display: none;">
+                                <button type="button" onclick="document.getElementById('photoFileInput').click()" class="custom-file-button">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span id="fileNameDisplay">Choose File</span>
+                                </button>
+                                <style>
+                                    .custom-file-button {
+                                        width: 100%;
+                                        padding: 12px;
+                                        background: rgba(255,255,255,0.05);
+                                        border: 1.5px solid rgba(255,255,255,0.15);
+                                        border-radius: 8px;
+                                        color: rgba(255,255,255,0.8);
+                                        font-size: 13px;
+                                        cursor: pointer;
+                                        transition: all 0.3s ease;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        gap: 8px;
+                                    }
+                                    .custom-file-button:hover {
+                                        background: rgba(255,122,24,0.15);
+                                        border-color: rgba(255,122,24,0.4);
+                                        color: #ff7a18;
+                                        transform: translateY(-2px);
+                                    }
+                                </style>
+                                <script>
+                                    document.getElementById('photoFileInput').addEventListener('change', function(e) {
+                                        const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose File';
+                                        document.getElementById('fileNameDisplay').textContent = fileName;
+                                    });
+                                </script>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; color: rgba(255,255,255,0.7); margin-bottom: 8px; font-size: 13px;">
+                                    <i class="fas fa-comment"></i> Caption (Optional)
+                                </label>
+                                <input type="text" name="caption" placeholder="Add a caption..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px;">
+                            </div>
+                            <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff7a18 0%, #ff9d5c 100%); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                <i class="fas fa-upload"></i> Upload Photo
+                            </button>
+                        </form>
+                        
+                        <!-- Photo Grid -->
+                        {% if photos %}
+                            <div style="padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                {% for photo in photos %}
+                                    <div style="position: relative; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);">
+                                        <img src="{{ photo.photo.url }}" alt="{{ photo.caption }}" style="width: 100%; height: 150px; object-fit: cover;">
+                                        {% if photo.caption %}
+                                            <div style="padding: 10px; background: rgba(20,20,22,0.95);">
+                                                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0;">{{ photo.caption }}</p>
+                                            </div>
+                                        {% endif %}
+                                        <a href="{% url 'delete_trainer_photo' photo.id %}" onclick="return confirm('Are you sure you want to delete this photo?');" style="position: absolute; top: 10px; right: 10px; background: rgba(220,53,69,0.9); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: all 0.3s ease;">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state" style="padding: 30px 10px;">
+                                <div class="empty-icon">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                                <h3>No Photos Yet</h3>
+                                <p>Upload photos to showcase your work</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-bolt"></i> Quick Actions
+                            </h2>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <a href="#" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="action-info">
+                                    <h4>My Clients</h4>
+                                    <p>View and manage clients</p>
+                                </div>
+                            </a>
+
+                            <a href="#" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="action-info">
+                                    <h4>Schedule</h4>
+                                    <p>Manage your schedule</p>
+                                </div>
+                            </a>
+
+                            <a href="#" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <div class="action-info">
+                                    <h4>Earnings</h4>
+                                    <p>View payment history</p>
+                                </div>
+                            </a>
+
+                            <a href="{% url 'trainer_registration_status' %}" class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="action-info">
+                                    <h4>Registration Details</h4>
+                                    <p>View full application</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            </div>
+        {% endif %}
+    </div>
+</body>
 </html>

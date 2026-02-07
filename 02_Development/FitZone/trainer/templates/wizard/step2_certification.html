@@ -188,6 +188,76 @@ input[type="file"] {
 .btn-wizard:hover {
     opacity: 0.9;
 }
+
+/* Image Preview Styles */
+.preview-container {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.preview-item {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #333;
+    background: #222;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-item .file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-direction: column;
+    color: #888;
+}
+
+.preview-item .file-icon i {
+    font-size: 32px;
+    color: #ff7a18;
+    margin-bottom: 8px;
+}
+
+.preview-item .file-name {
+    font-size: 10px;
+    color: #aaa;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-all;
+}
+
+.remove-file {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239,68,68,0.9);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.remove-file:hover {
+    background: #ef4444;
+    transform: scale(1.1);
+}
 </style>
 
 <div class="wizard-container">
@@ -233,6 +303,8 @@ input[type="file"] {
 
                 {{ form.certification }}
                 {{ form.certification.errors }}
+                
+                <div class="preview-container" id="cert-preview"></div>
             </div>
 
             <!-- Profile picture -->
@@ -247,6 +319,8 @@ input[type="file"] {
 
                 {{ form.profile_pic }}
                 {{ form.profile_pic.errors }}
+                
+                <div class="preview-container" id="pic-preview"></div>
             </div>
 
             <!-- Buttons -->
@@ -267,19 +341,115 @@ input[type="file"] {
 </div>
 
 <script>
+// Store selected files
+let certificationFiles = [];
+let profilePicFile = null;
+
+// Preview image function
+function createImagePreview(file, container, isSingle = false) {
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'preview-item';
+    
+    const isImage = file.type.startsWith('image/');
+    
+    if (isImage) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        previewDiv.appendChild(img);
+    } else {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'file-icon';
+        iconDiv.innerHTML = `
+            <i class="fas fa-file-pdf"></i>
+            <div class="file-name">${file.name}</div>
+        `;
+        previewDiv.appendChild(iconDiv);
+    }
+    
+    if (!isSingle) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-file';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.onclick = () => {
+            const index = certificationFiles.indexOf(file);
+            if (index > -1) {
+                certificationFiles.splice(index, 1);
+                updateCertificationInput();
+                renderCertificationPreviews();
+            }
+        };
+        previewDiv.appendChild(removeBtn);
+    }
+    
+    container.appendChild(previewDiv);
+}
+
+// Render certification previews
+function renderCertificationPreviews() {
+    const container = document.getElementById('cert-preview');
+    container.innerHTML = '';
+    certificationFiles.forEach(file => createImagePreview(file, container));
+    
+    const countEl = document.getElementById('cert-selected');
+    countEl.textContent = certificationFiles.length ? `✓ ${certificationFiles.length} file(s) selected` : '';
+}
+
+// Update certification input with stored files
+function updateCertificationInput() {
+    const input = document.getElementById('{{ form.certification.id_for_label }}');
+    const dataTransfer = new DataTransfer();
+    certificationFiles.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+}
+
+// Certification file input handler
 document.getElementById('{{ form.certification.id_for_label }}')
   .addEventListener('change', function(e) {
-    const count = e.target.files.length;
-    document.getElementById('cert-selected').textContent =
-      count ? `✓ ${count} file(s) selected` : '';
+    const newFiles = Array.from(e.target.files);
+    
+    // Add new files to existing files
+    newFiles.forEach(file => {
+        // Check if file already exists
+        if (!certificationFiles.some(f => f.name === file.name && f.size === file.size)) {
+            certificationFiles.push(file);
+        }
+    });
+    
+    updateCertificationInput();
+    renderCertificationPreviews();
 });
 
+// Profile picture handler
 document.getElementById('{{ form.profile_pic.id_for_label }}')
   .addEventListener('change', function(e) {
-    const name = e.target.files[0]?.name || '';
-    document.getElementById('pic-selected').textContent =
-      name ? `✓ ${name}` : '';
+    const file = e.target.files[0];
+    const container = document.getElementById('pic-preview');
+    const countEl = document.getElementById('pic-selected');
+    
+    container.innerHTML = '';
+    
+    if (file) {
+        profilePicFile = file;
+        createImagePreview(file, container, true);
+        countEl.textContent = `✓ ${file.name}`;
+    } else {
+        profilePicFile = null;
+        countEl.textContent = '';
+    }
 });
+
+// Make Previous button work without validation
+const prevButton = document.querySelector('button[name="wizard_goto_step"]');
+if (prevButton) {
+  prevButton.addEventListener('click', function(e) {
+    // Remove required attributes temporarily to allow navigation
+    const form = this.closest('form');
+    const requiredInputs = form.querySelectorAll('[required]');
+    requiredInputs.forEach(input => input.removeAttribute('required'));
+  });
+}
 </script>
 
 {% endblock content %}

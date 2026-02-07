@@ -29,6 +29,7 @@ class UserProfile(models.Model):
         choices=ROLE_CHOICES,
         default='user'
     )
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     email_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)

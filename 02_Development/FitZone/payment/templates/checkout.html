@@ -484,7 +484,7 @@ body{
               <div>
                 <h3 class="plan-title">{{ plan.name }}</h3>
                 <div class="plan-meta">
-                  <div class="price">${{ plan.price }}</div>
+                  <div class="price">Rs{{ plan.price }}</div>
                   <div class="pill"><i class="fa-regular fa-clock"></i> {{ plan.get_duration_display }}</div>
                 </div>
               </div>
@@ -523,14 +523,14 @@ body{
 
             <div class="summary-row">
               <span>Price</span>
-              <strong>${{ plan.price }}</strong>
+              <strong>Rs {{ plan.price }}</strong>
             </div>
 
             <div class="divider"></div>
 
             <div class="total">
               <div class="label">Total</div>
-              <div class="value">${{ plan.price }}</div>
+              <div class="value"> Rs {{ plan.price }}</div>
             </div>
 
             <div class="divider"></div>
