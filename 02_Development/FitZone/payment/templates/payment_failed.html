@@ -177,6 +177,8 @@
       font-size: 0.9rem;
       line-height: 1.8;
     }
+
+    .text-red { color: var(--red); }
   </style>
 </head>
 <body>
@@ -204,7 +206,7 @@
       </div>
       <div class="detail-row">
         <span class="detail-label">Status</span>
-        <span class="detail-value" style="color: var(--red);">{{ payment.status }}</span>
+        <span class="detail-value text-red">{{ payment.status }}</span>
       </div>
     </div>
     {% endif %}

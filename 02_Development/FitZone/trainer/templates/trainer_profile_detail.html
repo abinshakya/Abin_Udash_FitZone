@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Trainer CSS (shared booking modal classes) -->
+    <link rel="stylesheet" href="{% static 'trainer/trainer.css' %}">
     <style>
         * {
             margin: 0;
@@ -425,9 +427,139 @@
                 justify-content: center;
             }
         }
+
+        /* Messages Container */
+        .messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .alert-msg {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-msg.msg-success {
+            background: rgba(34,197,94,0.15);
+            border-left: 4px solid #22c55e;
+        }
+
+        .alert-msg.msg-error {
+            background: rgba(239,68,68,0.15);
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-msg.msg-warning {
+            background: rgba(251,191,36,0.15);
+            border-left: 4px solid #fbbf24;
+        }
+
+        .alert-msg.msg-info {
+            background: rgba(59,130,246,0.15);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-msg-icon {
+            font-size: 20px;
+        }
+
+        .msg-success .alert-msg-icon { color: #22c55e; }
+        .msg-error .alert-msg-icon { color: #ef4444; }
+        .msg-warning .alert-msg-icon { color: #fbbf24; }
+        .msg-info .alert-msg-icon { color: #3b82f6; }
+
+        .alert-msg-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        /* Sidebar sections */
+        .bio-section-sidebar {
+            margin-top: 20px;
+        }
+
+        .section-title-sm {
+            font-size: 18px;
+        }
+
+        .contact-info {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+
+        .contact-icon {
+            color: #ff7a18;
+            margin-right: 8px;
+        }
+
+        /* Cert/Exp PDF placeholder */
+        .cert-pdf-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cert-pdf-placeholder.orange-bg {
+            background: rgba(255,122,24,0.1);
+        }
+
+        .cert-pdf-placeholder.blue-bg {
+            background: rgba(59,130,246,0.1);
+        }
+
+        .cert-pdf-icon {
+            font-size: 64px;
+        }
+
+        .cert-pdf-icon.orange { color: #ff7a18; }
+        .cert-pdf-icon.blue { color: #3b82f6; }
+
+        /* Photo carousel no margin */
+        .photo-carousel-no-margin {
+            margin: 0;
+        }
+
+        /* Bio section full height */
+        .bio-section-full {
+            margin-top: 0;
+            height: 100%;
+        }
+
+        /* Row top gap */
+        .row-top-gap {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- Messages -->
+    {% if messages %}
+    <div id="messages-container" class="messages-container">
+        {% for message in messages %}
+            <div class="alert-msg {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' %}msg-error{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} alert-msg-icon"></i>
+                <span>{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="alert-msg-close"><i class="fas fa-times"></i></button>
+            </div>
+        {% endfor %}
+    </div>
+    <script>setTimeout(function(){document.querySelectorAll('.alert-msg').forEach(function(a){a.style.transition='all 0.3s';a.style.opacity='0';setTimeout(function(){a.remove();},300);});},5000);</script>
+    {% endif %}
+
     <div class="profile-container">
         <a href="{% url 'trainer' %}" class="back-btn">
             <i class="fas fa-arrow-left"></i> Back to Trainers
@@ -469,11 +601,11 @@
         </div>
 
         <!-- Photo Carousel & About Me Section -->
-        <div class="row g-4" style="margin-top: 10px;">
+        <div class="row g-4 row-top-gap">
             <!-- Photo Carousel -->
             {% if photos %}
             <div class="col-lg-6">
-                <div class="photo-carousel-section" style="margin: 0;">
+                <div class="photo-carousel-section photo-carousel-no-margin">
                     <div id="trainerPhotoCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-indicators">
                             {% for photo in photos %}
@@ -508,7 +640,7 @@
             <!-- About Me Section -->
             <div class="{% if photos %}col-lg-6{% else %}col-lg-12{% endif %}">
                 {% if trainer.bio %}
-                <div class="bio-section" style="margin-top: 0; height: 100%;">
+                <div class="bio-section bio-section-full">
                     <h2 class="section-title">
                         <i class="fas fa-quote-left"></i> About Me
                     </h2>
@@ -559,8 +691,8 @@
                                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                                 <div class="cert-card-carousel" onclick="window.open('{{ cert.file.url }}', '_blank')">
                                                     {% if cert.file.url|slice:"-4:" == '.pdf' %}
-                                                        <div class="cert-image-carousel" style="display: flex; align-items: center; justify-content: center; background: rgba(255,122,24,0.1);">
-                                                            <i class="fas fa-file-pdf" style="font-size: 64px; color: #ff7a18;"></i>
+                                                        <div class="cert-image-carousel cert-pdf-placeholder orange-bg">
+                                                            <i class="fas fa-file-pdf cert-pdf-icon orange"></i>
                                                         </div>
                                                     {% else %}
                                                         <img src="{{ cert.file.url }}" alt="Certificate" class="cert-image-carousel">
@@ -608,8 +740,8 @@
                                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                                 <div class="cert-card-carousel" onclick="window.open('{{ doc.file.url }}', '_blank')">
                                                     {% if doc.file.url|slice:"-4:" == '.pdf' %}
-                                                        <div class="cert-image-carousel" style="display: flex; align-items: center; justify-content: center; background: rgba(59,130,246,0.1);">
-                                                            <i class="fas fa-file-pdf" style="font-size: 64px; color: #3b82f6;"></i>
+                                                        <div class="cert-image-carousel cert-pdf-placeholder blue-bg">
+                                                            <i class="fas fa-file-pdf cert-pdf-icon blue"></i>
                                                         </div>
                                                     {% else %}
                                                         <img src="{{ doc.file.url }}" alt="Experience Document" class="cert-image-carousel">
@@ -660,8 +792,8 @@
 
                 <!-- Availability -->
                 {% if trainer.available_time %}
-                <div class="bio-section" style="margin-top: 20px;">
-                    <h2 class="section-title" style="font-size: 18px;">
+                <div class="bio-section bio-section-sidebar">
+                    <h2 class="section-title section-title-sm">
                         <i class="fas fa-clock"></i> Availability
                     </h2>
                     <div class="availability-card">
@@ -674,13 +806,13 @@
                 {% endif %}
 
                 <!-- Contact Info -->
-                <div class="bio-section" style="margin-top: 20px;">
-                    <h2 class="section-title" style="font-size: 18px;">
+                <div class="bio-section bio-section-sidebar">
+                    <h2 class="section-title section-title-sm">
                         <i class="fas fa-envelope"></i> Contact
                     </h2>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 14px;">
-                        <p><i class="fas fa-user" style="color: #ff7a18; margin-right: 8px;"></i> {{ trainer.user.username }}</p>
-                        <p><i class="fas fa-envelope" style="color: #ff7a18; margin-right: 8px;"></i> {{ trainer.user.email }}</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-user contact-icon"></i> {{ trainer.user.username }}</p>
+                        <p><i class="fas fa-envelope contact-icon"></i> {{ trainer.user.email }}</p>
                     </div>
                 </div>
             </div>
@@ -690,47 +822,111 @@
     <!-- Booking Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookingModalLabel">
-                        <i class="fas fa-calendar-check"></i> Book Training with {{ trainer.user.get_full_name|default:trainer.user.username }}
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="bio-section" style="margin-bottom: 20px;">
-                        <h6 style="color: #ff7a18; margin-bottom: 10px;"><i class="fas fa-rupee-sign"></i> Pricing</h6>
-                        <p style="font-size: 24px; font-weight: 700; color: #f4f4f4;">
-                            {% if trainer.monthly_price %}
-                                ₹{{ trainer.monthly_price }}
-                                <span style="font-size: 14px; color: rgba(255,255,255,0.6);">/ month</span>
-                            {% else %}
-                                Contact for pricing
-                            {% endif %}
+            <div class="modal-content booking-modal-content">
+                <form method="post" action="{% url 'book_trainer' trainer.id %}">
+                    {% csrf_token %}
+                    <!-- Hero Header -->
+                    <div class="booking-modal-hero">
+                        <div class="booking-hero-accent"></div>
+                        <button type="button" class="btn-close booking-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="booking-avatar">
+                            {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
+                        </div>
+                        <h5 class="booking-modal-title">
+                            Book Training Session
+                        </h5>
+                        <p class="booking-modal-subtitle">
+                            with <span class="booking-trainer-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</span>
                         </p>
                     </div>
 
-                    {% if trainer.available_time %}
-                    <div class="bio-section">
-                        <h6 style="color: #ff7a18; margin-bottom: 10px;"><i class="fas fa-clock"></i> Available Times</h6>
-                        <div class="availability-card">
-                            <div class="availability-text">
-                                {{ trainer.available_time }}
+                    <div class="modal-body booking-body">
+                        <!-- Pricing & Time Row -->
+                        <div class="booking-info-grid">
+                            <div class="booking-info-card orange">
+                                <div class="booking-info-icon orange"><i class="fas fa-tags"></i></div>
+                                <div class="booking-info-label">Price</div>
+                                <div class="booking-info-value">
+                                    {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}<span class="booking-price-suffix">/mo</span>{% else %}TBD{% endif %}
+                                </div>
+                            </div>
+                            <div class="booking-info-card green">
+                                <div class="booking-info-icon green"><i class="fas fa-clock"></i></div>
+                                <div class="booking-info-label">Availability</div>
+                                <div class="booking-avail-value">
+                                    {{ trainer.available_time|default:"Flexible" }}
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Date Picker -->
+                        <div class="booking-field-group">
+                            <label class="booking-field-label">
+                                <span class="booking-label-icon purple"><i class="fas fa-calendar-alt"></i></span>
+                                Preferred Start Date <span class="booking-required">*</span>
+                            </label>
+                            <input type="date" name="booking_date" required min="{{ today }}" class="booking-input">
+                        </div>
+
+                        <!-- Message -->
+                        <div class="booking-field-group">
+                            <label class="booking-field-label">
+                                <span class="booking-label-icon pink"><i class="fas fa-pen-fancy"></i></span>
+                                Message <span class="booking-optional">(optional)</span>
+                            </label>
+                            <textarea name="message" rows="3" placeholder="Tell the trainer about your fitness goals, preferred workout style..." class="booking-textarea"></textarea>
+                        </div>
+
+                        <!-- Warnings -->
+                        {% if has_pending_booking %}
+                        <div class="booking-warning warn">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>You already have a pending booking with this trainer.</span>
+                        </div>
+                        {% endif %}
+                        {% if user.is_authenticated and not user_is_email_verified %}
+                        <div class="booking-warning danger">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Please verify your email before booking.</span>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                </div>
-                <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
-                    <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #f4f4f4;" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn" style="background: linear-gradient(135deg, #ff7a18, #ff9a3c); color: #141416; font-weight: 700;" disabled>
-                        <i class="fas fa-calendar-plus"></i> Confirm Booking 
-                    </button>
-                </div>
-            </div> 
+
+                    <!-- Footer -->
+                    <div class="booking-footer">
+                        <button type="button" class="btn booking-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                        {% if user.is_authenticated and user_is_email_verified and not has_pending_booking %}
+                            <button type="submit" class="btn booking-submit-btn">
+                                <i class="fas fa-bolt me-1"></i> Confirm Booking
+                            </button>
+                        {% elif not user.is_authenticated %}
+                            <a href="{% url 'login' %}" class="btn booking-login-btn">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login to Book
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn booking-disabled-btn" disabled>
+                                <i class="fas fa-lock me-1"></i> Cannot Book
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-open booking modal if redirected with ?book=true
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('book') === 'true') {
+                const bookingModal = document.getElementById('bookingModal');
+                if (bookingModal) {
+                    const modal = new bootstrap.Modal(bookingModal);
+                    modal.show();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

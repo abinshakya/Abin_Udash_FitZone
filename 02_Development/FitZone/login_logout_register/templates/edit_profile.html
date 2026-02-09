@@ -157,6 +157,42 @@
         justify-content: center;
     }
 }
+
+.ep-messages-wrap {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 450px;
+}
+.ep-message {
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.ep-msg-icon {
+    font-size: 20px;
+}
+.ep-msg-text {
+    flex: 1;
+}
+.ep-msg-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+}
+.file-input-hidden {
+    display: none;
+}
 </style>
 <div class="profile-wrapper">
     <div class="profile-container">
@@ -177,7 +213,7 @@
                     </div>
                 {% endif %}
             </div>
-            <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" style="display: none;">
+            <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" class="file-input-hidden">
             <button type="button" class="change-picture-btn" onclick="document.getElementById('profilePictureInput').click()">
                 <i class="fas fa-camera"></i> Change Picture
             </button>
@@ -198,12 +234,12 @@
 
         <!-- Messages -->
         {% if messages %}
-            <div class="messages-container" id="messages-container" style="position: fixed; top: 80px; right: 20px; z-index: 9999; max-width: 450px;">
+            <div class="messages-container ep-messages-wrap" id="messages-container">
                 {% for message in messages %}
-                    <p class="message {{ message.tags }}" style="padding: 16px 20px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
-                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}" style="font-size: 20px;"></i>
-                        <span style="flex: 1;">{{ message }}</span>
-                        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
+                    <p class="message {{ message.tags }} ep-message">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} ep-msg-icon"></i>
+                        <span class="ep-msg-text">{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="ep-msg-close">&times;</button>
                     </p>
                 {% endfor %}
             </div>

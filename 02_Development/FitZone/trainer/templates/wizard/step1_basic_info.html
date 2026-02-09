@@ -507,6 +507,12 @@
   border-radius: 6px;
   border: 1px solid rgba(239,68,68,0.3);
 }
+
+.icon-accent { color: #ff7a18; }
+.help-text-gap { margin-top: 12px; }
+.help-text-gap-lg { margin-top: 15px; }
+.range-arrow-inline { margin-bottom: 0; font-size: 20px; }
+.btn-wizard-disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 
 <div class="wizard-container">
@@ -533,7 +539,7 @@
 
   <div class="wizard-card">
     <div class="wizard-header">
-      <h2><i class="fas fa-user" style="color:#ff7a18;"></i> Basic Information</h2>
+      <h2><i class="fas fa-user icon-accent"></i> Basic Information</h2>
       <p>Tell us about your experience and expertise</p>
     </div>
 
@@ -570,7 +576,7 @@
               </div>
             {% endfor %}
           </div>
-          <div class="help-text" style="margin-top: 12px;">
+          <div class="help-text help-text-gap">
             <i class="fas fa-info-circle"></i> Click on tags to select your areas of expertise
           </div>
         </div>
@@ -654,7 +660,7 @@
                 <label>From</label>
                 <input type="time" id="custom-time-from" class="custom-time-field">
               </div>
-              <div class="range-arrow" style="margin-bottom: 0; font-size: 20px;">
+              <div class="range-arrow range-arrow-inline">
                 <i class="fas fa-arrow-right"></i>
               </div>
               <div class="time-input-group">
@@ -669,14 +675,14 @@
             <input type="hidden" id="custom-times-hidden" name="custom_times" value="">
           </div>
           
-          <div class="help-text" style="margin-top: 15px;">
+          <div class="help-text help-text-gap-lg">
             <i class="fas fa-info-circle"></i> Select preset time slots or add your own custom availability times
           </div>
         </div>
       </div>
 
       <div class="wizard-actions">
-        <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn-wizard btn-back" disabled style="opacity: 0.5; cursor: not-allowed;">
+        <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn-wizard btn-back btn-wizard-disabled" disabled>
           <i class="fas fa-arrow-left"></i> Previous
         </button>
         <button type="submit" class="btn-wizard btn-next">

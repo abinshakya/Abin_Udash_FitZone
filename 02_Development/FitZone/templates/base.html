@@ -14,11 +14,60 @@
       <link rel="stylesheet" href="{% static 'trainerregestration.css' %}">
         <link rel="stylesheet" href="{% static 'trainer/trainer.css'%}">
         <link rel="stylesheet" href="{% static 'index.css'%}">
-    
+    <style>
+        .base-messages-wrap {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        .base-alert-msg {
+            color: #fff !important;
+            border: none;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .base-alert-msg i {
+            color: #fff !important;
+        }
+        .base-alert-msg .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+        .base-alert-msg.msg-success { background: rgba(34,197,94,0.9); }
+        .base-alert-msg.msg-error,
+        .base-alert-msg.msg-danger { background: rgba(239,68,68,0.9); }
+        .base-alert-msg.msg-warning { background: rgba(251,191,36,0.9); }
+        .base-alert-msg.msg-info { background: rgba(59,130,246,0.9); }
+    </style>
 
 </head>
 <body>
     {%include 'navbar.html'%}
+
+    <!-- Messages Container -->
+    {% if messages %}
+    <div class="base-messages-wrap">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show base-alert-msg {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' or message.tags == 'danger' %}msg-danger{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}" role="alert">
+            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    {% endif %}
 
 {% block content %}
     

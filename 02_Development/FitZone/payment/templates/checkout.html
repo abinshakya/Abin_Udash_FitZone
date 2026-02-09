@@ -447,6 +447,10 @@ body{
   .pm-option input:checked ~ .pm-fallback { display: none; }
 }
 
+  .icon-accent { color: var(--orange); }
+  .min-w-0 { min-width: 0; }
+  .icon-muted { color: rgba(255,255,255,0.7); }
+
   </style>
 </head>
 
@@ -467,7 +471,7 @@ body{
         <div class="card">
           <div class="card-header">
             <h2>
-              <i class="fa-solid fa-dumbbell" style="color:var(--orange)"></i>
+              <i class="fa-solid fa-dumbbell icon-accent"></i>
               Plan Details
             </h2>
             <span class="pill"><i class="fa-solid fa-shield-halved"></i> Secure Checkout</span>
@@ -505,7 +509,7 @@ body{
         <div class="card">
           <div class="card-header">
             <h3>
-              <i class="fa-solid fa-receipt" style="color:var(--orange)"></i>
+              <i class="fa-solid fa-receipt icon-accent"></i>
               Order Summary
             </h3>
           </div>
@@ -548,7 +552,7 @@ body{
 
             <!--Payment Method -->
             <div class="pm-title">
-              <i class="fa-solid fa-credit-card" style="color:var(--orange)"></i>
+              <i class="fa-solid fa-credit-card icon-accent"></i>
               Select Payment Method
             </div>
 
@@ -558,12 +562,12 @@ body{
                   <input type="radio" name="payment_method" value="khalti" checked>
                   <div class="pm-left">
                     <div class="pm-radio"></div>
-                    <div style="min-width:0;">
+                    <div class="min-w-0">
                       <div class="pm-name">Khalti <span class="pm-badge">Popular</span></div>
                       <div class="pm-note">Pay using Khalti wallet</div>
                     </div>
                   </div>
-                  <i class="fa-solid fa-wallet" style="color:rgba(255,255,255,0.7)"></i>
+                  <i class="fa-solid fa-wallet icon-muted"></i>
                 </label>
               </div>
 

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container py-5 trainer-page" style="min-height:100vh;">
+<div class="container py-5 trainer-page trainer-page-wrap">
 
   <!-- Section Title -->
   <div class="trainer-section-title">
@@ -78,48 +78,101 @@
 
         </article>
 
-        <!-- Booking Modal for this trainer -->
+        <!-- Booking Modal -->
         <div class="modal fade" id="bookingModal{{ trainer.id }}" tabindex="-1" aria-labelledby="bookingModalLabel{{ trainer.id }}" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="background: linear-gradient(135deg, rgba(20,20,22,0.98), rgba(30,30,35,0.95)); border: 2px solid rgba(255,122,24,0.3); color: #f4f4f4;">
-              <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h5 class="modal-title" id="bookingModalLabel{{ trainer.id }}" style="color: #ff7a18;">
-                  <i class="fas fa-calendar-check"></i> Book Training with {{ trainer.user.get_full_name|default:trainer.user.username }}
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
-              </div>
-              <div class="modal-body">
-                <div style="margin-bottom: 20px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-                  <h6 style="color: #ff7a18; margin-bottom: 10px;"><i class="fas fa-rupee-sign"></i> Monthly Fee</h6>
-                  <p style="font-size: 28px; font-weight: 700; color: #f4f4f4; margin: 0;">
-                    {% if trainer.monthly_price %}
-                      ₹{{ trainer.monthly_price }}
-                      <span style="font-size: 14px; color: rgba(255,255,255,0.6);">/ month</span>
-                    {% else %}
-                      <span style="font-size: 18px;">Contact for pricing</span>
-                    {% endif %}
-                  </p>
-                </div>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content booking-modal-content">
+                    <form method="post" action="{% url 'book_trainer' trainer.id %}">
+                        {% csrf_token %}
+                        <!-- Hero Header -->
+                        <div class="booking-modal-hero">
+                            <div class="booking-hero-accent"></div>
+                            <button type="button" class="btn-close booking-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="booking-avatar">
+                                {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
+                            </div>
+                            <h5 class="booking-modal-title">
+                                Book Training Session
+                            </h5>
+                            <p class="booking-modal-subtitle">
+                                with <span class="booking-trainer-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</span>
+                            </p>
+                        </div>
 
-                {% if trainer.available_time %}
-                <div style="padding: 20px; background: rgba(34,197,94,0.08); border: 1.5px solid rgba(34,197,94,0.3); border-radius: 12px;">
-                  <h6 style="color: #22c55e; margin-bottom: 10px;"><i class="fas fa-clock"></i> Available Times</h6>
-                  <p style="color: #22c55e; font-size: 15px; font-weight: 600; margin: 0;">
-                    {{ trainer.available_time }}
-                  </p>
+                        <div class="modal-body booking-body">
+                            <!-- Pricing & Time Row -->
+                            <div class="booking-info-grid">
+                                <div class="booking-info-card orange">
+                                    <div class="booking-info-icon orange"><i class="fas fa-tags"></i></div>
+                                    <div class="booking-info-label">Price</div>
+                                    <div class="booking-info-value">
+                                        {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}<span class="booking-price-suffix">/mo</span>{% else %}TBD{% endif %}
+                                    </div>
+                                </div>
+                                <div class="booking-info-card green">
+                                    <div class="booking-info-icon green"><i class="fas fa-clock"></i></div>
+                                    <div class="booking-info-label">Availability</div>
+                                    <div class="booking-avail-value">
+                                        {{ trainer.available_time|default:"Flexible" }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date Picker -->
+                            <div class="booking-field-group">
+                                <label class="booking-field-label">
+                                    <span class="booking-label-icon purple"><i class="fas fa-calendar-alt"></i></span>
+                                    Preferred Start Date <span class="booking-required">*</span>
+                                </label>
+                                <input type="date" name="booking_date" required min="{{ today }}" class="booking-input">
+                            </div>
+
+                            <!-- Message -->
+                            <div class="booking-field-group">
+                                <label class="booking-field-label">
+                                    <span class="booking-label-icon pink"><i class="fas fa-pen-fancy"></i></span>
+                                    Message <span class="booking-optional">(optional)</span>
+                                </label>
+                                <textarea name="message" rows="3" placeholder="Tell the trainer about your fitness goals, preferred workout style..." class="booking-textarea"></textarea>
+                            </div>
+
+                            <!-- Warnings -->
+                            {% if trainer.id in pending_booking_trainer_ids %}
+                            <div class="booking-warning warn">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>You already have a pending booking with this trainer.</span>
+                            </div>
+                            {% endif %}
+                            {% if user.is_authenticated and not user_is_email_verified %}
+                            <div class="booking-warning danger">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Please verify your email before booking.</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="booking-footer">
+                            <button type="button" class="btn booking-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                            {% if user.is_authenticated and user_is_email_verified and trainer.id not in pending_booking_trainer_ids %}
+                                <button type="submit" class="btn booking-submit-btn">
+                                    <i class="fas fa-bolt me-1"></i> Confirm Booking
+                                </button>
+                            {% elif not user.is_authenticated %}
+                                <a href="{% url 'login' %}" class="btn booking-login-btn">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Login to Book
+                                </a>
+                            {% else %}
+                                <button type="button" class="btn booking-disabled-btn" disabled>
+                                    <i class="fas fa-lock me-1"></i> Cannot Book
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
                 </div>
-                {% endif %}
-              </div>
-              <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
-                <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #f4f4f4;" data-bs-dismiss="modal">Close</button>
-                <a href="" class="btn" style="background: linear-gradient(135deg, #ff7a18, #ff9a3c); color: #141416; font-weight: 700;">
-                  <i class="fas fa-user"></i> Book Now
-                </a>
-              </div>
             </div>
-          </div>
         </div>
-        
+
       </div>
 
       {% endfor %}

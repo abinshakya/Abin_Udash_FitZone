@@ -4,95 +4,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* Animations */
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideOut {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(100%); opacity: 0; }
-}
-
-/* Messages Container */
-#messages-container {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  z-index: 9999;
-  max-width: 400px;
-}
-
-/* Alert Messages */
-.alert-message {
-  margin-bottom: 15px;
-  padding: 15px 20px;
-  border-radius: 8px;
-  color: #fff;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: slideIn 0.3s ease-out;
-}
-
-.alert-success {
-  background: rgba(34,197,94,0.15);
-  border-left: 4px solid #22c55e;
-}
-
-.alert-error {
-  background: rgba(239,68,68,0.15);
-  border-left: 4px solid #ef4444;
-}
-
-.alert-warning {
-  background: rgba(251,191,36,0.15);
-  border-left: 4px solid #fbbf24;
-}
-
-.alert-info {
-  background: rgba(59,130,246,0.15);
-  border-left: 4px solid #3b82f6;
-}
-
-.alert-message i.fas {
-  font-size: 20px;
-}
-
-.alert-success i.fas {
-  color: #22c55e;
-}
-
-.alert-error i.fas {
-  color: #ef4444;
-}
-
-.alert-warning i.fas {
-  color: #fbbf24;
-}
-
-.alert-info i.fas {
-  color: #3b82f6;
-}
-
-.alert-close-btn {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.3s;
-}
-
-.alert-close-btn:hover {
-  opacity: 1;
-}
-
-
 /* Page layout */
 .status-container {
   max-width: 800px;
@@ -289,31 +200,6 @@
   color: #f59e0b;
 }
 </style>
-
-<!-- Messages Display -->
-{% if messages %}
-<div id="messages-container">
-    {% for message in messages %}
-        <div class="alert-message alert-{{ message.tags }}">
-            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
-            <span>{{ message }}</span>
-            <button onclick="this.parentElement.remove()" class="alert-close-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    {% endfor %}
-</div>
-<script>
-    // Auto-dismiss messages after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert-message');
-        alerts.forEach(function(alert) {
-            alert.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(function() { alert.remove(); }, 300);
-        });
-    }, 5000);
-</script>
-{% endif %}
 
 <div class="status-container">
   <div class="status-card">

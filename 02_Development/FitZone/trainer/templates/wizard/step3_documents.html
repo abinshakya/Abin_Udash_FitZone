@@ -283,6 +283,13 @@ input[type="file"]{
     background: #ef4444;
     transform: scale(1.1);
 }
+
+.icon-accent { color: #ff7a18; }
+.file-help-text {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+}
 </style>
 
 <div class="wizard-container">
@@ -306,7 +313,7 @@ input[type="file"]{
 
   <div class="wizard-card">
     <div class="wizard-header">
-      <h2><i class="fas fa-file-shield" style="color:#ff7a18;"></i> Verification Documents</h2>
+      <h2><i class="fas fa-file-shield icon-accent"></i> Verification Documents</h2>
       <p>Final step - Upload your identity and experience proof</p>
     </div>
 
@@ -325,7 +332,7 @@ input[type="file"]{
         <label for="{{ form.identity_proof.id_for_label }}" class="file-upload-box">
           <i class="fas fa-id-card"></i>
           <p>Click to upload ID documents</p>
-          <p style="font-size:12px; color:#888; margin-top:6px;">License, Passport, etc. (Multiple files allowed)</p>
+          <p class="file-help-text">License, Passport, etc. (Multiple files allowed)</p>
           <div class="file-selected" id="id-selected"></div>
         </label>
 
@@ -341,7 +348,7 @@ input[type="file"]{
         <label for="{{ form.experience_verification.id_for_label }}" class="file-upload-box">
           <i class="fas fa-briefcase"></i>
           <p>Click to upload experience proof</p>
-          <p style="font-size:12px; color:#888; margin-top:6px;">Employment letters, references (Multiple files allowed)</p>
+          <p class="file-help-text">Employment letters, references (Multiple files allowed)</p>
           <div class="file-selected" id="exp-selected"></div>
         </label>
 

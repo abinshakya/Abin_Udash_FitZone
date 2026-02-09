@@ -434,6 +434,317 @@
       .sidebar{ display: none; }
       .sidebar.open{ display: block; }
     }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ---------- Card icons ---------- */
+    .card-icon-orange { color: var(--orange2); }
+
+    /* ---------- Unread badge ---------- */
+    .ud-unread-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-left: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    /* ---------- Mark all read link ---------- */
+    .ud-mark-all-read {
+      text-decoration: none;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    /* ---------- Zero padding card body ---------- */
+    .card-body-flush { padding: 0; }
+
+    /* ---------- Scrollable list ---------- */
+    .ud-scroll-list {
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    /* ---------- Notification Items ---------- */
+    .ud-notif-item {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: background 0.2s;
+    }
+
+    .ud-notif-item.unread {
+      background: rgba(255,122,24,0.05);
+    }
+
+    .ud-notif-item.unread:hover {
+      background: rgba(255,122,24,0.08);
+    }
+
+    .ud-notif-icon {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .ud-notif-icon.confirmed {
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+    }
+
+    .ud-notif-icon.rejected {
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+    }
+
+    .ud-notif-icon.general {
+      background: rgba(59,130,246,0.12);
+      color: #3b82f6;
+    }
+
+    .ud-notif-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ud-notif-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .ud-notif-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f4f4f4;
+    }
+
+    .ud-notif-unread-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .ud-notif-msg {
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.45;
+    }
+
+    .ud-notif-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .ud-notif-time {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      font-weight: 600;
+    }
+
+    .ud-mark-read-link {
+      font-size: 11px;
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    /* ---------- Empty States ---------- */
+    .ud-empty-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .ud-empty-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 24px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .ud-empty-title {
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .ud-empty-text {
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .ud-empty-text-gap {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ---------- Booking Items ---------- */
+    .ud-booking-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ud-booking-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(255,154,60,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,122,24,0.2);
+    }
+
+    .ud-booking-info {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .ud-booking-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f4f4f4;
+    }
+
+    .ud-booking-date {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .ud-status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .ud-status-badge.status-pending {
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+
+    .ud-status-badge.status-confirmed {
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .ud-status-badge.status-rejected {
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+
+    .ud-status-badge.status-cancelled {
+      background: rgba(156,163,175,0.12);
+      color: #9ca3af;
+      border: 1px solid rgba(156,163,175,0.25);
+    }
+
+    .ud-cancel-form {
+      margin: 0;
+    }
+
+    .ud-cancel-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(239,68,68,0.2);
+      background: rgba(239,68,68,0.08);
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .ud-cancel-btn:hover {
+      background: rgba(239,68,68,0.2);
+    }
+
+    /* ---------- No Membership ---------- */
+    .ud-no-plan-text {
+      color: rgba(255,255,255,0.7);
+      margin: 10px 0;
+    }
+
+    .ud-browse-plans-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .ud-browse-trainers-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #141416;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* ---------- Inactive plan chip ---------- */
+    .chip-inactive {
+      background: rgba(220,53,69,0.12);
+      border-color: rgba(220,53,69,0.22);
+    }
+
+    .chip-inactive i {
+      color: #ef4444;
+    }
+
+    .grid-gap-top { margin-top: 18px; }
   </style>
 </head>
 
@@ -492,11 +803,11 @@
         <!-- Membership Card -->
         <section class="card">
           <div class="card-head">
-            <h2><i class="fa-solid fa-id-card" style="color:var(--orange2)"></i> Membership Status</h2>
+            <h2><i class="fa-solid fa-id-card card-icon-orange"></i> Membership Status</h2>
             {% if membership and membership.is_active %}
-              <span class="chip gray"><i class="fa-regular fa-circle-check" style="color:var(--orange2)"></i> Active</span>
+              <span class="chip gray"><i class="fa-regular fa-circle-check card-icon-orange"></i> Active</span>
             {% else %}
-              <span class="chip gray" style="background:rgba(220,53,69,0.12);border-color:rgba(220,53,69,0.22);"><i class="fa-solid fa-circle-xmark" style="color:#ef4444"></i> No Active Plan</span>
+              <span class="chip gray chip-inactive"><i class="fa-solid fa-circle-xmark"></i> No Active Plan</span>
             {% endif %}
           </div>
           <div class="card-body">
@@ -524,8 +835,8 @@
             {% else %}
             <!-- No membership -->
             <h3 class="membership-title">No Active Plan</h3>
-            <p style="color:rgba(255,255,255,0.7);margin:10px 0;">You don't have an active membership yet.</p>
-            <a href="{% url 'membership' %}" style="display:inline-block;margin-top:10px;padding:12px 20px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;text-decoration:none;border-radius:12px;font-weight:700;">Browse Plans</a>
+            <p class="ud-no-plan-text">You don't have an active membership yet.</p>
+            <a href="{% url 'membership' %}" class="ud-browse-plans-btn">Browse Plans</a>
             {% endif %}
           </div>
         </section>
@@ -533,7 +844,7 @@
         <!-- Actions Card -->
         <aside class="card">
           <div class="card-head">
-            <h2><i class="fa-solid fa-bolt" style="color:var(--orange2)"></i> Quick Actions</h2>
+            <h2><i class="fa-solid fa-bolt card-icon-orange"></i> Quick Actions</h2>
           </div>
           <div class="card-body">
             <div class="actions">
@@ -584,6 +895,113 @@
             </div>
           </div>
         </aside>
+      </div>
+
+      <!-- Notifications & Bookings Row -->
+      <div class="grid grid-gap-top">
+
+        <!-- Notifications Card -->
+        <section class="card">
+          <div class="card-head">
+            <h2>
+              <i class="fa-solid fa-bell card-icon-orange"></i> Notifications
+              {% if unread_count > 0 %}
+                <span class="ud-unread-badge">{{ unread_count }}</span>
+              {% endif %}
+            </h2>
+            {% if notifications %}
+              <a href="{% url 'user_mark_all_notifications_read' %}" class="chip gray ud-mark-all-read">
+                <i class="fa-solid fa-check-double card-icon-orange"></i> Mark all read
+              </a>
+            {% endif %}
+          </div>
+          <div class="card-body card-body-flush">
+            {% if notifications %}
+              <div class="ud-scroll-list">
+                {% for notif in notifications %}
+                  <div class="ud-notif-item {% if not notif.is_read %}unread{% endif %}">
+                    <div class="ud-notif-icon {% if notif.notif_type == 'booking_confirmed' %}confirmed{% elif notif.notif_type == 'booking_rejected' %}rejected{% else %}general{% endif %}">
+                      <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'booking_rejected' %}fa-times-circle{% else %}fa-info-circle{% endif %}"></i>
+                    </div>
+                    <div class="ud-notif-content">
+                      <div class="ud-notif-title-row">
+                        <span class="ud-notif-title">{{ notif.title }}</span>
+                        {% if not notif.is_read %}
+                          <span class="ud-notif-unread-dot"></span>
+                        {% endif %}
+                      </div>
+                      <p class="ud-notif-msg">{{ notif.message|truncatewords:30 }}</p>
+                      <div class="ud-notif-meta">
+                        <span class="ud-notif-time"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</span>
+                        {% if not notif.is_read %}
+                          <a href="{% url 'user_mark_notification_read' notif.id %}" class="ud-mark-read-link">Mark read</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="ud-empty-state">
+                <div class="ud-empty-icon"><i class="fa-solid fa-bell-slash"></i></div>
+                <h3 class="ud-empty-title">No Notifications</h3>
+                <p class="ud-empty-text">You'll be notified when trainers respond to your bookings</p>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <!-- My Bookings Card -->
+        <aside class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-calendar-check card-icon-orange"></i> My Bookings</h2>
+          </div>
+          <div class="card-body card-body-flush">
+            {% if bookings %}
+              <div class="ud-scroll-list">
+                {% for booking in bookings %}
+                  <div class="ud-booking-item">
+                    <!-- Trainer Avatar -->
+                    <div class="ud-booking-avatar">
+                      {{ booking.trainer.user.username.0|upper }}
+                    </div>
+                    <!-- Info -->
+                    <div class="ud-booking-info">
+                      <div class="ud-booking-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</div>
+                      <div class="ud-booking-date">
+                        <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
+                      </div>
+                    </div>
+                    <!-- Status Badge -->
+                    <span class="ud-status-badge {% if booking.status == 'pending' %}status-pending{% elif booking.status == 'confirmed' %}status-confirmed{% elif booking.status == 'rejected' %}status-rejected{% else %}status-cancelled{% endif %}">
+                      {{ booking.get_status_display }}
+                    </span>
+                    <!-- Cancel button for pending -->
+                    {% if booking.status == 'pending' %}
+                      <form method="post" action="{% url 'user_cancel_booking' booking.id %}" class="ud-cancel-form">
+                        {% csrf_token %}
+                        <button type="submit" title="Cancel booking" class="ud-cancel-btn"
+                                onclick="return confirm('Cancel this booking?')">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="ud-empty-state">
+                <div class="ud-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                <h3 class="ud-empty-title">No Bookings</h3>
+                <p class="ud-empty-text-gap">Book a trainer to get started</p>
+                <a href="{% url 'trainer' %}" class="ud-browse-trainers-btn">
+                  <i class="fa-solid fa-dumbbell"></i> Browse Trainers
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </aside>
+
       </div>
     </main>
   </div>

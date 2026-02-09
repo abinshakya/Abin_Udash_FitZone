@@ -210,6 +210,34 @@
             color: #ff7a18;
             font-size: 20px;
         }
+
+        .etp-messages-wrap {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 450px;
+        }
+        .etp-alert-box {
+            margin-bottom: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+        }
+        .etp-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+        .etp-day-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -226,16 +254,16 @@
 
         <!-- Messages -->
         {% if messages %}
-            <div class="messages" id="messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 450px;">
+            <div class="messages etp-messages-wrap" id="messages-container">
                 {% for message in messages %}
-                    <div class="alert-box alert-{{ message.tags }}" style="margin-bottom: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transition: all 0.3s ease;">
+                    <div class="alert-box alert-{{ message.tags }} etp-alert-box">
                         <div class="alert-icon">
                             <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
                         </div>
                         <div class="alert-content">
                             <p>{{ message }}</p>
                         </div>
-                        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: inherit; font-size: 20px; cursor: pointer; padding: 5px 10px; margin-left: 10px;">&times;</button>
+                        <button onclick="this.parentElement.remove()" class="etp-alert-close">&times;</button>
                     </div>
                 {% endfor %}
             </div>
@@ -334,14 +362,14 @@
                         </label>
                         <div class="day-range-group">
                             <div class="day-dropdown">
-                                <label style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; display: block;">From</label>
+                                <label class="etp-day-label">From</label>
                                 {{ form.available_days_from }}
                             </div>
                             <div class="range-arrow">
                                 <i class="fas fa-arrow-right"></i>
                             </div>
                             <div class="day-dropdown">
-                                <label style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 5px; display: block;">To</label>
+                                <label class="etp-day-label">To</label>
                                 {{ form.available_days_to }}
                             </div>
                         </div>

@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -11,7 +12,7 @@ import os
 from .forms import (
     Step1BasicInfoForm, Step2CertificationForm, Step3DocumentsForm, TrainerProfileEditForm
 )
-from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPhoto
+from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPhoto, TrainerBooking, TrainerNotification, UserNotification
 
 
 def trainer(request):
@@ -19,9 +20,26 @@ def trainer(request):
     verified_trainers = TrainerRegistration.objects.filter(
         is_verified=True
     ).select_related('user').prefetch_related('documents').order_by('-submitted_at')
-    
+
+    # Booking context
+    user_is_email_verified = False
+    pending_booking_trainer_ids = []
+    if request.user.is_authenticated:
+        from login_logout_register.models import UserProfile
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            user_is_email_verified = profile.email_verified
+        except UserProfile.DoesNotExist:
+            pass
+        pending_booking_trainer_ids = list(
+            TrainerBooking.objects.filter(user=request.user, status='pending').values_list('trainer_id', flat=True)
+        )
+
     context = {
-        'trainers': verified_trainers
+        'trainers': verified_trainers,
+        'today': timezone.now().date().isoformat(),
+        'user_is_email_verified': user_is_email_verified,
+        'pending_booking_trainer_ids': pending_booking_trainer_ids,
     }
     return render(request, 'trainer.html', context)
 
@@ -35,7 +53,7 @@ def trainer_profile_detail(request, trainer_id):
         is_verified=True
     )
     
-    # Get documents by type - explicitly use .all() to ensure all documents are retrieved
+    # Get documents by type
     certifications = trainer.documents.filter(doc_type='certification').all()
     profile_pic = trainer.documents.filter(doc_type='profile_pic').first()
     experience_docs = trainer.documents.filter(doc_type='experience_verification').all()
@@ -48,6 +66,18 @@ def trainer_profile_detail(request, trainer_id):
     if trainer.specialization:
         specializations = [s.strip() for s in trainer.specialization.split(',')]
     
+    # Check if logged-in user already has a pending booking
+    has_pending_booking = False
+    user_is_email_verified = False
+    if request.user.is_authenticated:
+        has_pending_booking = TrainerBooking.objects.filter(
+            user=request.user, trainer=trainer, status='pending'
+        ).exists()
+        try:
+            user_is_email_verified = request.user.userprofile.email_verified
+        except Exception:
+            pass
+    
     context = {
         'trainer': trainer,
         'certifications': certifications,
@@ -55,6 +85,9 @@ def trainer_profile_detail(request, trainer_id):
         'experience_docs': experience_docs,
         'specializations': specializations,
         'photos': photos,
+        'has_pending_booking': has_pending_booking,
+        'user_is_email_verified': user_is_email_verified,
+        'today': timezone.now().date().isoformat(),
     }
     
     return render(request, 'trainer_profile_detail.html', context)
@@ -104,10 +137,25 @@ def trainer_dashboard(request):
     if registration:
         photos = registration.photos.all()
     
+    # Get notifications and bookings
+    notifications = []
+    unread_count = 0
+    bookings = []
+    active_clients = 0
+    if registration:
+        notifications = registration.notifications.all()[:20]
+        unread_count = registration.notifications.filter(is_read=False).count()
+        bookings = registration.bookings.select_related('user').all()[:20]
+        active_clients = registration.bookings.filter(status='confirmed').values('user').distinct().count()
+    
     context = {
         'registration': registration,
         'specializations': specializations,
         'photos': photos,
+        'notifications': notifications,
+        'unread_count': unread_count,
+        'bookings': bookings,
+        'active_clients': active_clients,
     }
     
     return render(request, 'trainer_dashboard.html', context)
@@ -499,3 +547,175 @@ def edit_trainer_profile(request):
         form = TrainerProfileEditForm(initial=initial_data)
     
     return render(request, 'edit_trainer_profile.html', {'form': form, 'registration': registration})
+
+
+@login_required
+def book_trainer(request, trainer_id):
+    """Handle trainer booking from users with verified email."""
+    trainer_reg = get_object_or_404(TrainerRegistration, id=trainer_id, is_verified=True)
+
+    # Can't book yourself
+    if request.user == trainer_reg.user:
+        messages.error(request, "You cannot book yourself!")
+        return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+    # Check email verification
+    try:
+        profile = request.user.userprofile
+        if not profile.email_verified:
+            messages.warning(request, "Please verify your email before booking a trainer.")
+            return redirect('trainer_profile_detail', trainer_id=trainer_id)
+    except Exception:
+        messages.error(request, "Please complete your profile first.")
+        return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+    if request.method == 'POST':
+        booking_date = request.POST.get('booking_date')
+        user_message = request.POST.get('message', '')
+
+        if not booking_date:
+            messages.error(request, "Please select a preferred start date.")
+            return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+        # Check for existing pending booking
+        if TrainerBooking.objects.filter(user=request.user, trainer=trainer_reg, status='pending').exists():
+            messages.warning(request, "You already have a pending booking with this trainer.")
+            return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+        # Create booking
+        booking = TrainerBooking.objects.create(
+            user=request.user,
+            trainer=trainer_reg,
+            booking_date=booking_date,
+            message=user_message,
+        )
+
+        # Create notification for the trainer
+        user_full_name = request.user.get_full_name() or request.user.username
+        trainer_name = trainer_reg.user.get_full_name() or trainer_reg.user.username
+        TrainerNotification.objects.create(
+            trainer=trainer_reg,
+            booking=booking,
+            notif_type='booking',
+            title=f'New Booking from {user_full_name}',
+            message=f'{user_full_name} wants to start training on {booking_date}.'
+                    + (f' Message: "{user_message}"' if user_message else ''),
+        )
+
+        # Create confirmation notification for the user
+        UserNotification.objects.create(
+            user=request.user,
+            booking=booking,
+            notif_type='general',
+            title='Booking Request Sent',
+            message=f'Your booking request to {trainer_name} for {booking_date} has been sent. You\'ll be notified once the trainer responds.',
+        )
+
+        messages.success(request, "Your booking request has been sent to the trainer!")
+        return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+    return redirect('trainer_profile_detail', trainer_id=trainer_id)
+
+
+@login_required
+def update_booking_status(request, booking_id):
+    """Trainer accepts or rejects a booking."""
+    booking = get_object_or_404(TrainerBooking, id=booking_id)
+
+    if booking.trainer.user != request.user:
+        messages.error(request, "Access denied.")
+        return redirect('trainer_dashboard')
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in ('confirmed', 'rejected'):
+            booking.status = new_status
+            booking.save()
+            messages.success(request, f"Booking {new_status} successfully!")
+
+            # Notify the user
+            trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+            if new_status == 'confirmed':
+                UserNotification.objects.create(
+                    user=booking.user,
+                    booking=booking,
+                    notif_type='booking_confirmed',
+                    title='Booking Confirmed!',
+                    message=f'Great news! {trainer_name} has accepted your booking for {booking.booking_date.strftime("%b %d, %Y")}. Get ready for your training!'
+                )
+            else:
+                UserNotification.objects.create(
+                    user=booking.user,
+                    booking=booking,
+                    notif_type='booking_rejected',
+                    title='Booking Declined',
+                    message=f'{trainer_name} was unable to accept your booking for {booking.booking_date.strftime("%b %d, %Y")}. You can try booking another trainer.'
+                )
+        else:
+            messages.error(request, "Invalid action.")
+
+    return redirect('trainer_dashboard')
+
+
+@login_required
+def mark_notification_read(request, notif_id):
+    """Mark a single notification as read."""
+    notif = get_object_or_404(TrainerNotification, id=notif_id)
+    if notif.trainer.user != request.user:
+        messages.error(request, "Access denied.")
+        return redirect('trainer_dashboard')
+    notif.is_read = True
+    notif.save()
+    return redirect('trainer_dashboard')
+
+
+@login_required
+def mark_all_notifications_read(request):
+    """Mark all notifications as read for current trainer."""
+    registration = TrainerRegistration.objects.filter(user=request.user).first()
+    if registration:
+        registration.notifications.filter(is_read=False).update(is_read=True)
+        messages.success(request, "All notifications marked as read.")
+    return redirect('trainer_dashboard')
+
+
+@login_required
+def user_mark_notification_read(request, notif_id):
+    """Mark a single user notification as read."""
+    notif = get_object_or_404(UserNotification, id=notif_id)
+    if notif.user != request.user:
+        messages.error(request, "Access denied.")
+        return redirect('user_dashboard')
+    notif.is_read = True
+    notif.save()
+    return redirect('user_dashboard')
+
+
+@login_required
+def user_mark_all_notifications_read(request):
+    """Mark all user notifications as read."""
+    UserNotification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect('user_dashboard')
+
+
+@login_required
+def user_cancel_booking(request, booking_id):
+    """User cancels their own pending booking."""
+    booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
+    if booking.status == 'pending':
+        booking.status = 'cancelled'
+        booking.save()
+        # Notify trainer
+        user_name = request.user.get_full_name() or request.user.username
+        TrainerNotification.objects.create(
+            trainer=booking.trainer,
+            booking=booking,
+            notif_type='cancellation',
+            title='Booking Cancelled',
+            message=f'{user_name} has cancelled their booking for {booking.booking_date.strftime("%b %d, %Y")}.'
+        )
+        messages.success(request, "Booking cancelled successfully.")
+    else:
+        messages.error(request, "Only pending bookings can be cancelled.")
+    return redirect('user_dashboard')

@@ -9,6 +9,449 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'trainer_dashboard.css' %}">
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ── Notification Dropdown ── */
+        .notif-dropdown-wrap{position:relative;display:inline-flex}
+        .notif-bell-btn{background:none;border:2px solid rgba(255,255,255,0.2);color:rgba(255,255,255,.85);font-size:18px;cursor:pointer;position:relative;padding:10px 16px;border-radius:12px;transition:all .25s;display:flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px}
+        .notif-bell-btn:hover{border-color:#ff7a18;color:#ff9a3c;background:rgba(255,122,24,0.08)}
+        .notif-bell-btn .bell-icon{font-size:16px}
+        .notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:20px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1;border:2px solid #141416;animation:bellPulse 2s infinite}
+        @keyframes bellPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+        .notif-panel{position:absolute;top:calc(100% + 12px);right:0;width:380px;background:#1a1a1e;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 25px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);opacity:0;visibility:hidden;transform:translateY(8px) scale(.97);transition:all .25s cubic-bezier(.4,0,.2,1);z-index:9999;overflow:hidden}
+        .notif-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+        .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+        .notif-panel-head h4{margin:0;font-size:16px;font-weight:800;color:#f4f4f4}
+        .notif-panel-head .mark-all{font-size:12px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
+        .notif-panel-head .mark-all:hover{color:#ff7a18}
+        .notif-list{max-height:380px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
+        .notif-list::-webkit-scrollbar{width:4px}
+        .notif-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px}
+        .notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .2s;cursor:default}
+        .notif-item:last-child{border-bottom:none}
+        .notif-item.unread{background:rgba(255,122,24,.04)}
+        .notif-item:hover{background:rgba(255,255,255,.03)}
+        .notif-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
+        .notif-icon.confirmed{background:rgba(34,197,94,.12);color:#22c55e}
+        .notif-icon.rejected{background:rgba(239,68,68,.12);color:#ef4444}
+        .notif-icon.booking{background:rgba(59,130,246,.12);color:#3b82f6}
+        .notif-icon.cancellation{background:rgba(251,191,36,.12);color:#fbbf24}
+        .notif-icon.general{background:rgba(139,92,246,.12);color:#8b5cf6}
+        .notif-content{flex:1;min-width:0}
+        .notif-content .notif-text{margin:0;font-size:13px;color:rgba(255,255,255,.65);line-height:1.45}
+        .notif-content .notif-text strong{color:#f4f4f4;font-weight:700}
+        .notif-content .notif-time{font-size:11px;color:rgba(255,255,255,.3);margin-top:4px;font-weight:600}
+        .notif-unread-dot{width:8px;height:8px;border-radius:50%;background:#ff7a18;flex-shrink:0;margin-top:6px}
+        .notif-panel-foot{padding:12px 20px;border-top:1px solid rgba(255,255,255,.06);text-align:center}
+        .notif-panel-foot a{font-size:13px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
+        .notif-panel-foot a:hover{color:#ff7a18}
+        .notif-empty{text-align:center;padding:40px 20px}
+        .notif-empty i{font-size:28px;color:rgba(255,255,255,.15);margin-bottom:10px}
+        .notif-empty p{margin:0;font-size:13px;color:rgba(255,255,255,.35)}
+
+        /* ── Messages Container ── */
+        .td-messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .td-alert-message {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .td-alert-message.msg-success {
+            background: rgba(34,197,94,0.15);
+            border-left: 4px solid #22c55e;
+        }
+
+        .td-alert-message.msg-error {
+            background: rgba(239,68,68,0.15);
+            border-left: 4px solid #ef4444;
+        }
+
+        .td-alert-message.msg-warning {
+            background: rgba(251,191,36,0.15);
+            border-left: 4px solid #fbbf24;
+        }
+
+        .td-alert-message.msg-info {
+            background: rgba(59,130,246,0.15);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .td-alert-icon {
+            font-size: 20px;
+        }
+
+        .msg-success .td-alert-icon { color: #22c55e; }
+        .msg-error .td-alert-icon { color: #ef4444; }
+        .msg-warning .td-alert-icon { color: #fbbf24; }
+        .msg-info .td-alert-icon { color: #3b82f6; }
+
+        .td-alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ── No Registration CTA ── */
+        .td-register-cta {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .td-register-cta .btn-action {
+            display: inline-flex;
+        }
+
+        /* ── Admin Remarks ── */
+        .td-admin-remarks {
+            margin-top: 8px;
+        }
+
+        /* ── Verified Alert Close ── */
+        .td-verified-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(34,197,94,0.8);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* ── About Me Section ── */
+        .td-about-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1.5px solid rgba(255,255,255,0.08);
+        }
+
+        .td-about-title {
+            color: #ff7a18;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .td-about-text {
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* ── Dashboard Card Spacing ── */
+        .td-card-gap {
+            margin-bottom: 20px;
+        }
+
+        /* ── Bookings ── */
+        .td-bookings-scroll {
+            overflow-x: auto;
+        }
+
+        .td-booking-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .td-booking-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,122,24,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff7a18;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .td-booking-info {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .td-booking-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f4f4f4;
+        }
+
+        .td-booking-email {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .td-booking-date-col {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .td-booking-date-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .td-booking-date-value {
+            font-size: 13px;
+            color: #f4f4f4;
+            font-weight: 600;
+        }
+
+        .td-booking-status-col {
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .td-status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .td-status-badge.status-pending {
+            background: rgba(251,191,36,0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+
+        .td-status-badge.status-confirmed {
+            background: rgba(34,197,94,0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+
+        .td-status-badge.status-rejected {
+            background: rgba(239,68,68,0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .td-status-badge.status-cancelled {
+            background: rgba(156,163,175,0.15);
+            color: #9ca3af;
+            border: 1px solid rgba(156,163,175,0.3);
+        }
+
+        .td-booking-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .td-booking-actions form {
+            margin: 0;
+        }
+
+        .td-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .td-action-btn.accept {
+            background: rgba(34,197,94,0.2);
+            color: #22c55e;
+        }
+
+        .td-action-btn.accept:hover {
+            background: rgba(34,197,94,0.4);
+        }
+
+        .td-action-btn.reject {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .td-action-btn.reject:hover {
+            background: rgba(239,68,68,0.4);
+        }
+
+        /* ── Booking Message ── */
+        .td-booking-msg {
+            padding: 6px 20px 12px 70px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .td-booking-msg p {
+            margin: 0;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-style: italic;
+        }
+
+        .td-booking-msg .fa-quote-left {
+            font-size: 10px;
+            margin-right: 5px;
+            color: #ff7a18;
+        }
+
+        /* ── Empty State Compact ── */
+        .td-empty-compact {
+            padding: 30px 10px;
+        }
+
+        /* ── Photo Upload Form ── */
+        .td-photo-upload {
+            padding: 20px;
+            border-bottom: 1.5px solid rgba(255,255,255,0.08);
+        }
+
+        .td-form-group {
+            margin-bottom: 15px;
+        }
+
+        .td-form-label {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .td-caption-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .td-upload-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff7a18 0%, #ff9d5c 100%);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* ── Photo Grid ── */
+        .td-photo-grid {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .td-photo-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.08);
+        }
+
+        .td-photo-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .td-photo-caption {
+            padding: 10px;
+            background: rgba(20,20,22,0.95);
+        }
+
+        .td-photo-caption p {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .td-photo-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(220,53,69,0.9);
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .notif-panel-foot .fa-arrow-right {
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        /* ── Custom File Button ── */
+        .custom-file-button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .custom-file-button:hover {
+            background: rgba(255,122,24,0.15);
+            border-color: rgba(255,122,24,0.4);
+            color: #ff7a18;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -44,6 +487,56 @@
             </div>
             
             <div class="header-actions">
+                <!-- Notification Bell Dropdown -->
+                <div class="notif-dropdown-wrap">
+                    <button class="notif-bell-btn" id="notifBellBtn" type="button" title="Notifications">
+                        <i class="fas fa-bell bell-icon"></i>
+                        {% if user_unread_notif_count > 0 %}
+                            <span class="notif-badge">{{ user_unread_notif_count }}</span>
+                        {% endif %}
+                    </button>
+
+                    <div class="notif-panel" id="notifPanel">
+                        <div class="notif-panel-head">
+                            <h4>Notifications</h4>
+                            {% if user_unread_notif_count > 0 %}
+                                <a href="{% url 'mark_all_notifications_read' %}" class="mark-all">Mark all read</a>
+                            {% endif %}
+                        </div>
+                        <div class="notif-list">
+                            {% if navbar_notifications %}
+                                {% for notif in navbar_notifications %}
+                                    <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+                                        <div class="notif-icon {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'confirmed' or notif.notif_type == 'approved' %}confirmed{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}rejected{% elif notif.notif_type == 'booking' %}booking{% elif notif.notif_type == 'cancellation' %}cancellation{% else %}general{% endif %}">
+                                            <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'approved' %}fa-trophy{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}fa-times-circle{% elif notif.notif_type == 'booking' %}fa-calendar-plus{% elif notif.notif_type == 'cancellation' %}fa-ban{% else %}fa-info-circle{% endif %}"></i>
+                                        </div>
+                                        <div class="notif-content">
+                                            <p class="notif-text"><strong>{{ notif.title }}</strong></p>
+                                            <p class="notif-text">{{ notif.message|truncatewords:18 }}</p>
+                                            <div class="notif-time"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</div>
+                                        </div>
+                                        {% if not notif.is_read %}
+                                            <span class="notif-unread-dot"></span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="notif-empty">
+                                    <i class="fa-solid fa-bell-slash"></i>
+                                    <p>No notifications yet</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if navbar_notifications %}
+                            <div class="notif-panel-foot">
+                                <a href="{% url 'trainer_dashboard' %}">
+                                    View all <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <a href="{% url 'home' %}" class="btn-action btn-secondary">
                     <i class="fas fa-home"></i> Home
                 </a>
@@ -58,12 +551,12 @@
 
         <!-- Messages Container -->
         {% if messages %}
-        <div id="messages-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;">
+        <div id="messages-container" class="td-messages-container">
             {% for message in messages %}
-                <div class="alert-message alert-{{ message.tags }}" style="margin-bottom: 15px; padding: 15px 20px; background: {% if message.tags == 'success' %}rgba(34,197,94,0.15){% elif message.tags == 'error' %}rgba(239,68,68,0.15){% elif message.tags == 'warning' %}rgba(251,191,36,0.15){% else %}rgba(59,130,246,0.15){% endif %}; border-left: 4px solid {% if message.tags == 'success' %}#22c55e{% elif message.tags == 'error' %}#ef4444{% elif message.tags == 'warning' %}#fbbf24{% else %}#3b82f6{% endif %}; border-radius: 8px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease-out;">
-                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}" style="font-size: 20px; color: {% if message.tags == 'success' %}#22c55e{% elif message.tags == 'error' %}#ef4444{% elif message.tags == 'warning' %}#fbbf24{% else %}#3b82f6{% endif %};"></i>
+                <div class="td-alert-message {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' %}msg-error{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} td-alert-icon"></i>
                     <span>{{ message }}</span>
-                    <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; opacity: 0.7; transition: opacity 0.3s;">
+                    <button onclick="this.parentElement.remove()" class="td-alert-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -72,23 +565,13 @@
         <script>
             // Auto-dismiss messages after 5 seconds
             setTimeout(function() {
-                const alerts = document.querySelectorAll('.alert-message');
+                const alerts = document.querySelectorAll('.td-alert-message');
                 alerts.forEach(function(alert) {
                     alert.style.animation = 'slideOut 0.3s ease-out';
                     setTimeout(function() { alert.remove(); }, 300);
                 });
             }, 5000);
         </script>
-        <style>
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        </style>
         {% endif %}
 
         {% if not registration %}
@@ -103,8 +586,8 @@
                 </div>
             </div>
             
-            <div style="text-align: center; padding: 40px;">
-                <a href="{% url 'trainerregestration' %}" class="btn-action btn-primary" style="display: inline-flex;">
+            <div class="td-register-cta">
+                <a href="{% url 'trainerregestration' %}" class="btn-action btn-primary">
                     <i class="fas fa-clipboard-check"></i> Complete Registration
                 </a>
             </div>
@@ -119,7 +602,7 @@
                         <h4>Verification Pending</h4>
                         <p>Your trainer application is under review. You'll be notified once your profile is verified.</p>
                         {% if registration.remarks %}
-                            <p style="margin-top: 8px;"><strong>Admin Remarks:</strong> {{ registration.remarks }}</p>
+                            <p class="td-admin-remarks"><strong>Admin Remarks:</strong> {{ registration.remarks }}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -132,7 +615,7 @@
                         <h4>Profile Verified!</h4>
                         <p>Congratulations! Your trainer profile has been verified and is now visible to potential clients.</p>
                     </div>
-                    <button onclick="this.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: rgba(34,197,94,0.8); font-size: 20px; cursor: pointer; transition: all 0.3s;">
+                    <button onclick="this.parentElement.remove()" class="td-verified-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -166,10 +649,10 @@
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ active_clients }}</div>
                     <div class="stat-label">Active Clients</div>
                     <div class="stat-change stat-up">
-                        <i class="fas fa-arrow-up"></i> Coming Soon
+                        <i class="fas fa-check-circle"></i> Confirmed
                     </div>
                 </div>
 
@@ -270,11 +753,11 @@
                     </div>
 
                     {% if registration.bio %}
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1.5px solid rgba(255,255,255,0.08);">
-                        <h4 style="color: #ff7a18; font-size: 16px; margin-bottom: 12px;">
+                    <div class="td-about-section">
+                        <h4 class="td-about-title">
                             <i class="fas fa-quote-left"></i> About Me
                         </h4>
-                        <p style="color: rgba(255,255,255,0.8); line-height: 1.7; font-size: 14px;">
+                        <p class="td-about-text">
                             {{ registration.bio }}
                         </p>
                     </div>
@@ -283,8 +766,76 @@
 
                 <!-- Right Sidebar -->
                 <div>
+                    <!-- Bookings Card -->
+                    <div class="dashboard-card td-card-gap">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-calendar-alt"></i> Booking Requests
+                            </h2>
+                        </div>
+
+                        {% if bookings %}
+                            <div class="td-bookings-scroll">
+                                {% for booking in bookings %}
+                                    <div class="td-booking-item">
+                                        <div class="td-booking-avatar">
+                                            {{ booking.user.username.0|upper }}
+                                        </div>
+                                        <div class="td-booking-info">
+                                            <div class="td-booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                                            <div class="td-booking-email">{{ booking.user.email }}</div>
+                                        </div>
+                                        <div class="td-booking-date-col">
+                                            <div class="td-booking-date-label">Start Date</div>
+                                            <div class="td-booking-date-value">{{ booking.booking_date|date:"M d, Y" }}</div>
+                                        </div>
+                                        <div class="td-booking-status-col">
+                                            <span class="td-status-badge {% if booking.status == 'pending' %}status-pending{% elif booking.status == 'confirmed' %}status-confirmed{% elif booking.status == 'rejected' %}status-rejected{% else %}status-cancelled{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </div>
+                                        {% if booking.status == 'pending' %}
+                                            <div class="td-booking-actions">
+                                                <form method="post" action="{% url 'update_booking_status' booking.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="confirmed">
+                                                    <button type="submit" title="Accept" class="td-action-btn accept">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'update_booking_status' booking.id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="rejected">
+                                                    <button type="submit" title="Reject" class="td-action-btn reject">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if booking.message %}
+                                        <div class="td-booking-msg">
+                                            <p>
+                                                <i class="fas fa-quote-left"></i>
+                                                {{ booking.message|truncatewords:30 }}
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state td-empty-compact">
+                                <div class="empty-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <h3>No Bookings Yet</h3>
+                                <p>Booking requests will appear here</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <!-- Availability -->
-                    <div class="dashboard-card" style="margin-bottom: 20px;">
+                    <div class="dashboard-card td-card-gap">
                         <div class="card-header">
                             <h2 class="card-title">
                                 <i class="fas fa-clock"></i> Availability
@@ -307,7 +858,7 @@
                                 </div>
                             </div>
                         {% else %}
-                            <div class="empty-state" style="padding: 30px 10px;">
+                            <div class="empty-state td-empty-compact">
                                 <div class="empty-icon">
                                     <i class="fas fa-calendar-times"></i>
                                 </div>
@@ -318,7 +869,7 @@
                     </div>
 
                     <!-- Photos Gallery -->
-                    <div class="dashboard-card" style="margin-bottom: 20px;">
+                    <div class="dashboard-card td-card-gap">
                         <div class="card-header">
                             <h2 class="card-title">
                                 <i class="fas fa-images"></i> Photo Gallery
@@ -326,10 +877,10 @@
                         </div>
                         
                         <!-- Upload Form -->
-                        <form method="post" action="{% url 'upload_trainer_photo' %}" enctype="multipart/form-data" style="padding: 20px; border-bottom: 1.5px solid rgba(255,255,255,0.08);">
+                        <form method="post" action="{% url 'upload_trainer_photo' %}" enctype="multipart/form-data" class="td-photo-upload">
                             {% csrf_token %}
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; color: rgba(255,255,255,0.7); margin-bottom: 8px; font-size: 13px;">
+                            <div class="td-form-group">
+                                <label class="td-form-label">
                                     <i class="fas fa-image"></i> Select Photo
                                 </label>
                                 <input type="file" name="photo" accept="image/*" required id="photoFileInput" style="display: none;">
@@ -337,29 +888,6 @@
                                     <i class="fas fa-folder-open"></i>
                                     <span id="fileNameDisplay">Choose File</span>
                                 </button>
-                                <style>
-                                    .custom-file-button {
-                                        width: 100%;
-                                        padding: 12px;
-                                        background: rgba(255,255,255,0.05);
-                                        border: 1.5px solid rgba(255,255,255,0.15);
-                                        border-radius: 8px;
-                                        color: rgba(255,255,255,0.8);
-                                        font-size: 13px;
-                                        cursor: pointer;
-                                        transition: all 0.3s ease;
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        gap: 8px;
-                                    }
-                                    .custom-file-button:hover {
-                                        background: rgba(255,122,24,0.15);
-                                        border-color: rgba(255,122,24,0.4);
-                                        color: #ff7a18;
-                                        transform: translateY(-2px);
-                                    }
-                                </style>
                                 <script>
                                     document.getElementById('photoFileInput').addEventListener('change', function(e) {
                                         const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose File';
@@ -367,36 +895,36 @@
                                     });
                                 </script>
                             </div>
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; color: rgba(255,255,255,0.7); margin-bottom: 8px; font-size: 13px;">
+                            <div class="td-form-group">
+                                <label class="td-form-label">
                                     <i class="fas fa-comment"></i> Caption (Optional)
                                 </label>
-                                <input type="text" name="caption" placeholder="Add a caption..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 13px;">
+                                <input type="text" name="caption" placeholder="Add a caption..." class="td-caption-input">
                             </div>
-                            <button type="submit" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff7a18 0%, #ff9d5c 100%); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            <button type="submit" class="td-upload-btn">
                                 <i class="fas fa-upload"></i> Upload Photo
                             </button>
                         </form>
                         
                         <!-- Photo Grid -->
                         {% if photos %}
-                            <div style="padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div class="td-photo-grid">
                                 {% for photo in photos %}
-                                    <div style="position: relative; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.08);">
-                                        <img src="{{ photo.photo.url }}" alt="{{ photo.caption }}" style="width: 100%; height: 150px; object-fit: cover;">
+                                    <div class="td-photo-card">
+                                        <img src="{{ photo.photo.url }}" alt="{{ photo.caption }}">
                                         {% if photo.caption %}
-                                            <div style="padding: 10px; background: rgba(20,20,22,0.95);">
-                                                <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin: 0;">{{ photo.caption }}</p>
+                                            <div class="td-photo-caption">
+                                                <p>{{ photo.caption }}</p>
                                             </div>
                                         {% endif %}
-                                        <a href="{% url 'delete_trainer_photo' photo.id %}" onclick="return confirm('Are you sure you want to delete this photo?');" style="position: absolute; top: 10px; right: 10px; background: rgba(220,53,69,0.9); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: all 0.3s ease;">
+                                        <a href="{% url 'delete_trainer_photo' photo.id %}" onclick="return confirm('Are you sure you want to delete this photo?');" class="td-photo-delete">
                                             <i class="fas fa-times"></i>
                                         </a>
                                     </div>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <div class="empty-state" style="padding: 30px 10px;">
+                            <div class="empty-state td-empty-compact">
                                 <div class="empty-icon">
                                     <i class="fas fa-camera"></i>
                                 </div>
@@ -461,5 +989,26 @@
             </div>
         {% endif %}
     </div>
+
+    <script>
+    // Notification dropdown toggle
+    (function(){
+        const btn = document.getElementById('notifBellBtn');
+        const panel = document.getElementById('notifPanel');
+        if(!btn || !panel) return;
+        btn.addEventListener('click', function(e){
+            e.stopPropagation();
+            panel.classList.toggle('open');
+        });
+        document.addEventListener('click', function(e){
+            if(!panel.contains(e.target) && e.target !== btn){
+                panel.classList.remove('open');
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape') panel.classList.remove('open');
+        });
+    })();
+    </script>
 </body>
 </html>

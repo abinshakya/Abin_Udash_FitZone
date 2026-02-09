@@ -29,9 +29,18 @@ def user_dashboard(request):
     if not membership:
         messages.warning(request, "You don't have an active membership plan. Please purchase a membership to access the dashboard.")
         return redirect('/membership/')
-    
+
+    # Get user notifications
+    from trainer.models import UserNotification, TrainerBooking
+    notifications = UserNotification.objects.filter(user=request.user)[:20]
+    unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
+    bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user')[:20]
+
     context = {
-        'membership': membership
+        'membership': membership,
+        'notifications': notifications,
+        'unread_count': unread_count,
+        'bookings': bookings,
     }
     
     return render(request, 'member/user_dashboard.html', context)

@@ -64,3 +64,72 @@ class TrainerPhoto(models.Model):
     
     def __str__(self):
         return f"{self.trainer.user.username} - Photo {self.id}"
+
+
+class TrainerBooking(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='trainer_bookings')
+    trainer = models.ForeignKey(TrainerRegistration, on_delete=models.CASCADE, related_name='bookings')
+    booking_date = models.DateField(help_text="Preferred start date")
+    message = models.TextField(blank=True, null=True, help_text="Message to the trainer")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.trainer.user.username} ({self.status})"
+
+
+class TrainerNotification(models.Model):
+    NOTIF_TYPES = [
+        ('booking', 'New Booking'),
+        ('cancellation', 'Booking Cancelled'),
+        ('approved', 'Registration Approved'),
+        ('rejected', 'Registration Rejected'),
+        ('general', 'General'),
+    ]
+
+    trainer = models.ForeignKey(TrainerRegistration, on_delete=models.CASCADE, related_name='notifications')
+    booking = models.ForeignKey(TrainerBooking, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    notif_type = models.CharField(max_length=20, choices=NOTIF_TYPES, default='general')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notif_type}] {self.title} -> {self.trainer.user.username}"
+
+
+class UserNotification(models.Model):
+    NOTIF_TYPES = [
+        ('booking_confirmed', 'Booking Confirmed'),
+        ('booking_rejected', 'Booking Rejected'),
+        ('general', 'General'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_notifications')
+    booking = models.ForeignKey(TrainerBooking, on_delete=models.CASCADE, null=True, blank=True, related_name='user_notifications')
+    notif_type = models.CharField(max_length=20, choices=NOTIF_TYPES, default='general')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notif_type}] {self.title} -> {self.user.username}"
