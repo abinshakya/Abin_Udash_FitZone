@@ -31,16 +31,67 @@ def user_dashboard(request):
         return redirect('/membership/')
 
     # Get user notifications
-    from trainer.models import UserNotification, TrainerBooking
+    from notifications.models import UserNotification
+    from trainer.models import TrainerBooking
     notifications = UserNotification.objects.filter(user=request.user)[:20]
     unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
-    bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user')[:20]
+    bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user').order_by('-created_at')[:20]
+    
+    # Get bookings requiring payment
+    confirmed_bookings = TrainerBooking.objects.filter(
+        user=request.user, 
+        status='confirmed',
+        payment_status='pending'
+    ).select_related('trainer__user').order_by('payment_due_date')
 
     context = {
         'membership': membership,
         'notifications': notifications,
         'unread_count': unread_count,
         'bookings': bookings,
+        'confirmed_bookings': confirmed_bookings,
     }
     
     return render(request, 'member/user_dashboard.html', context)
+
+@login_required
+def trainer_client_dashboard(request):
+    """Dashboard for users who have booked trainers"""
+    from notifications.models import UserNotification
+    from trainer.models import TrainerBooking
+    
+    # Get all bookings for this user
+    all_bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user').order_by('-created_at')
+    
+    # Check if user has any bookings
+    if not all_bookings.exists():
+        messages.info(request, "You haven't booked any trainers yet. Browse our trainers to get started!")
+        return redirect('trainer')
+    
+    # Get bookings requiring payment
+    confirmed_bookings = TrainerBooking.objects.filter(
+        user=request.user, 
+        status='confirmed',
+        payment_status='pending'
+    ).select_related('trainer__user').order_by('payment_due_date')
+    
+    # Get active trainers (confirmed and paid)
+    active_trainers = TrainerBooking.objects.filter(
+        user=request.user,
+        status='confirmed',
+        payment_status='completed'
+    ).select_related('trainer__user').order_by('-updated_at')
+    
+    # Get notifications
+    notifications = UserNotification.objects.filter(user=request.user).order_by('-created_at')[:20]
+    unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
+    
+    context = {
+        'all_bookings': all_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'active_trainers': active_trainers,
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    
+    return render(request, 'trainer_client/dashboard.html', context)

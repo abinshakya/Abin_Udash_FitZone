@@ -1,0 +1,948 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Trainers - FitZone</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg0:#0b0b0c;
+      --bg1:#141416;
+
+      --cardTop: rgba(30,30,30,0.92);
+      --cardBot: rgba(14,14,14,0.92);
+
+      --text:#f4f4f4;
+      --muted: rgba(255,255,255,0.68);
+      --border: rgba(255,255,255,0.10);
+
+      --orange:#ff7a18;
+      --orange2:#ff9a3c;
+
+      --shadow: 0 22px 70px rgba(0,0,0,0.65);
+      --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: "Poppins", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
+        radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+        linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+      min-height: 100vh;
+    }
+
+    /* ---------- Layout ---------- */
+    .dash{
+      min-height: 100vh;
+    }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar{
+      width:220px;
+      background:var(--bg0);
+      border-right:1px solid rgba(255,255,255,0.06);
+      display:flex;
+      flex-direction:column;
+      position:fixed;
+      top:0;bottom:0;left:0;
+      z-index:100;
+    }
+    .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px}
+    .brand-logo{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg,var(--orange),var(--orange2));
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;font-weight:900;color:#141416;
+    }
+    .brand-title{font-size:17px;font-weight:900;color:var(--text)}
+    .brand-sub{font-size:10px;color:rgba(255,255,255,0.55);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
+    .nav a{
+      display:flex;align-items:center;gap:12px;
+      padding:11px 14px;border-radius:10px;
+      color:rgba(255,255,255,0.55);text-decoration:none;
+      font-size:13px;font-weight:600;transition:all .2s;
+    }
+    .nav a:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+    .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
+    .nav a i{width:18px;text-align:center;font-size:14px}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+    .logout{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
+    .logout:hover{color:#ef4444}
+
+    /* ---------- Main ---------- */
+    .main{
+      margin-left:220px;
+      padding: 26px 26px 60px;
+      max-width: 1400px;
+    }
+
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .hello h1{
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #fff, var(--orange2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hello p{
+      margin: 6px 0 0;
+      color: rgba(255,255,255,0.65);
+      font-weight: 600;
+    }
+
+    /* ---------- Cards ---------- */
+    .card{
+      background: linear-gradient(155deg, var(--cardTop) 0%, var(--cardBot) 100%);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 22px;
+      box-shadow: var(--shadowSoft);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-head{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .card-head h2{
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 950;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon-orange{
+      color: var(--orange);
+    }
+
+    .card-body{
+      padding: 24px;
+    }
+
+    .card-body-flush{
+      padding: 0;
+    }
+
+    /* ---------- Payment Alert ---------- */
+    .payment-alert{
+      background: linear-gradient(135deg, rgba(255,122,24,0.15), rgba(255,154,60,0.08));
+      border: 2px solid rgba(255,122,24,0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .payment-alert-icon{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #141416;
+      flex-shrink: 0;
+    }
+
+    .payment-alert-content{
+      flex: 1;
+    }
+
+    .payment-alert-title{
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      margin: 0 0 6px;
+    }
+
+    .payment-alert-text{
+      margin: 0;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+    }
+
+    /* ---------- Payment Items ---------- */
+    .payment-item{
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: linear-gradient(135deg, rgba(255,122,24,0.04), rgba(255,154,60,0.01));
+      border-left: 4px solid var(--orange);
+    }
+
+    .payment-item:last-child{
+      border-bottom: none;
+    }
+
+    .payment-left{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .payment-avatar{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #141416;
+      font-weight: 900;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .payment-info h3{
+      margin: 0 0 6px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .payment-meta{
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin: 2px 0;
+    }
+
+    .payment-due{
+      font-size: 13px;
+      color: #fbbf24;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .payment-right{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .payment-amount{
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--orange);
+      text-shadow: 0 0 20px rgba(255,122,24,0.3);
+    }
+
+    .pay-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #141416;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 900;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(255,122,24,0.3);
+      transition: all 0.2s;
+    }
+
+    .pay-btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(255,122,24,0.4);
+    }
+
+    /* ---------- Trainer Cards ---------- */
+    .trainer-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .trainer-card{
+      background: linear-gradient(155deg, rgba(30,30,30,0.85), rgba(20,20,20,0.85));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .trainer-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(255,122,24,0.3);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    .trainer-header{
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .trainer-avatar-lg{
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #141416;
+      font-weight: 900;
+      font-size: 24px;
+    }
+
+    .trainer-header-info h3{
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .trainer-spec{
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+    }
+
+    .trainer-details{
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .trainer-detail-row{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .trainer-detail-row i{
+      color: var(--orange);
+      width: 16px;
+    }
+
+    .trainer-actions{
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .trainer-btn{
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+
+    .trainer-btn-primary{
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #141416;
+      border-color: transparent;
+    }
+
+    .trainer-btn-primary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255,122,24,0.3);
+    }
+
+    .trainer-btn-secondary{
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .trainer-btn-secondary:hover{
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ---------- Booking List ---------- */
+    .booking-list{
+      display: grid;
+      gap: 0;
+    }
+
+    .booking-item{
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .booking-item:last-child{
+      border-bottom: none;
+    }
+
+    .booking-avatar{
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(255,154,60,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,122,24,0.2);
+    }
+
+    .booking-info{
+      flex: 1;
+    }
+
+    .booking-name{
+      font-size: 15px;
+      font-weight: 700;
+      color: #f4f4f4;
+      margin-bottom: 4px;
+    }
+
+    .booking-date{
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 600;
+    }
+
+    .status-badge{
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-pending{
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+
+    .status-confirmed{
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .status-rejected{
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+
+    .status-cancelled{
+      background: rgba(156,163,175,0.12);
+      color: #9ca3af;
+      border: 1px solid rgba(156,163,175,0.25);
+    }
+
+    .cancel-form{
+      margin: 0;
+    }
+
+    .cancel-btn{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(239,68,68,0.2);
+      background: rgba(239,68,68,0.08);
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .cancel-btn:hover{
+      background: rgba(239,68,68,0.2);
+    }
+
+    /* ---------- Empty State ---------- */
+    .empty-state{
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .empty-icon{
+      font-size: 64px;
+      color: rgba(255,255,255,0.2);
+      margin-bottom: 16px;
+    }
+
+    .empty-title{
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .empty-text{
+      margin: 0;
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+
+    /* ---------- Notifications ---------- */
+    .notif-list{
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .notif-item{
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      gap: 14px;
+    }
+
+    .notif-item.unread{
+      background: rgba(255,122,24,0.05);
+      border-left: 3px solid var(--orange);
+    }
+
+    .notif-icon{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .notif-icon.confirmed{
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+    }
+
+    .notif-icon.rejected{
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+    }
+
+    .notif-icon.general{
+      background: rgba(59,130,246,0.15);
+      color: #3b82f6;
+    }
+
+    .notif-icon.payment{
+      background: rgba(251,191,36,0.15);
+      color: #fbbf24;
+    }
+
+    .notif-content{
+      flex: 1;
+    }
+
+    .notif-title{
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notif-unread-dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .notif-msg{
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin: 4px 0;
+      line-height: 1.5;
+    }
+
+    .notif-time{
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+
+    .notif-time i{
+      margin-right: 4px;
+    }
+
+    .mark-read-link{
+      font-size: 12px;
+      color: var(--orange);
+      text-decoration: none;
+      margin-left: 12px;
+      font-weight: 700;
+    }
+
+    .mark-read-link:hover{
+      text-decoration: underline;
+    }
+
+    .chip{
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip.error{
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+
+    .chip.gray{
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .unread-badge{
+      background: var(--orange);
+      color: #141416;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 900;
+      margin-left: 8px;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 900px) {
+      .sidebar{width:64px}
+      .brand>div,.nav a span,.sidebar-footer span{display:none}
+      .nav a{justify-content:center;padding:12px}
+      .main{margin-left:64px}
+    }
+    @media (max-width: 600px) {
+      .sidebar{display:none}
+      .main{margin-left:0}
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .trainer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .payment-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .payment-right {
+        width: 100%;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dash">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">FZ</div>
+        <div>
+          <div class="brand-title">FitZone</div>
+          <div class="brand-sub">Trainer Client</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="{% url 'trainer_client_dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="{% url 'client_chat' %}"><i class="fa-solid fa-comments"></i> Chat</a>
+        <a href="#"><i class="fa-solid fa-apple-whole"></i> Diet Plan</a>
+        <a href="#"><i class="fa-solid fa-dumbbell"></i> Workout Plan</a>
+        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="topbar">
+        <div class="hello">
+          <h1>Hey, {{ request.user.get_full_name|default:request.user.username }}! 👋</h1>
+          <p>Manage your trainer bookings and stay on track with your fitness goals</p>
+        </div>
+      </div>
+
+      <!-- Django Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="payment-alert" style="{% if message.tags == 'error' %}border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1);{% elif message.tags == 'success' %}border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.1);{% endif %}">
+            <div class="payment-alert-icon" style="{% if message.tags == 'error' %}background: #ef4444;{% elif message.tags == 'success' %}background: #22c55e;{% endif %}">
+              <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check{% else %}fa-info-circle{% endif %}"></i>
+            </div>
+            <div class="payment-alert-content">
+              <p class="payment-alert-title">{{ message }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Payment Required Section -->
+      {% if confirmed_bookings %}
+      <div class="payment-alert">
+        <div class="payment-alert-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="payment-alert-content">
+          <h3 class="payment-alert-title">Payment Required!</h3>
+          <p class="payment-alert-text">You have {{ confirmed_bookings|length }} confirmed booking(s) waiting for payment. Complete payment to start your training!</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-credit-card card-icon-orange"></i> Pending Payments</h2>
+          <span class="chip error">{{ confirmed_bookings|length }} Pending</span>
+        </div>
+        <div class="card-body card-body-flush">
+          {% for booking in confirmed_bookings %}
+            <div class="payment-item">
+              <div class="payment-left">
+                <div class="payment-avatar">
+                  {{ booking.trainer.user.username.0|upper }}
+                </div>
+                <div class="payment-info">
+                  <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+                  <div class="payment-meta">
+                    <i class="fa-regular fa-calendar"></i> Training starts: {{ booking.booking_date|date:"M d, Y" }}
+                  </div>
+                  <div class="payment-due">
+                    <i class="fa-solid fa-clock"></i> Pay by: {{ booking.payment_due_date|date:"M d, Y, g:i A" }}
+                  </div>
+                </div>
+              </div>
+              <div class="payment-right">
+                <div class="payment-amount">₹{{ booking.amount }}</div>
+                <div style="display: flex; gap: 10px;">
+                  <a href="/payment/checkout/{{ booking.id }}/" class="pay-btn">
+                    <i class="fa-solid fa-lock"></i> Pay Now
+                  </a>
+                  <form method="post" action="{% url 'user_cancel_booking' booking.id %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="pay-btn" style="background: rgba(239,68,68,0.15); color: #ef4444; box-shadow: 0 8px 24px rgba(239,68,68,0.2);"
+                            onclick="return confirm('Cancel this booking? You will need to book again.')">
+                      <i class="fa-solid fa-times"></i> Cancel
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Active Trainers -->
+      {% if active_trainers %}
+      <div class="card">
+        <div class="card-head">
+          <h2><i class="fa-solid fa-dumbbell card-icon-orange"></i> My Active Trainers</h2>
+          <span class="chip gray">{{ active_trainers|length }} Active</span>
+        </div>
+        <div class="card-body">
+          <div class="trainer-grid">
+            {% for booking in active_trainers %}
+              <div class="trainer-card">
+                <div class="trainer-header">
+                  <div class="trainer-avatar-lg">
+                    {{ booking.trainer.user.username.0|upper }}
+                  </div>
+                  <div class="trainer-header-info">
+                    <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+                    <div class="trainer-spec">{{ booking.trainer.specialization }}</div>
+                  </div>
+                </div>
+                <div class="trainer-details">
+                  <div class="trainer-detail-row">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+                  </div>
+                  <div class="trainer-detail-row">
+                    <i class="fas fa-award"></i>
+                    <span>{{ booking.trainer.experience }} years experience</span>
+                  </div>
+                  <div class="trainer-detail-row">
+                    <i class="fas fa-rupee-sign"></i>
+                    <span>₹{{ booking.amount }}/month</span>
+                  </div>
+                </div>
+                <div class="trainer-actions">
+                  <a href="{% url 'start_chat_with_trainer' booking.trainer.id %}" class="trainer-btn trainer-btn-primary">
+                    <i class="fas fa-comments"></i> Message
+                  </a>
+                  <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
+                    <i class="fas fa-eye"></i> View Profile
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- All Bookings & Notifications -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        
+        <!-- All Bookings -->
+        <div class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-calendar-check card-icon-orange"></i> All Bookings</h2>
+          </div>
+          <div class="card-body card-body-flush">
+            {% if all_bookings %}
+              <div class="booking-list">
+                {% for booking in all_bookings %}
+                  <div class="booking-item">
+                    <div class="booking-avatar">
+                      {{ booking.trainer.user.username.0|upper }}
+                    </div>
+                    <div class="booking-info">
+                      <div class="booking-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</div>
+                      <div class="booking-date">
+                        <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
+                      </div>
+                    </div>
+                    <span class="status-badge status-{{ booking.status }}">
+                      {{ booking.get_status_display }}
+                    </span>
+                    {% if booking.status == 'pending' or booking.status == 'confirmed' and booking.payment_status == 'pending' %}
+                      <form method="post" action="{% url 'user_cancel_booking' booking.id %}" class="cancel-form">
+                        {% csrf_token %}
+                        <button type="submit" title="Cancel booking" class="cancel-btn"
+                                onclick="return confirm('Cancel this booking?')">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                <h3 class="empty-title">No Bookings</h3>
+                <p class="empty-text">Start your fitness journey by booking a trainer!</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card">
+          <div class="card-head">
+            <h2>
+              <i class="fa-solid fa-bell card-icon-orange"></i> Notifications
+              {% if unread_count > 0 %}
+                <span class="unread-badge">{{ unread_count }}</span>
+              {% endif %}
+            </h2>
+            {% if notifications %}
+              <a href="{% url 'user_mark_all_notifications_read' %}" class="chip gray">
+                <i class="fa-solid fa-check-double"></i> Mark all read
+              </a>
+            {% endif %}
+          </div>
+          <div class="card-body card-body-flush">
+            {% if notifications %}
+              <div class="notif-list">
+                {% for notif in notifications %}
+                  <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
+                    <div class="notif-icon {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'payment_required' %}payment{% elif notif.notif_type == 'booking_rejected' %}rejected{% else %}general{% endif %}">
+                      <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'booking_rejected' %}fa-times-circle{% elif notif.notif_type == 'payment_required' %}fa-credit-card{% else %}fa-info-circle{% endif %}"></i>
+                    </div>
+                    <div class="notif-content">
+                      <div class="notif-title">
+                        {{ notif.title }}
+                        {% if not notif.is_read %}
+                          <span class="notif-unread-dot"></span>
+                        {% endif %}
+                      </div>
+                      <p class="notif-msg">{{ notif.message|truncatewords:25 }}</p>
+                      <div class="notif-time">
+                        <i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago
+                        {% if not notif.is_read %}
+                          <a href="{% url 'user_mark_notification_read' notif.id %}" class="mark-read-link">Mark read</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-bell-slash"></i></div>
+                <h3 class="empty-title">No Notifications</h3>
+                <p class="empty-text">You're all caught up!</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

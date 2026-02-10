@@ -24,10 +24,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('my-trainer-dashboard/', views.trainer_client_dashboard, name='trainer_client_dashboard'),
     path('', include('login_logout_register.urls')),
     path('', include('membership.urls')),
     path('', include('payment.urls')),
     path('', include('trainer.urls')),
+    path('notifications/', include('notifications.urls')),
+    path('', include('chat.urls')),
 
 ]
 

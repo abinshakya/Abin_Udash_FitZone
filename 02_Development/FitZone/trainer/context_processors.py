@@ -1,11 +1,11 @@
 from itertools import chain
 from operator import attrgetter
 
-from trainer.models import UserNotification, TrainerNotification, TrainerRegistration
+from trainer.models import TrainerRegistration
+from notifications.models import UserNotification, TrainerNotification
 
 
 def notification_count(request):
-    """Inject unread notification count and recent notifications for the navbar dropdown."""
     context = {
         'user_unread_notif_count': 0,
         'navbar_notifications': [],

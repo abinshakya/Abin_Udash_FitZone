@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils import timezone
+from datetime import timedelta
 from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
@@ -12,7 +13,8 @@ import os
 from .forms import (
     Step1BasicInfoForm, Step2CertificationForm, Step3DocumentsForm, TrainerProfileEditForm
 )
-from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPhoto, TrainerBooking, TrainerNotification, UserNotification
+from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPhoto, TrainerBooking
+from notifications.models import TrainerNotification, UserNotification
 
 
 def trainer(request):
@@ -175,7 +177,7 @@ def upload_trainer_photo(request):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     if not registration:
         messages.error(request, "Please complete trainer registration first.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_settings')
     
     if request.method == 'POST':
         photo_file = request.FILES.get('photo')
@@ -192,6 +194,84 @@ def upload_trainer_photo(request):
             messages.error(request, "Please select a photo to upload.")
     
     return redirect('trainer_dashboard')
+
+
+@login_required
+def update_profile_picture(request):
+    """Update trainer's profile picture."""
+    try:
+        profile = request.user.userprofile
+        if profile.role != 'trainer':
+            messages.warning(request, "Access denied. Trainers only!")
+            return redirect('/')
+    except:
+        messages.warning(request, "Access denied. Trainers only!")
+        return redirect('/')
+
+    registration = TrainerRegistration.objects.filter(user=request.user).first()
+    if not registration:
+        messages.error(request, "Please complete trainer registration first.")
+        return redirect('trainer_settings')
+
+    if request.method == 'POST':
+        pic_file = request.FILES.get('profile_picture')
+        if pic_file:
+            # Delete old profile_pic document if exists
+            old_pic = registration.documents.filter(doc_type='profile_pic').first()
+            if old_pic:
+                old_pic.delete()
+
+            # Save new profile_pic document
+            file_ext = pic_file.name.split('.')[-1] if '.' in pic_file.name else 'jpg'
+            new_filename = f"profile.{file_ext}"
+            doc = TrainerRegistrationDocument.objects.create(
+                registration=registration,
+                doc_type="profile_pic",
+            )
+            doc.file.save(new_filename, pic_file, save=True)
+
+            # Sync to UserProfile
+            try:
+                profile.profile_picture.save(new_filename, pic_file, save=True)
+            except:
+                pass
+
+            messages.success(request, "Profile picture updated successfully!")
+        else:
+            messages.error(request, "Please select an image.")
+
+    return redirect('trainer_settings')
+
+
+@login_required
+def trainer_settings(request):
+    """Trainer settings page with profile picture, profile details, availability, photo gallery."""
+    try:
+        profile = request.user.userprofile
+        if profile.role != 'trainer':
+            messages.warning(request, "Access denied. Trainers only!")
+            return redirect('/')
+    except:
+        messages.warning(request, "Access denied. Trainers only!")
+        return redirect('/')
+
+    registration = TrainerRegistration.objects.filter(user=request.user).first()
+
+    specializations = []
+    if registration and registration.specialization:
+        specializations = [s.strip() for s in registration.specialization.split(',')]
+
+    photos = []
+    if registration:
+        photos = registration.photos.all()
+
+    context = {
+        'registration': registration,
+        'specializations': specializations,
+        'photos': photos,
+    }
+
+    return render(request, 'trainersettings.html', context)
 
 
 @login_required
@@ -214,7 +294,7 @@ def delete_trainer_photo(request, photo_id):
     
     photo.delete()
     messages.success(request, "Photo deleted successfully!")
-    return redirect('trainer_dashboard')
+    return redirect('trainer_settings')
 
 
 FORMS = [
@@ -612,7 +692,7 @@ def book_trainer(request, trainer_id):
         )
 
         messages.success(request, "Your booking request has been sent to the trainer!")
-        return redirect('trainer_profile_detail', trainer_id=trainer_id)
+        return redirect('trainer_client_dashboard')
 
     return redirect('trainer_profile_detail', trainer_id=trainer_id)
 
@@ -628,28 +708,45 @@ def update_booking_status(request, booking_id):
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        if new_status in ('confirmed', 'rejected'):
+        if new_status in ('confirmed', 'rejected', 'cancelled'):
+            old_status = booking.status
             booking.status = new_status
+            
+            # If confirmed, set payment details
+            if new_status == 'confirmed':
+                booking.payment_status = 'pending'
+                booking.payment_due_date = timezone.now() + timedelta(days=2)
+                booking.amount = booking.trainer.monthly_price
+            
             booking.save()
             messages.success(request, f"Booking {new_status} successfully!")
 
             # Notify the user
             trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
             if new_status == 'confirmed':
+                payment_due_str = booking.payment_due_date.strftime("%b %d, %Y at %I:%M %p")
                 UserNotification.objects.create(
                     user=booking.user,
                     booking=booking,
-                    notif_type='booking_confirmed',
-                    title='Booking Confirmed!',
-                    message=f'Great news! {trainer_name} has accepted your booking for {booking.booking_date.strftime("%b %d, %Y")}. Get ready for your training!'
+                    notif_type='payment_required',
+                    title='Booking Confirmed - Payment Required!',
+                    message=f'Great news! {trainer_name} has accepted your booking for {booking.booking_date.strftime("%b %d, %Y")}. Please complete your payment of ₹{booking.amount} by {payment_due_str}. Check your dashboard for payment details.'
                 )
-            else:
+            elif new_status == 'rejected':
                 UserNotification.objects.create(
                     user=booking.user,
                     booking=booking,
                     notif_type='booking_rejected',
                     title='Booking Declined',
                     message=f'{trainer_name} was unable to accept your booking for {booking.booking_date.strftime("%b %d, %Y")}. You can try booking another trainer.'
+                )
+            elif new_status == 'cancelled':
+                UserNotification.objects.create(
+                    user=booking.user,
+                    booking=booking,
+                    notif_type='general',
+                    title='Booking Cancelled',
+                    message=f'{trainer_name} has cancelled your booking for {booking.booking_date.strftime("%b %d, %Y")}. You can book another session or contact the trainer.'
                 )
         else:
             messages.error(request, "Invalid action.")
@@ -658,52 +755,12 @@ def update_booking_status(request, booking_id):
 
 
 @login_required
-def mark_notification_read(request, notif_id):
-    """Mark a single notification as read."""
-    notif = get_object_or_404(TrainerNotification, id=notif_id)
-    if notif.trainer.user != request.user:
-        messages.error(request, "Access denied.")
-        return redirect('trainer_dashboard')
-    notif.is_read = True
-    notif.save()
-    return redirect('trainer_dashboard')
-
-
-@login_required
-def mark_all_notifications_read(request):
-    """Mark all notifications as read for current trainer."""
-    registration = TrainerRegistration.objects.filter(user=request.user).first()
-    if registration:
-        registration.notifications.filter(is_read=False).update(is_read=True)
-        messages.success(request, "All notifications marked as read.")
-    return redirect('trainer_dashboard')
-
-
-@login_required
-def user_mark_notification_read(request, notif_id):
-    """Mark a single user notification as read."""
-    notif = get_object_or_404(UserNotification, id=notif_id)
-    if notif.user != request.user:
-        messages.error(request, "Access denied.")
-        return redirect('user_dashboard')
-    notif.is_read = True
-    notif.save()
-    return redirect('user_dashboard')
-
-
-@login_required
-def user_mark_all_notifications_read(request):
-    """Mark all user notifications as read."""
-    UserNotification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    messages.success(request, "All notifications marked as read.")
-    return redirect('user_dashboard')
-
-
-@login_required
 def user_cancel_booking(request, booking_id):
-    """User cancels their own pending booking."""
+    """User cancels their own pending or confirmed (unpaid) booking."""
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
-    if booking.status == 'pending':
+    
+    # Allow canceling pending bookings or confirmed bookings that haven't been paid
+    if booking.status == 'pending' or (booking.status == 'confirmed' and booking.payment_status == 'pending'):
         booking.status = 'cancelled'
         booking.save()
         # Notify trainer
@@ -717,5 +774,5 @@ def user_cancel_booking(request, booking_id):
         )
         messages.success(request, "Booking cancelled successfully.")
     else:
-        messages.error(request, "Only pending bookings can be cancelled.")
-    return redirect('user_dashboard')
+        messages.error(request, "Only pending or unpaid confirmed bookings can be cancelled.")
+    return redirect('trainer_client_dashboard')
