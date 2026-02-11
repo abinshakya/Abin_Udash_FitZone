@@ -2,6 +2,31 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
+
+def cancel_overdue_bookings(user):
+    from notifications.models import UserNotification
+    from trainer.models import TrainerBooking
+
+    overdue = TrainerBooking.objects.filter(
+        user=user,
+        status='confirmed',
+        payment_status='pending',
+        payment_due_date__lt=timezone.now(),
+    ).select_related('trainer__user')
+
+    for booking in overdue:
+        booking.status = 'cancelled'
+        booking.payment_status = 'overdue'
+        booking.save()
+        trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+        UserNotification.objects.create(
+            user=user,
+            booking=booking,
+            notif_type='general',
+            title='Booking Cancelled - Payment Overdue',
+            message=f'Your booking with {trainer_name} for {booking.booking_date.strftime("%b %d, %Y")} was cancelled because payment was not completed within 2 days.',
+        )
 
 def home(request):
     return render(request,'index.html')
@@ -37,6 +62,9 @@ def user_dashboard(request):
     unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
     bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user').order_by('-created_at')[:20]
     
+    # Auto-cancel overdue bookings (unpaid for 2+ days)
+    cancel_overdue_bookings(request.user)
+
     # Get bookings requiring payment
     confirmed_bookings = TrainerBooking.objects.filter(
         user=request.user, 
@@ -54,9 +82,9 @@ def user_dashboard(request):
     
     return render(request, 'member/user_dashboard.html', context)
 
+# Dashboard for users who have booked trainers
 @login_required
 def trainer_client_dashboard(request):
-    """Dashboard for users who have booked trainers"""
     from notifications.models import UserNotification
     from trainer.models import TrainerBooking
     
@@ -68,6 +96,9 @@ def trainer_client_dashboard(request):
         messages.info(request, "You haven't booked any trainers yet. Browse our trainers to get started!")
         return redirect('trainer')
     
+    # Auto-cancel overdue bookings (unpaid for 2+ days)
+    cancel_overdue_bookings(request.user)
+
     # Get bookings requiring payment
     confirmed_bookings = TrainerBooking.objects.filter(
         user=request.user, 
