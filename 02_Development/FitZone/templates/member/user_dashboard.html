@@ -11,21 +11,21 @@
 
   <style>
     :root{
-      --bg0:#0b0b0c;
-      --bg1:#141416;
+      --bg0:#f8f9fa;
+      --bg1:#ffffff;
 
-      --cardTop: rgba(30,30,30,0.92);
-      --cardBot: rgba(14,14,14,0.92);
+      --cardTop: rgba(255,255,255,0.95);
+      --cardBot: rgba(248,249,250,0.95);
 
-      --text:#f4f4f4;
-      --muted: rgba(255,255,255,0.68);
-      --border: rgba(255,255,255,0.10);
+      --text:#1a1a1a;
+      --muted: rgba(0,0,0,0.55);
+      --border: rgba(0,0,0,0.10);
 
       --orange:#ff7a18;
       --orange2:#ff9a3c;
 
-      --shadow: 0 22px 70px rgba(0,0,0,0.65);
-      --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+      --shadow: 0 22px 70px rgba(0,0,0,0.08);
+      --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
     }
 
     *{ box-sizing: border-box; }
@@ -49,7 +49,7 @@
     .sidebar{
       width:220px;
       background:var(--bg0);
-      border-right:1px solid rgba(255,255,255,0.06);
+      border-right:1px solid rgba(0,0,0,0.06);
       display:flex;
       flex-direction:column;
       position:fixed;
@@ -61,22 +61,22 @@
       width:40px;height:40px;border-radius:12px;
       background:linear-gradient(135deg,var(--orange),var(--orange2));
       display:flex;align-items:center;justify-content:center;
-      font-size:18px;font-weight:900;color:#141416;
+      font-size:18px;font-weight:900;color:#fff;
     }
     .brand-title{font-size:17px;font-weight:900;color:var(--text)}
-    .brand-sub{font-size:10px;color:rgba(255,255,255,0.55);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+    .brand-sub{font-size:10px;color:rgba(0,0,0,0.45);font-weight:700;text-transform:uppercase;letter-spacing:1px}
     .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
     .nav a{
       display:flex;align-items:center;gap:12px;
       padding:11px 14px;border-radius:10px;
-      color:rgba(255,255,255,0.55);text-decoration:none;
+      color:rgba(0,0,0,0.45);text-decoration:none;
       font-size:13px;font-weight:600;transition:all .2s;
     }
-    .nav a:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+    .nav a:hover{background:rgba(0,0,0,0.03);color:var(--text)}
     .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
     .nav a i{width:18px;text-align:center;font-size:14px}
-    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06)}
-    .logout{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(0,0,0,0.06)}
+    .logout{display:flex;align-items:center;gap:10px;color:rgba(0,0,0,0.3);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
     .logout:hover{color:#ef4444}
 
     /* ---------- Main ---------- */
@@ -97,13 +97,13 @@
       margin: 0;
       font-size: 1.9rem;
       font-weight: 1000;
-      background: linear-gradient(135deg, #fff, var(--orange2));
+      background: linear-gradient(135deg, #1a1a1a, var(--orange2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .hello p{
       margin: 6px 0 0;
-      color: rgba(255,255,255,0.65);
+      color: rgba(0,0,0,0.5);
       font-weight: 600;
     }
 
@@ -113,9 +113,9 @@
       gap: 8px;
       padding: 10px 12px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.85);
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.08);
+      color: rgba(0,0,0,0.75);
       font-weight: 800;
       white-space: nowrap;
     }
@@ -146,7 +146,7 @@
     .card{
       position: relative;
       border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(0,0,0,0.08);
       background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
       box-shadow: var(--shadowSoft);
       overflow: hidden;
@@ -159,7 +159,7 @@
       padding: 1px;
       background: linear-gradient(135deg,
         rgba(255,122,24,0.20),
-        rgba(255,255,255,0.08),
+        rgba(0,0,0,0.06),
         rgba(255,154,60,0.16)
       );
       -webkit-mask:
@@ -173,8 +173,8 @@
 
     .card-head{
       padding: 18px 18px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: rgba(0,0,0,0.02);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -189,7 +189,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: rgba(255,255,255,0.92);
+      color: rgba(0,0,0,0.85);
     }
 
     .card-body{ padding: 18px; position: relative; z-index: 1; }
@@ -199,7 +199,7 @@
       font-size: 1.4rem;
       font-weight: 1000;
       margin: 0 0 10px;
-      color: #fff;
+      color: #1a1a1a;
     }
 
     .meta{
@@ -217,16 +217,16 @@
       border-radius: 999px;
       background: rgba(255,122,24,0.12);
       border: 1px solid rgba(255,122,24,0.22);
-      color: #fff;
+      color: #1a1a1a;
       font-weight: 900;
       font-size: 0.9rem;
       white-space: nowrap;
     }
 
     .chip.gray{
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(255,255,255,0.10);
-      color: rgba(255,255,255,0.86);
+      background: rgba(0,0,0,0.03);
+      border-color: rgba(0,0,0,0.08);
+      color: rgba(0,0,0,0.75);
     }
 
     .progress-wrap{
@@ -240,7 +240,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      color: rgba(255,255,255,0.70);
+      color: rgba(0,0,0,0.55);
       font-weight: 700;
       font-size: 0.92rem;
     }
@@ -248,8 +248,8 @@
     .bar{
       height: 12px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.06);
+      border: 1px solid rgba(0,0,0,0.08);
       overflow: hidden;
     }
 
@@ -274,19 +274,19 @@
       gap: 12px;
       padding: 14px 14px;
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(0,0,0,0.03);
       text-decoration: none;
-      color: rgba(255,255,255,0.88);
+      color: rgba(0,0,0,0.78);
       font-weight: 900;
       transition: transform .2s ease, background .2s ease, border-color .2s ease;
     }
 
     .action:hover{
       transform: translateY(-2px);
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.05);
       border-color: rgba(255,122,24,0.26);
-      color: #fff;
+      color: #1a1a1a;
     }
 
     .action .left{
@@ -310,7 +310,7 @@
 
     .action small{
       display: block;
-      color: rgba(255,255,255,0.62);
+      color: rgba(0,0,0,0.5);
       font-weight: 700;
       margin-top: 2px;
       white-space: nowrap;
@@ -319,7 +319,7 @@
     }
 
     .action .chev{
-      color: rgba(255,255,255,0.55);
+      color: rgba(0,0,0,0.45);
       flex: 0 0 auto;
     }
 
@@ -327,8 +327,8 @@
     .mobile-top{
       display: none;
       padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(14,14,14,0.55);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      background: rgba(245,245,245,0.9);
       backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
@@ -336,9 +336,9 @@
     }
 
     .mobile-top button{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04);
-      color: #fff;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.03);
+      color: #1a1a1a;
       padding: 10px 12px;
       border-radius: 14px;
       cursor: pointer;
@@ -391,7 +391,7 @@
     /* ---------- Notification Items ---------- */
     .ud-notif-item {
       padding: 16px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       display: flex;
       align-items: flex-start;
       gap: 14px;
@@ -447,7 +447,7 @@
     .ud-notif-title {
       font-size: 14px;
       font-weight: 700;
-      color: #f4f4f4;
+      color: #1a1a1a;
     }
 
     .ud-notif-unread-dot {
@@ -461,7 +461,7 @@
     .ud-notif-msg {
       margin: 0;
       font-size: 13px;
-      color: rgba(255,255,255,0.55);
+      color: rgba(0,0,0,0.45);
       line-height: 1.45;
     }
 
@@ -474,7 +474,7 @@
 
     .ud-notif-time {
       font-size: 11px;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.3);
       font-weight: 600;
     }
 
@@ -495,39 +495,39 @@
       width: 60px;
       height: 60px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.03);
+      border: 1px solid rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 14px;
       font-size: 24px;
-      color: rgba(255,255,255,0.25);
+      color: rgba(0,0,0,0.2);
     }
 
     .ud-empty-title {
       margin: 0 0 6px;
       font-size: 16px;
       font-weight: 800;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.55);
     }
 
     .ud-empty-text {
       margin: 0;
       font-size: 13px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
     }
 
     .ud-empty-text-gap {
       margin: 0 0 14px;
       font-size: 13px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
     }
 
     /* ---------- Booking Items ---------- */
     .ud-booking-item {
       padding: 14px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -557,12 +557,12 @@
     .ud-booking-name {
       font-size: 14px;
       font-weight: 700;
-      color: #f4f4f4;
+      color: #1a1a1a;
     }
 
     .ud-booking-date {
       font-size: 11px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
       font-weight: 600;
       margin-top: 2px;
     }
@@ -623,7 +623,7 @@
 
     /* ---------- No Membership ---------- */
     .ud-no-plan-text {
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.55);
       margin: 10px 0;
     }
 
@@ -644,7 +644,7 @@
       gap: 8px;
       padding: 10px 20px;
       background: linear-gradient(135deg, var(--orange), var(--orange2));
-      color: #141416;
+      color: #fff;
       text-decoration: none;
       border-radius: 12px;
       font-weight: 700;

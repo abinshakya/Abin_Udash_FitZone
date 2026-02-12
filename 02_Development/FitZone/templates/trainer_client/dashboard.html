@@ -11,21 +11,21 @@
 
   <style>
     :root{
-      --bg0:#0b0b0c;
-      --bg1:#141416;
+      --bg0:#f8f9fa;
+      --bg1:#ffffff;
 
-      --cardTop: rgba(30,30,30,0.92);
-      --cardBot: rgba(14,14,14,0.92);
+      --cardTop: rgba(255,255,255,0.95);
+      --cardBot: rgba(248,249,250,0.95);
 
-      --text:#f4f4f4;
-      --muted: rgba(255,255,255,0.68);
-      --border: rgba(255,255,255,0.10);
+      --text:#1a1a1a;
+      --muted: rgba(0,0,0,0.55);
+      --border: rgba(0,0,0,0.10);
 
       --orange:#ff7a18;
       --orange2:#ff9a3c;
 
-      --shadow: 0 22px 70px rgba(0,0,0,0.65);
-      --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+      --shadow: 0 22px 70px rgba(0,0,0,0.12);
+      --shadowSoft: 0 16px 45px rgba(0,0,0,0.08);
     }
 
     *{ box-sizing: border-box; }
@@ -49,7 +49,7 @@
     .sidebar{
       width:220px;
       background:var(--bg0);
-      border-right:1px solid rgba(255,255,255,0.06);
+      border-right:1px solid rgba(0,0,0,0.06);
       display:flex;
       flex-direction:column;
       position:fixed;
@@ -61,22 +61,22 @@
       width:40px;height:40px;border-radius:12px;
       background:linear-gradient(135deg,var(--orange),var(--orange2));
       display:flex;align-items:center;justify-content:center;
-      font-size:18px;font-weight:900;color:#141416;
+      font-size:18px;font-weight:900;color:#fff;
     }
     .brand-title{font-size:17px;font-weight:900;color:var(--text)}
-    .brand-sub{font-size:10px;color:rgba(255,255,255,0.55);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+    .brand-sub{font-size:10px;color:rgba(0,0,0,0.55);font-weight:700;text-transform:uppercase;letter-spacing:1px}
     .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
     .nav a{
       display:flex;align-items:center;gap:12px;
       padding:11px 14px;border-radius:10px;
-      color:rgba(255,255,255,0.55);text-decoration:none;
+      color:rgba(0,0,0,0.55);text-decoration:none;
       font-size:13px;font-weight:600;transition:all .2s;
     }
-    .nav a:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+    .nav a:hover{background:rgba(0,0,0,0.04);color:var(--text)}
     .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
     .nav a i{width:18px;text-align:center;font-size:14px}
-    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06)}
-    .logout{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(0,0,0,0.06)}
+    .logout{display:flex;align-items:center;gap:10px;color:rgba(0,0,0,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
     .logout:hover{color:#ef4444}
 
     /* ---------- Main ---------- */
@@ -98,20 +98,20 @@
       margin: 0;
       font-size: 1.9rem;
       font-weight: 1000;
-      background: linear-gradient(135deg, #fff, var(--orange2));
+      background: linear-gradient(135deg, #1a1a1a, var(--orange2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .hello p{
       margin: 6px 0 0;
-      color: rgba(255,255,255,0.65);
+      color: rgba(0,0,0,0.55);
       font-weight: 600;
     }
 
     /* ---------- Cards ---------- */
     .card{
       background: linear-gradient(155deg, var(--cardTop) 0%, var(--cardBot) 100%);
-      border: 1px solid rgba(255,255,255,0.11);
+      border: 1px solid rgba(0,0,0,0.08);
       border-radius: 22px;
       box-shadow: var(--shadowSoft);
       overflow: hidden;
@@ -124,14 +124,14 @@
       justify-content: space-between;
       gap: 12px;
       padding: 20px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
     }
 
     .card-head h2{
       margin: 0;
       font-size: 1.25rem;
       font-weight: 950;
-      color: #fff;
+      color: #1a1a1a;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -170,7 +170,7 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
-      color: #141416;
+      color: #fff;
       flex-shrink: 0;
     }
 
@@ -181,20 +181,20 @@
     .payment-alert-title{
       font-size: 18px;
       font-weight: 900;
-      color: #fff;
+      color: #1a1a1a;
       margin: 0 0 6px;
     }
 
     .payment-alert-text{
       margin: 0;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.55);
       font-size: 14px;
     }
 
     /* ---------- Payment Items ---------- */
     .payment-item{
       padding: 20px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -222,7 +222,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #141416;
+      color: #fff;
       font-weight: 900;
       font-size: 20px;
       flex-shrink: 0;
@@ -232,12 +232,12 @@
       margin: 0 0 6px;
       font-size: 16px;
       font-weight: 800;
-      color: #fff;
+      color: #1a1a1a;
     }
 
     .payment-meta{
       font-size: 12px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(0,0,0,0.4);
       margin: 2px 0;
     }
 
@@ -268,7 +268,7 @@
       gap: 8px;
       padding: 12px 28px;
       background: linear-gradient(135deg, var(--orange), var(--orange2));
-      color: #141416;
+      color: #fff;
       text-decoration: none;
       border-radius: 12px;
       font-weight: 900;
@@ -290,8 +290,8 @@
     }
 
     .trainer-card{
-      background: linear-gradient(155deg, rgba(30,30,30,0.85), rgba(20,20,20,0.85));
-      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(155deg, rgba(255,255,255,0.92), rgba(248,249,250,0.92));
+      border: 1px solid rgba(0,0,0,0.08);
       border-radius: 18px;
       padding: 20px;
       transition: all 0.2s;
@@ -300,7 +300,7 @@
     .trainer-card:hover{
       transform: translateY(-3px);
       border-color: rgba(255,122,24,0.3);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     }
 
     .trainer-header{
@@ -318,7 +318,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #141416;
+      color: #fff;
       font-weight: 900;
       font-size: 24px;
     }
@@ -327,12 +327,12 @@
       margin: 0 0 4px;
       font-size: 18px;
       font-weight: 900;
-      color: #fff;
+      color: #1a1a1a;
     }
 
     .trainer-spec{
       font-size: 12px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(0,0,0,0.5);
       font-weight: 600;
     }
 
@@ -347,7 +347,7 @@
       align-items: center;
       gap: 8px;
       font-size: 13px;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.55);
     }
 
     .trainer-detail-row i{
@@ -374,7 +374,7 @@
 
     .trainer-btn-primary{
       background: linear-gradient(135deg, var(--orange), var(--orange2));
-      color: #141416;
+      color: #fff;
       border-color: transparent;
     }
 
@@ -384,13 +384,13 @@
     }
 
     .trainer-btn-secondary{
-      background: rgba(255,255,255,0.05);
-      color: #fff;
-      border-color: rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.04);
+      color: #1a1a1a;
+      border-color: rgba(0,0,0,0.1);
     }
 
     .trainer-btn-secondary:hover{
-      background: rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.06);
     }
 
     /* ---------- Booking List ---------- */
@@ -401,7 +401,7 @@
 
     .booking-item{
       padding: 18px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       display: flex;
       align-items: center;
       gap: 14px;
@@ -433,13 +433,13 @@
     .booking-name{
       font-size: 15px;
       font-weight: 700;
-      color: #f4f4f4;
+      color: #1a1a1a;
       margin-bottom: 4px;
     }
 
     .booking-date{
       font-size: 12px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
       font-weight: 600;
     }
 
@@ -505,7 +505,7 @@
 
     .empty-icon{
       font-size: 64px;
-      color: rgba(255,255,255,0.2);
+      color: rgba(0,0,0,0.15);
       margin-bottom: 16px;
     }
 
@@ -513,12 +513,12 @@
       margin: 0 0 8px;
       font-size: 20px;
       font-weight: 900;
-      color: rgba(255,255,255,0.7);
+      color: rgba(0,0,0,0.55);
     }
 
     .empty-text{
       margin: 0;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
       font-size: 14px;
     }
 
@@ -530,7 +530,7 @@
 
     .notif-item{
       padding: 16px 24px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       display: flex;
       gap: 14px;
     }
@@ -578,7 +578,7 @@
     .notif-title{
       font-size: 14px;
       font-weight: 700;
-      color: #fff;
+      color: #1a1a1a;
       margin-bottom: 4px;
       display: flex;
       align-items: center;
@@ -594,14 +594,14 @@
 
     .notif-msg{
       font-size: 13px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(0,0,0,0.5);
       margin: 4px 0;
       line-height: 1.5;
     }
 
     .notif-time{
       font-size: 11px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.35);
       margin-top: 4px;
     }
 
@@ -638,14 +638,14 @@
     }
 
     .chip.gray{
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.06);
+      color: rgba(0,0,0,0.55);
+      border: 1px solid rgba(0,0,0,0.1);
     }
 
     .unread-badge{
       background: var(--orange);
-      color: #141416;
+      color: #fff;
       padding: 4px 10px;
       border-radius: 12px;
       font-size: 11px;

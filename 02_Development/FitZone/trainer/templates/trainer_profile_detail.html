@@ -19,9 +19,9 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0a0a0b 0%, #141416 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #f4f4f4;
+            color: #1a1a1a;
             min-height: 100vh;
         }
 
@@ -85,12 +85,43 @@
             margin-top: 20px;
         }
 
+        .profile-fee-card {
+            min-width: 260px;
+            padding: 22px 24px;
+            background: rgba(255,255,255,0.85);
+            border: 1.5px solid rgba(255,122,24,0.25);
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(255,122,24,0.12);
+            text-align: center;
+        }
+
+        .fee-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(0,0,0,0.55);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .fee-amount {
+            font-size: 34px;
+            font-weight: 800;
+            color: #ff7a18;
+            margin: 10px 0 6px;
+        }
+
+        .fee-sub {
+            font-size: 12px;
+            color: rgba(0,0,0,0.55);
+            font-weight: 600;
+        }
+
         .stat-box {
             text-align: center;
             padding: 15px 25px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.03);
             border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(0,0,0,0.08);
         }
 
         .stat-value {
@@ -101,14 +132,14 @@
 
         .stat-label {
             font-size: 12px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(0,0,0,0.5);
             margin-top: 5px;
         }
 
         /* Bio Section */
         .bio-section {
-            background: rgba(20,20,22,0.9);
-            border: 1.5px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.95);
+            border: 1.5px solid rgba(0,0,0,0.06);
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 30px;
@@ -125,7 +156,7 @@
         }
 
         .bio-text {
-            color: rgba(255,255,255,0.85);
+            color: rgba(0,0,0,0.75);
             line-height: 1.8;
             font-size: 15px;
         }
@@ -158,8 +189,8 @@
         }
 
         .cert-card {
-            background: rgba(255,255,255,0.03);
-            border: 1.5px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.02);
+            border: 1.5px solid rgba(0,0,0,0.06);
             border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -176,7 +207,7 @@
             width: 100%;
             height: 180px;
             object-fit: cover;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.03);
         }
 
         .cert-info {
@@ -185,7 +216,7 @@
 
         .cert-title {
             font-size: 14px;
-            color: #f4f4f4;
+            color: #1a1a1a;
             font-weight: 600;
             margin-bottom: 8px;
         }
@@ -243,7 +274,7 @@
         .book-btn {
             width: 100%;
             padding: 15px;
-            background: #141416;
+            background: #ffffff;
             color: #ff7a18;
             border: none;
             border-radius: 12px;
@@ -254,6 +285,17 @@
             transition: all 0.3s ease;
         }
 
+        .profile-fee-card .book-btn {
+            margin-top: 14px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+            color: #141416;
+            border: 1px solid rgba(255,122,24,0.35);
+            box-shadow: 0 10px 22px rgba(255,122,24,0.18);
+        }
+
         .book-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
@@ -261,9 +303,9 @@
 
         .back-btn {
             padding: 12px 24px;
-            background: rgba(255,255,255,0.05);
-            color: #f4f4f4;
-            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.03);
+            color: #1a1a1a;
+            border: 1.5px solid rgba(0,0,0,0.12);
             border-radius: 10px;
             text-decoration: none;
             display: inline-flex;
@@ -274,7 +316,7 @@
         }
 
         .back-btn:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.06);
             border-color: rgba(255,122,24,0.5);
             color: #ff7a18;
         }
@@ -344,12 +386,12 @@
         .cert-carousel-wrapper {
             border-radius: 16px;
             overflow: hidden;
-            border: 1.5px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.02);
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: rgba(0,0,0,0.01);
         }
 
         .cert-card-carousel {
-            background: rgba(255,255,255,0.03);
+            background: rgba(0,0,0,0.02);
             border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
@@ -365,7 +407,7 @@
             width: 100%;
             height: 280px;
             object-fit: cover;
-            background: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.03);
         }
 
         #certCarousel .carousel-control-prev-icon,
@@ -398,13 +440,13 @@
 
         /* Booking Modal */
         .modal-content {
-            background: linear-gradient(135deg, rgba(20,20,22,0.98), rgba(30,30,35,0.95));
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,249,250,0.98));
             border: 2px solid rgba(255,122,24,0.3);
-            color: #f4f4f4;
+            color: #1a1a1a;
         }
 
         .modal-header {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
         }
 
         .modal-title {
@@ -412,7 +454,7 @@
         }
 
         .btn-close {
-            filter: invert(1);
+            filter: none;
         }
 
         @media (max-width: 768px) {
@@ -425,6 +467,10 @@
             .profile-stats {
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .profile-fee-card {
+                width: 100%;
             }
         }
 
@@ -492,12 +538,26 @@
             margin-top: 20px;
         }
 
+        .sidebar-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .sidebar-stack .bio-section-sidebar {
+            margin-top: 0;
+        }
+
+        .sidebar-stack .bio-section {
+            margin-bottom: 0;
+        }
+
         .section-title-sm {
             font-size: 18px;
         }
 
         .contact-info {
-            color: rgba(255,255,255,0.7);
+            color: rgba(0,0,0,0.55);
             font-size: 14px;
         }
 
@@ -598,6 +658,17 @@
                     </div>
                 </div>
             </div>
+
+            <div class="profile-fee-card">
+                <div class="fee-label">Monthly Training Fee</div>
+                <div class="fee-amount">
+                    {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}{% else %}TBD{% endif %}
+                </div>
+                <div class="fee-sub">per month</div>
+                <button class="book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                    <i class="fas fa-calendar-check"></i> Book Training Session
+                </button>
+            </div>
         </div>
 
         <!-- Photo Carousel & About Me Section -->
@@ -678,44 +749,25 @@
                                 <i class="fas fa-certificate"></i> Certifications
                             </h2>
                             
-                            <!-- Certifications Carousel -->
-                            <div class="cert-carousel-wrapper">
-                                <div id="certCarousel" class="carousel slide" data-bs-ride="carousel">
-                                    <div class="carousel-indicators">
-                                        {% for cert in certifications %}
-                                            <button type="button" data-bs-target="#certCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Certificate {{ forloop.counter }}"></button>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="carousel-inner">
-                                        {% for cert in certifications %}
-                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                                <div class="cert-card-carousel" onclick="window.open('{{ cert.file.url }}', '_blank')">
-                                                    {% if cert.file.url|slice:"-4:" == '.pdf' %}
-                                                        <div class="cert-image-carousel cert-pdf-placeholder orange-bg">
-                                                            <i class="fas fa-file-pdf cert-pdf-icon orange"></i>
-                                                        </div>
-                                                    {% else %}
-                                                        <img src="{{ cert.file.url }}" alt="Certificate" class="cert-image-carousel">
-                                                    {% endif %}
-                                                    <div class="cert-info">
-                                                        <div class="cert-title">Certification Document {{ forloop.counter }}</div>
-                                                        <a href="{{ cert.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
-                                                            <i class="fas fa-external-link-alt"></i> View Document
-                                                        </a>
-                                                    </div>
-                                                </div>
+                            <!-- Certifications Grid -->
+                            <div class="certificates-grid">
+                                {% for cert in certifications %}
+                                    <div class="cert-card" onclick="window.open('{{ cert.file.url }}', '_blank')">
+                                        {% if cert.file.url|slice:"-4:" == '.pdf' %}
+                                            <div class="cert-image cert-pdf-placeholder orange-bg">
+                                                <i class="fas fa-file-pdf cert-pdf-icon orange"></i>
                                             </div>
-                                        {% endfor %}
+                                        {% else %}
+                                            <img src="{{ cert.file.url }}" alt="Certificate" class="cert-image">
+                                        {% endif %}
+                                        <div class="cert-info">
+                                            <div class="cert-title">Certification Document {{ forloop.counter }}</div>
+                                            <a href="{{ cert.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
+                                                <i class="fas fa-external-link-alt"></i> View Document
+                                            </a>
+                                        </div>
                                     </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#certCarousel" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#certCarousel" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
-                                    </button>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                         {% endif %}
@@ -727,44 +779,25 @@
                                 <i class="fas fa-briefcase"></i> Experience Verification
                             </h2>
                             
-                            <!-- Experience Carousel -->
-                            <div class="cert-carousel-wrapper">
-                                <div id="expCarousel" class="carousel slide" data-bs-ride="carousel">
-                                    <div class="carousel-indicators">
-                                        {% for doc in experience_docs %}
-                                            <button type="button" data-bs-target="#expCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Experience {{ forloop.counter }}"></button>
-                                        {% endfor %}
-                                    </div>
-                                    <div class="carousel-inner">
-                                        {% for doc in experience_docs %}
-                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                                <div class="cert-card-carousel" onclick="window.open('{{ doc.file.url }}', '_blank')">
-                                                    {% if doc.file.url|slice:"-4:" == '.pdf' %}
-                                                        <div class="cert-image-carousel cert-pdf-placeholder blue-bg">
-                                                            <i class="fas fa-file-pdf cert-pdf-icon blue"></i>
-                                                        </div>
-                                                    {% else %}
-                                                        <img src="{{ doc.file.url }}" alt="Experience Document" class="cert-image-carousel">
-                                                    {% endif %}
-                                                    <div class="cert-info">
-                                                        <div class="cert-title">Experience Document {{ forloop.counter }}</div>
-                                                        <a href="{{ doc.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
-                                                            <i class="fas fa-external-link-alt"></i> View Document
-                                                        </a>
-                                                    </div>
-                                                </div>
+                            <!-- Experience Grid -->
+                            <div class="certificates-grid">
+                                {% for doc in experience_docs %}
+                                    <div class="cert-card" onclick="window.open('{{ doc.file.url }}', '_blank')">
+                                        {% if doc.file.url|slice:"-4:" == '.pdf' %}
+                                            <div class="cert-image cert-pdf-placeholder blue-bg">
+                                                <i class="fas fa-file-pdf cert-pdf-icon blue"></i>
                                             </div>
-                                        {% endfor %}
+                                        {% else %}
+                                            <img src="{{ doc.file.url }}" alt="Experience Document" class="cert-image">
+                                        {% endif %}
+                                        <div class="cert-info">
+                                            <div class="cert-title">Experience Document {{ forloop.counter }}</div>
+                                            <a href="{{ doc.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
+                                                <i class="fas fa-external-link-alt"></i> View Document
+                                            </a>
+                                        </div>
                                     </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#expCarousel" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#expCarousel" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
-                                    </button>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                         {% endif %}
@@ -773,23 +806,7 @@
                 {% endif %}
             </div>
 
-            <div class="col-lg-4">
-                <!-- Pricing -->
-                <div class="price-card">
-                    <div class="price-label">Monthly Training Fee</div>
-                    <div class="price-amount">
-                        {% if trainer.monthly_price %}
-                            ₹{{ trainer.monthly_price }}
-                        {% else %}
-                            Contact
-                        {% endif %}
-                    </div>
-                    <div class="price-label">per month</div>
-                    <button class="book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
-                        <i class="fas fa-calendar-check"></i> Book Training Session
-                    </button>
-                </div>
-
+            <div class="col-lg-4 sidebar-stack">
                 <!-- Availability -->
                 {% if trainer.available_time %}
                 <div class="bio-section bio-section-sidebar">
@@ -812,6 +829,9 @@
                     </h2>
                     <div class="contact-info">
                         <p><i class="fas fa-user contact-icon"></i> {{ trainer.user.username }}</p>
+                        {% if trainer.user.userprofile.phone %}
+                        <p><i class="fas fa-phone contact-icon"></i> {{ trainer.user.userprofile.phone }}</p>
+                        {% endif %}
                         <p><i class="fas fa-envelope contact-icon"></i> {{ trainer.user.email }}</p>
                     </div>
                 </div>

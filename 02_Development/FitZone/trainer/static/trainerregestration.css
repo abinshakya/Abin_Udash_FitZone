@@ -1,19 +1,19 @@
 
   :root{
-    --bg0:#0b0b0c;
-    --bg1:#141416;
-    --cardTop: rgba(30,30,30,0.92);
-    --cardBot: rgba(14,14,14,0.92);
+    --bg0:#ffffff;
+    --bg1:#f8f9fa;
+    --cardTop: rgba(255,255,255,0.95);
+    --cardBot: rgba(248,249,250,0.95);
 
-    --text:#f4f4f4;
-    --muted: rgba(255,255,255,0.68);
-    --border: rgba(255,255,255,0.10);
+    --text:#1a1a1a;
+    --muted: rgba(0,0,0,0.55);
+    --border: rgba(0,0,0,0.10);
 
     --orange:#ff7a18;
     --orange2:#ff9a3c;
 
-    --shadow: 0 22px 70px rgba(0,0,0,0.65);
-    --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+    --shadow: 0 22px 70px rgba(0,0,0,0.08);
+    --shadowSoft: 0 16px 45px rgba(0,0,0,0.05);
   }
 
   *{ box-sizing: border-box; }
@@ -26,31 +26,31 @@
   }
   .fz-alert-wrap .alert{
     border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.9);
-    box-shadow: 0 14px 35px rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.02);
+    color: #333;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.06);
   }
   .fz-alert-wrap .alert-success{
     border-color: rgba(25,135,84,0.30);
-    background: rgba(25,135,84,0.14);
-    color: #b8f7cf;
+    background: rgba(25,135,84,0.08);
+    color: #0a5c36;
   }
   .fz-alert-wrap .alert-danger,
   .fz-alert-wrap .alert-error{
     border-color: rgba(220,53,69,0.30);
-    background: rgba(220,53,69,0.14);
-    color: #ffb3bd;
+    background: rgba(220,53,69,0.08);
+    color: #842029;
   }
   .fz-alert-wrap .alert-warning{
     border-color: rgba(255,193,7,0.30);
-    background: rgba(255,193,7,0.12);
-    color: #ffe7a3;
+    background: rgba(255,193,7,0.08);
+    color: #664d03;
   }
   .fz-alert-wrap .alert-info{
     border-color: rgba(13,202,240,0.30);
-    background: rgba(13,202,240,0.12);
-    color: #b7f4ff;
+    background: rgba(13,202,240,0.08);
+    color: #055160;
   }
 
   .page-wrapper{
@@ -59,8 +59,8 @@
     place-items: center;
     padding: 38px 16px 70px;
     background:
-      radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
-      radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+      radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.08), transparent 60%),
+      radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.05), transparent 60%),
       linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
     font-family: "Poppins", system-ui, sans-serif;
     color: var(--text);
@@ -74,7 +74,7 @@
   .form-card{
     position: relative;
     border-radius: 22px;
-    border: 1px solid rgba(255,255,255,0.10);
+    border: 1px solid rgba(0,0,0,0.08);
     background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
     box-shadow: var(--shadow);
     overflow: hidden;
@@ -87,9 +87,9 @@
     border-radius: 22px;
     padding: 1px;
     background: linear-gradient(135deg,
-      rgba(255,122,24,0.22),
-      rgba(255,255,255,0.08),
-      rgba(255,154,60,0.18)
+      rgba(255,122,24,0.12),
+      rgba(0,0,0,0.04),
+      rgba(255,154,60,0.10)
     );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -102,8 +102,8 @@
 
   .form-header{
     padding: 22px 24px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: rgba(0,0,0,0.01);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -118,14 +118,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(135deg, #ffffff, var(--orange2));
+    background: linear-gradient(135deg, #1a1a1a, var(--orange2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .form-subtitle{
     margin: 0;
-    color: rgba(255,255,255,0.65);
+    color: #6c757d;
     font-weight: 600;
     font-size: 0.95rem;
     line-height: 1.35;
@@ -137,9 +137,9 @@
     gap: 8px;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(255,122,24,0.14);
-    border: 1px solid rgba(255,122,24,0.28);
-    color: #fff;
+    background: rgba(255,122,24,0.10);
+    border: 1px solid rgba(255,122,24,0.25);
+    color: #ff7a18;
     font-weight: 900;
     font-size: 0.9rem;
     white-space: nowrap;
@@ -174,7 +174,7 @@
 
   .form-group label{
     font-size: 0.92rem;
-    color: rgba(255,255,255,0.78);
+    color: #555;
     font-weight: 800;
   }
 
@@ -184,9 +184,9 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.10);
-    background: rgba(255,255,255,0.04);
-    color: #fff;
+    border: 1px solid rgba(0,0,0,0.10);
+    background: rgba(0,0,0,0.02);
+    color: #1a1a1a;
     outline: none;
     transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
     font-size: 0.98rem;
@@ -199,19 +199,19 @@
 
   .form-group input::placeholder,
   .form-group textarea::placeholder{
-    color: rgba(255,255,255,0.45);
+    color: rgba(0,0,0,0.35);
   }
 
   .form-group input:focus,
   .form-group textarea:focus{
     border-color: rgba(255,122,24,0.75);
-    box-shadow: 0 0 0 0.22rem rgba(255,122,24,0.18);
-    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 0 0.22rem rgba(255,122,24,0.12);
+    background: rgba(0,0,0,0.01);
   }
 
   .help{
     margin-top: -2px;
-    color: rgba(255,255,255,0.55);
+    color: #999;
     font-size: 0.88rem;
     line-height: 1.35;
   }
@@ -220,8 +220,8 @@
   .file-block{
     padding: 16px 16px;
     border-radius: 16px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.01);
+    border: 1px solid rgba(0,0,0,0.06);
   }
 
   .file-head{
@@ -238,9 +238,9 @@
     gap: 8px;
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(255,122,24,0.14);
-    border: 1px solid rgba(255,122,24,0.22);
-    color: #fff;
+    background: rgba(255,122,24,0.10);
+    border: 1px solid rgba(255,122,24,0.20);
+    color: #ff7a18;
     font-weight: 900;
     font-size: 0.78rem;
     white-space: nowrap;
@@ -262,9 +262,9 @@
     gap: 10px;
     padding: 10px 14px;
     border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.92);
+    border: 1px solid rgba(0,0,0,0.10);
+    background: rgba(0,0,0,0.03);
+    color: #333;
     font-weight: 900;
     cursor: pointer;
     transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
@@ -274,15 +274,15 @@
 
   .file-btn:hover{
     transform: translateY(-1px);
-    background: rgba(255,255,255,0.09);
+    background: rgba(0,0,0,0.05);
     border-color: rgba(255,122,24,0.28);
-    box-shadow: 0 14px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.06);
   }
 
   .file-btn i{ color: var(--orange); }
 
   .file-name{
-    color: rgba(255,255,255,0.70);
+    color: #6c757d;
     font-weight: 700;
     font-size: 0.92rem;
     overflow: hidden;
@@ -303,10 +303,10 @@
     width: 46px;
     height: 46px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(0,0,0,0.02);
     overflow: hidden;
-    box-shadow: 0 12px 26px rgba(0,0,0,0.35);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.06);
   }
 
   .thumb img{
@@ -347,7 +347,7 @@
 
   .fineprint{
     margin: 0;
-    color: rgba(255,255,255,0.60);
+    color: #999;
     font-size: 0.9rem;
     line-height: 1.4;
     text-align: center;

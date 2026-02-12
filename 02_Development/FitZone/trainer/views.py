@@ -221,12 +221,14 @@ def update_profile_picture(request):
             if old_pic:
                 old_pic.delete()
 
-            # Save new profile_pic document
+            # Save new profile_pic document with username prefix
+            username = request.user.username
             file_ext = pic_file.name.split('.')[-1] if '.' in pic_file.name else 'jpg'
-            new_filename = f"profile.{file_ext}"
+            new_filename = f"{username}_profilepic.{file_ext}"
             doc = TrainerRegistrationDocument.objects.create(
                 registration=registration,
                 doc_type="profile_pic",
+                original_filename=pic_file.name,
             )
             doc.file.save(new_filename, pic_file, save=True)
 
@@ -331,19 +333,24 @@ class TrainerRegistrationWizard(SessionWizardView):
                 print(f"DEBUG: Field {field_name} received {len(field_files)} files")
                 
                 if len(field_files) > 1:
-                    # Multiple files - save additional files with numbered keys
-                    extra_files = {}
-                    for index, uploaded_file in enumerate(field_files):
-                        if index == 0:
-                            # First file already handled by parent class
-                            continue
-                        
-                        file_key = f'{step}-{field_name}-{index}'
-                        extra_files[file_key] = uploaded_file
-                        print(f"DEBUG: Queued additional file {file_key}: {uploaded_file.name}")
+                    # The parent class only saves the LAST file via form.files[key]
+                    # (Django MultiValueDict returns the last value for a key)
+                    # We need to save ALL files explicitly with correct keys
+                    existing_files = self.storage.get_step_files(step) or {}
                     
-                    if extra_files:
-                        self.storage.set_step_files(step, extra_files)
+                    # Save the FIRST file as the base key (overwrite what parent saved)
+                    base_key = f'{step}-{field_name}'
+                    existing_files[base_key] = field_files[0]
+                    print(f"DEBUG: Saved first file {base_key}: {field_files[0].name}")
+                    
+                    # Save remaining files with numbered keys
+                    for index in range(1, len(field_files)):
+                        file_key = f'{step}-{field_name}-{index}'
+                        existing_files[file_key] = field_files[index]
+                        print(f"DEBUG: Added additional file {file_key}: {field_files[index].name}")
+                    
+                    # Set all files back
+                    self.storage.set_step_files(step, existing_files)
         
         return step_data
 
@@ -493,20 +500,30 @@ class TrainerRegistrationWizard(SessionWizardView):
         exp_files = get_files_from_storage('documents', 'experience_verification')
         print(f"DEBUG: Experience files count: {len(exp_files)}")
         
+        # Map doc_type to a short label for filenames
+        doc_type_labels = {
+            'certification': 'certificate',
+            'identity_proof': 'identityproof',
+            'experience_verification': 'experience',
+        }
+
         def save_docs(files, doc_type):
+            username = self.request.user.username
+            label = doc_type_labels.get(doc_type, doc_type)
             for index, f in enumerate(files, start=1):
                 if f:  # Only save if file exists
                     # Get file extension
                     original_name = f.name if hasattr(f, 'name') else 'file'
                     file_ext = original_name.split('.')[-1] if '.' in original_name else 'jpg'
                     
-                    # Generate new sequential filename
-                    new_filename = f"{index}.{file_ext}"
+                    # Generate username-prefixed sequential filename
+                    new_filename = f"{username}_{label}{index}.{file_ext}"
                     
                     # Save with new filename
                     doc = TrainerRegistrationDocument.objects.create(
                         registration=registration,
                         doc_type=doc_type,
+                        original_filename=original_name,
                     )
                     # Save file with custom name
                     doc.file.save(new_filename, f, save=True)
@@ -514,14 +531,16 @@ class TrainerRegistrationWizard(SessionWizardView):
         
         save_docs(cert_files, "certification")
         if profile_file:
+            username = self.request.user.username
             # Get file extension for profile pic
             original_name = profile_file.name if hasattr(profile_file, 'name') else 'profile.jpg'
             file_ext = original_name.split('.')[-1] if '.' in original_name else 'jpg'
-            new_filename = f"profile.{file_ext}"
+            new_filename = f"{username}_profilepic.{file_ext}"
             
             doc = TrainerRegistrationDocument.objects.create(
                 registration=registration,
                 doc_type="profile_pic",
+                original_filename=original_name,
             )
             doc.file.save(new_filename, profile_file, save=True)
             # Sync profile picture to UserProfile

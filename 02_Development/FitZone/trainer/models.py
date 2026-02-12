@@ -42,6 +42,7 @@ class TrainerRegistrationDocument(models.Model):
 
     doc_type = models.CharField(max_length=40, choices=DOC_TYPES)
     file = models.FileField(upload_to="trainer_docs/")
+    original_filename = models.CharField(max_length=255, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

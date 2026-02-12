@@ -10,21 +10,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>:root{
-  --bg0:#0b0b0c;
-  --bg1:#141416;
+  --bg0:#f8f9fa;
+  --bg1:#ffffff;
 
-  --cardTop: rgba(30,30,30,0.92);
-  --cardBot: rgba(14,14,14,0.92);
+  --cardTop: rgba(255,255,255,0.95);
+  --cardBot: rgba(248,249,250,0.95);
 
-  --text:#f4f4f4;
-  --muted: rgba(255,255,255,0.68);
-  --border: rgba(255,255,255,0.10);
+  --text:#1a1a1a;
+  --muted: rgba(0,0,0,0.55);
+  --border: rgba(0,0,0,0.10);
 
   --orange:#ff7a18;
   --orange2:#ff9a3c;
 
-  --shadow: 0 22px 70px rgba(0,0,0,0.65);
-  --shadowSoft: 0 16px 45px rgba(0,0,0,0.45);
+  --shadow: 0 22px 70px rgba(0,0,0,0.08);
+  --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
 }
 
 *{ box-sizing: border-box; }
@@ -59,7 +59,7 @@ body{
   font-size: clamp(2.05rem, 3vw, 2.7rem);
   font-weight: 900;
   letter-spacing: 0.3px;
-  background: linear-gradient(135deg, #ffffff, var(--orange2));
+  background: linear-gradient(135deg, #1a1a1a, var(--orange2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 12px 40px rgba(255,122,24,0.10);
@@ -67,7 +67,7 @@ body{
 
 .page-head p{
   margin: 0;
-  color: rgba(255,255,255,0.72);
+  color: rgba(0,0,0,0.55);
   font-size: 1.05rem;
 }
 
@@ -87,7 +87,7 @@ body{
 .card{
   position: relative;
   background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
-  border: 1px solid rgba(255,255,255,0.10);
+  border: 1px solid rgba(0,0,0,0.10);
   border-radius: 22px;
   overflow: hidden;
   box-shadow: var(--shadowSoft);
@@ -102,7 +102,7 @@ body{
   padding: 1px;
   background: linear-gradient(135deg,
     rgba(255,122,24,0.22),
-    rgba(255,255,255,0.08),
+    rgba(0,0,0,0.06),
     rgba(255,154,60,0.18)
   );
   -webkit-mask:
@@ -116,12 +116,12 @@ body{
 
 .card-header{
   padding: 18px 22px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(0,0,0,0.02);
 }
 
 .card-header h2,
@@ -133,7 +133,7 @@ body{
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(255,255,255,0.92);
+  color: rgba(0,0,0,0.85);
 }
 
 .card-body{ padding: 22px; }
@@ -156,15 +156,15 @@ body{
   height: 112px;
   border-radius: 16px;
   object-fit: cover;
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.08);
 }
 
 .plan-title{
   margin: 0 0 8px;
   font-size: 1.55rem;
   font-weight: 900;
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .plan-meta{
@@ -182,7 +182,7 @@ body{
   border-radius: 999px;
   background: rgba(255,122,24,0.14);
   border: 1px solid rgba(255,122,24,0.28);
-  color: #fff;
+  color: #1a1a1a;
   font-size: 0.9rem;
   font-weight: 900;
   white-space: nowrap;
@@ -200,7 +200,7 @@ body{
   margin: 18px 0 12px;
   font-size: 1.05rem;
   font-weight: 900;
-  color: rgba(255,255,255,0.90);
+  color: rgba(0,0,0,0.80);
 }
 
 .plan-features{
@@ -215,7 +215,7 @@ body{
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: rgba(255,255,255,0.86);
+  color: rgba(0,0,0,0.75);
   line-height: 1.35;
 }
 
@@ -230,17 +230,17 @@ body{
   justify-content: space-between;
   gap: 12px;
   padding: 12px 0;
-  color: rgba(255,255,255,0.86);
+  color: rgba(0,0,0,0.75);
 }
 
 .summary-row span:first-child{
-  color: rgba(255,255,255,0.62);
+  color: rgba(0,0,0,0.55);
   font-weight: 600;
 }
 
 .divider{
   height: 1px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.08);
   margin: 12px 0;
 }
 
@@ -254,7 +254,7 @@ body{
 
 .total .label{
   font-weight: 900;
-  color: rgba(255,255,255,0.86);
+  color: rgba(0,0,0,0.80);
 }
 
 .total .value{
@@ -276,9 +276,9 @@ body{
   align-items: center;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
-  color: rgba(255,255,255,0.86);
+  background: rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.75);
   font-weight: 700;
 }
 
@@ -296,7 +296,7 @@ body{
   margin: 18px 0 10px;
   font-size: 1.05rem;
   font-weight: 950;
-  color: rgba(255,255,255,0.88);
+  color: rgba(0,0,0,0.80);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -316,8 +316,8 @@ body{
   gap: 12px;
   padding: 14px 14px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.025);
+  border: 1px solid rgba(0,0,0,0.10);
   cursor: pointer;
   transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
   user-select: none;
@@ -325,9 +325,9 @@ body{
 
 .pm-option:hover{
   transform: translateY(-2px);
-  background: rgba(255,255,255,0.055);
+  background: rgba(0,0,0,0.04);
   border-color: rgba(255,122,24,0.30);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.06);
 }
 
 .pm-left{
@@ -341,7 +341,7 @@ body{
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 2px solid rgba(0,0,0,0.25);
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -359,7 +359,7 @@ body{
 
 .pm-name{
   font-weight: 950;
-  color: rgba(255,255,255,0.92);
+  color: rgba(0,0,0,0.85);
 }
 
 .pm-badge{
@@ -370,12 +370,12 @@ body{
   border-radius: 999px;
   background: rgba(255,122,24,0.14);
   border: 1px solid rgba(255,122,24,0.22);
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .pm-note{
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.60);
+  color: rgba(0,0,0,0.50);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -431,7 +431,7 @@ body{
 
 .note{
   margin-top: 12px;
-  color: rgba(255,255,255,0.60);
+  color: rgba(0,0,0,0.50);
   font-size: 0.92rem;
   line-height: 1.4;
 }
@@ -449,7 +449,7 @@ body{
 
   .icon-accent { color: var(--orange); }
   .min-w-0 { min-width: 0; }
-  .icon-muted { color: rgba(255,255,255,0.7); }
+  .icon-muted { color: rgba(0,0,0,0.5); }
 
   </style>
 </head>

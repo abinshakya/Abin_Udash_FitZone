@@ -4,12 +4,12 @@
   --primary-orange: #ff6b35;
   --primary-dark: #e55a2b;
   --primary-light: #f7931e;
-  --dark-bg: #0c0c0c;
-  --medium-bg: #1a1a1a;
-  --light-gray: #2d2d2d;
-  --border-color: #3a3a3a;
-  --text-light: #f0f0f0;
-  --text-muted: #a0a0a0;
+  --dark-bg: #ffffff;
+  --medium-bg: #f8f9fa;
+  --light-gray: #e9ecef;
+  --border-color: #dee2e6;
+  --text-light: #1a1a1a;
+  --text-muted: #6c757d;
   --success-color: #10b981;
   --error-color: #ef4444;
 
@@ -67,13 +67,13 @@ body {
 }
 
 .profile-container {
-  background: rgba(45, 45, 45, 0.85);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 650px;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   animation: slideUp var(--transition-slow);
   overflow: hidden;
 }
@@ -147,7 +147,7 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--light-gray), rgba(255, 107, 53, 0.15));
+  background: linear-gradient(135deg, var(--light-gray), rgba(255, 107, 53, 0.1));
   border: 3px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -287,8 +287,8 @@ body {
   padding-right: 40px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  background: rgba(58, 58, 58, 0.5);
-  color: var(--text-light);
+  background: #fff;
+  color: #333;
   font-size: 0.95rem;
   font-family: inherit;
   transition: all var(--transition-base);
@@ -311,9 +311,9 @@ body {
 .input-wrapper input[type="password"]:focus {
   outline: none;
   border-color: var(--primary-orange);
-  background: rgba(58, 58, 58, 0.8);
-  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15),
-              inset 0 1px 2px rgba(255, 107, 53, 0.1);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.12),
+              inset 0 1px 2px rgba(255, 107, 53, 0.05);
 }
 
 
