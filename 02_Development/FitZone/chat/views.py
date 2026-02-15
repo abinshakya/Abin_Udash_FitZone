@@ -71,8 +71,6 @@ def trainer_chat(request):
 
     if room_id:
         active_room = ChatRoom.objects.filter(id=room_id, trainer=registration).first()
-    elif chat_rooms.exists():
-        active_room = chat_rooms.first()
 
     if active_room:
         messages_list = active_room.messages.select_related('sender').all()
@@ -141,8 +139,6 @@ def client_chat(request):
 
     if room_id:
         active_room = ChatRoom.objects.filter(id=room_id, client=request.user).first()
-    elif chat_rooms.exists():
-        active_room = chat_rooms.first()
 
     if active_room:
         messages_list = active_room.messages.select_related('sender').all()

@@ -691,7 +691,7 @@
         <a href="#"><i class="fa-solid fa-robot"></i> Chat with AI Trainer</a>
         <a href="#"><i class="fa-solid fa-bowl-food"></i> AI Food Recommender</a>
         <a href="{% url 'trainer' %}"><i class="fa-solid fa-user-tie"></i> Book a Trainer</a>
-        <a href="{% url 'client_chat' %}"><i class="fa-solid fa-comments"></i> Chat with Trainer</a>
+        <a href="{% url 'client_chat' %}"><i class="fa-solid fa-comments"></i> Chat with Trainer {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
         <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
       </nav>
 
@@ -796,7 +796,12 @@
                     <small>Message your assigned trainer</small>
                   </div>
                 </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  {% if chat_unread_count > 0 %}
+                  <span style="min-width:22px;height:22px;border-radius:50%;background:#ff7a18;color:#fff;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;">{{ chat_unread_count }}</span>
+                  {% endif %}
+                  <i class="fa-solid fa-chevron-right chev"></i>
+                </div>
               </a>
 
               <a class="action" href="#">

@@ -661,7 +661,7 @@
 
       <nav class="nav">
         <a href="{% url 'trainer_dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a href="{% url 'trainer_chat' %}"><i class="fa-solid fa-comments"></i> Chat</a>
+        <a href="{% url 'trainer_chat' %}"><i class="fa-solid fa-comments"></i> Chat {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
         <a href="#"><i class="fa-solid fa-apple-whole"></i> Create Diet Plan</a>
         <a href="#"><i class="fa-solid fa-dumbbell"></i> Create Workout Plan</a>
         <a href="{% url 'trainer_settings' %}"><i class="fa-solid fa-gear"></i> Settings</a>
