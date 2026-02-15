@@ -375,6 +375,38 @@
       background: rgba(156,163,175,0.25);
     }
 
+    /* Cancel Modal */
+    .cancel-modal-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+      z-index:9999;align-items:center;justify-content:center;
+    }
+    .cancel-modal-overlay.open{display:flex}
+    .cancel-modal{
+      background:#fff;border-radius:16px;padding:28px 32px;width:100%;max-width:440px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    }
+    .cancel-modal h3{
+      font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:6px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .cancel-modal h3 i{color:#ef4444;font-size:20px}
+    .cancel-modal p{font-size:13px;color:rgba(0,0,0,0.55);margin-bottom:16px}
+    .cancel-modal textarea{
+      width:100%;min-height:90px;padding:12px 14px;border:1px solid rgba(0,0,0,0.12);
+      border-radius:10px;font-family:inherit;font-size:13px;resize:vertical;
+      outline:none;transition:border-color .2s;
+    }
+    .cancel-modal textarea:focus{border-color:rgba(239,68,68,0.5)}
+    .cancel-modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+    .cancel-modal-btn{
+      padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;
+      cursor:pointer;border:none;transition:all .2s;font-family:inherit;
+    }
+    .cancel-modal-btn.secondary{background:#f3f4f6;color:#6b7280}
+    .cancel-modal-btn.secondary:hover{background:#e5e7eb}
+    .cancel-modal-btn.danger{background:#ef4444;color:#fff}
+    .cancel-modal-btn.danger:hover{background:#dc2626}
+
     /* ---------- Empty State ---------- */
     .empty-state{
       text-align: center;
@@ -840,26 +872,27 @@
                             <i class="fas fa-check"></i>
                           </button>
                         </form>
-                        <form method="post" action="{% url 'update_booking_status' booking.id %}" style="display: inline;">
-                          {% csrf_token %}
-                          <input type="hidden" name="status" value="rejected">
-                          <button type="submit" class="action-btn reject" title="Reject booking">
-                            <i class="fas fa-times"></i>
-                          </button>
-                        </form>
+                        <button type="button" class="action-btn reject" title="Reject booking"
+                                onclick="openRejectModal({{ booking.id }})">
+                          <i class="fas fa-times"></i>
+                        </button>
                       {% elif booking.status == 'confirmed' %}
-                        <form method="post" action="{% url 'update_booking_status' booking.id %}" style="display: inline;">
-                          {% csrf_token %}
-                          <input type="hidden" name="status" value="cancelled">
-                          <button type="submit" class="action-btn cancel" title="Cancel booking" 
-                                  onclick="return confirm('Are you sure you want to cancel this booking?')">
-                            <i class="fas fa-ban"></i>
-                          </button>
-                        </form>
+                        <button type="button" class="action-btn cancel" title="Cancel booking"
+                                onclick="openCancelModal({{ booking.id }})">
+                          <i class="fas fa-ban"></i>
+                        </button>
                       {% endif %}
                     </div>
                   </div>
-                  {% if booking.message %}
+                  {% if booking.cancellation_reason and booking.status == 'cancelled' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-ban" style="color:#ef4444"></i> <strong>Cancelled{% if booking.cancelled_by %} by {{ booking.cancelled_by }}{% endif %}:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.cancellation_reason and booking.status == 'rejected' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-times-circle" style="color:#ef4444"></i> <strong>Rejected:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.message %}
                     <div class="booking-message">
                       <p><i class="fas fa-quote-left"></i> {{ booking.message|truncatewords:30 }}</p>
                     </div>
@@ -892,6 +925,40 @@
     </main>
   </div>
 
+  <!-- Reject Booking Modal -->
+  <div class="cancel-modal-overlay" id="rejectModal">
+    <div class="cancel-modal">
+      <h3><i class="fas fa-times-circle" style="color:#ef4444"></i> Reject Booking</h3>
+      <p>Please provide a reason for rejecting this booking. The client will be notified.</p>
+      <form method="post" id="rejectForm">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="rejected">
+        <textarea name="rejection_reason" placeholder="e.g. Fully booked, schedule conflict, not a good fit..." required></textarea>
+        <div class="cancel-modal-actions">
+          <button type="button" class="cancel-modal-btn secondary" onclick="closeRejectModal()">Go Back</button>
+          <button type="submit" class="cancel-modal-btn danger">Reject Booking</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Cancel Booking Modal -->
+  <div class="cancel-modal-overlay" id="cancelModal">
+    <div class="cancel-modal">
+      <h3><i class="fas fa-ban"></i> Cancel Booking</h3>
+      <p>Please provide a reason for cancelling this booking. The client will see this message in the chat.</p>
+      <form method="post" id="cancelForm">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="cancelled">
+        <textarea name="cancellation_reason" placeholder="e.g. Schedule conflict, payment issue, personal reasons..." required></textarea>
+        <div class="cancel-modal-actions">
+          <button type="button" class="cancel-modal-btn secondary" onclick="closeCancelModal()">Go Back</button>
+          <button type="submit" class="cancel-modal-btn danger">Cancel Booking</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
   // Notification dropdown toggle
   (function(){
@@ -911,6 +978,39 @@
       if(e.key === 'Escape') panel.classList.remove('open');
     });
   })();
+
+  // Reject modal
+  function openRejectModal(bookingId){
+    var modal = document.getElementById('rejectModal');
+    var form = document.getElementById('rejectForm');
+    form.action = '/trainer/booking/' + bookingId + '/update/';
+    modal.classList.add('open');
+  }
+  function closeRejectModal(){
+    document.getElementById('rejectModal').classList.remove('open');
+    document.getElementById('rejectForm').querySelector('textarea').value = '';
+  }
+  document.getElementById('rejectModal').addEventListener('click', function(e){
+    if(e.target === this) closeRejectModal();
+  });
+
+  // Cancel modal
+  function openCancelModal(bookingId){
+    var modal = document.getElementById('cancelModal');
+    var form = document.getElementById('cancelForm');
+    form.action = '/trainer/booking/' + bookingId + '/update/';
+    modal.classList.add('open');
+  }
+  function closeCancelModal(){
+    document.getElementById('cancelModal').classList.remove('open');
+    document.getElementById('cancelForm').querySelector('textarea').value = '';
+  }
+  document.getElementById('cancelModal').addEventListener('click', function(e){
+    if(e.target === this) closeCancelModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') { closeCancelModal(); closeRejectModal(); }
+  });
   </script>
 
 </body>

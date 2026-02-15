@@ -45,7 +45,7 @@ def trainer_chat(request):
             client=booking.user
         )
 
-    # Fetch all chat rooms with last message info
+    # Fetch ALL chat rooms (including past/cancelled) to preserve chat history
     chat_rooms = ChatRoom.objects.filter(trainer=registration).select_related(
         'client'
     ).annotate(
@@ -55,6 +55,14 @@ def trainer_chat(request):
             filter=Q(messages__is_read=False) & ~Q(messages__sender=request.user)
         )
     ).order_by('-last_message_time')
+
+    # Determine which clients have active bookings
+    active_client_ids = set(
+        TrainerBooking.objects.filter(
+            trainer=registration,
+            status='confirmed',
+        ).values_list('user_id', flat=True)
+    )
 
     # Active room
     room_id = request.GET.get('room')
@@ -71,6 +79,11 @@ def trainer_chat(request):
         # Mark messages as read
         active_room.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
 
+    # Check if active room's client has an active booking
+    active_room_is_active = False
+    if active_room and active_room.client_id in active_client_ids:
+        active_room_is_active = True
+
     total_unread = sum(room.unread for room in chat_rooms)
 
     context = {
@@ -80,13 +93,15 @@ def trainer_chat(request):
         'messages': messages_list,
         'total_unread': total_unread,
         'user_role': 'trainer',
+        'active_client_ids': active_client_ids,
+        'active_room_is_active': active_room_is_active,
     }
     return render(request, 'chat/trainer_chat.html', context)
 
 
 @login_required
 def client_chat(request):
-    """Chat page for clients — shows all trainer conversations."""
+    """Chat page for clients — shows all trainer conversations (including past)."""
     # Get active trainer bookings for this user
     active_bookings = TrainerBooking.objects.filter(
         user=request.user,
@@ -100,7 +115,15 @@ def client_chat(request):
             client=request.user
         )
 
-    # Fetch all chat rooms
+    # Determine which trainers have active bookings
+    active_trainer_ids = set(
+        TrainerBooking.objects.filter(
+            user=request.user,
+            status='confirmed',
+        ).values_list('trainer_id', flat=True)
+    )
+
+    # Fetch ALL chat rooms (including past/cancelled) to preserve chat history
     chat_rooms = ChatRoom.objects.filter(client=request.user).select_related(
         'trainer__user'
     ).annotate(
@@ -125,6 +148,11 @@ def client_chat(request):
         messages_list = active_room.messages.select_related('sender').all()
         active_room.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
 
+    # Check if active room's trainer has an active booking
+    active_room_is_active = False
+    if active_room and active_room.trainer_id in active_trainer_ids:
+        active_room_is_active = True
+
     total_unread = sum(room.unread for room in chat_rooms)
 
     context = {
@@ -133,6 +161,8 @@ def client_chat(request):
         'messages': messages_list,
         'total_unread': total_unread,
         'user_role': 'client',
+        'active_trainer_ids': active_trainer_ids,
+        'active_room_is_active': active_room_is_active,
     }
     return render(request, 'chat/client_chat.html', context)
 
@@ -168,6 +198,7 @@ def send_message(request, room_id):
             'sender': msg.sender.username,
             'sender_name': msg.sender.get_full_name() or msg.sender.username,
             'content': msg.content,
+            'message_type': msg.message_type,
             'time': msg.created_at.strftime('%I:%M %p'),
             'is_mine': True,
             'profile_picture': get_profile_picture_url(msg.sender),
@@ -201,6 +232,7 @@ def fetch_messages(request, room_id):
             'sender': msg.sender.username,
             'sender_name': msg.sender.get_full_name() or msg.sender.username,
             'content': msg.content,
+            'message_type': msg.message_type,
             'time': msg.created_at.strftime('%I:%M %p'),
             'is_mine': msg.sender == request.user,
             'profile_picture': get_profile_picture_url(msg.sender),
@@ -214,14 +246,13 @@ def start_chat_with_trainer(request, trainer_id):
     """Start or open a chat with a specific trainer (from client dashboard)."""
     trainer = get_object_or_404(TrainerRegistration, id=trainer_id)
 
-    # Verify active booking
-    has_booking = TrainerBooking.objects.filter(
+    # Check for any booking (active or past) - allow viewing past chat history
+    has_any_booking = TrainerBooking.objects.filter(
         user=request.user,
         trainer=trainer,
-        status='confirmed',
     ).exists()
 
-    if not has_booking:
+    if not has_any_booking:
         return redirect('trainer_client_dashboard')
 
     room, _ = ChatRoom.objects.get_or_create(

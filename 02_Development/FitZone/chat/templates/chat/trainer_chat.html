@@ -258,6 +258,38 @@
     }
     .msg-row.mine .msg-time{text-align:right}
 
+    /* System / Cancellation messages */
+    .msg-row.system-msg{
+      align-self:center;max-width:90%;
+    }
+    .msg-row.system-msg .msg-bubble{
+      background:rgba(239,68,68,0.08);
+      border:1px solid rgba(239,68,68,0.2);
+      color:#b91c1c;
+      border-radius:12px;
+      text-align:center;
+      font-weight:600;
+      white-space:pre-line;
+    }
+    .msg-row.system-msg .msg-avatar{display:none}
+    .msg-row.system-msg .msg-sender{
+      text-align:center;
+      color:#ef4444;
+      font-weight:800;
+    }
+    .msg-row.system-msg .msg-time{text-align:center}
+
+    /* Inactive chat banner */
+    .chat-inactive-banner{
+      padding:10px 24px;
+      background:rgba(239,68,68,0.06);
+      border-bottom:1px solid rgba(239,68,68,0.15);
+      text-align:center;
+      font-size:12px;font-weight:600;color:#b91c1c;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .chat-inactive-banner i{font-size:14px}
+
     /* Chat input */
     .chat-input-area{
       padding:16px 24px;
@@ -362,7 +394,7 @@
           {% for room in chat_rooms %}
             {% with last_msg=room.get_last_message %}
             <a href="?room={{ room.id }}" class="chat-item {% if active_room and active_room.id == room.id %}active{% endif %}" style="text-decoration:none;color:inherit;">
-              <div class="chat-avatar avatar-green">
+              <div class="chat-avatar {% if room.client_id in active_client_ids %}avatar-green{% else %}avatar-red{% endif %}">
                 {% if room.client.userprofile.profile_picture %}
                   <img src="{{ room.client.userprofile.profile_picture.url }}" alt="{{ room.client.username }}">
                 {% else %}
@@ -370,7 +402,12 @@
                 {% endif %}
               </div>
               <div class="chat-info">
-                <div class="chat-name">{{ room.client.get_full_name|default:room.client.username }}</div>
+                <div class="chat-name">
+                  {{ room.client.get_full_name|default:room.client.username }}
+                  {% if room.client_id not in active_client_ids %}
+                    <span style="font-size:10px;color:#9ca3af;font-weight:600;margin-left:4px;">Inactive</span>
+                  {% endif %}
+                </div>
                 <div class="chat-preview">
                   {% if last_msg %}{{ last_msg.content|truncatechars:35 }}{% else %}No messages yet{% endif %}
                 </div>
@@ -428,7 +465,16 @@
           </div>
 
           {% for msg in messages %}
-            <div class="msg-row {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}" data-msg-id="{{ msg.id }}">
+            {% if msg.message_type == 'cancellation' or msg.message_type == 'system' %}
+            <div class="msg-row system-msg" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
+              <div class="msg-content" style="width:100%">
+                <span class="msg-sender"><i class="fas fa-ban"></i> System</span>
+                <div class="msg-bubble">{{ msg.content }}</div>
+                <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
+              </div>
+            </div>
+            {% else %}
+            <div class="msg-row {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
               <div class="msg-avatar {% if msg.sender == request.user %}avatar-orange{% else %}avatar-green{% endif %}">
                 {% if msg.sender.userprofile.profile_picture %}
                   <img src="{{ msg.sender.userprofile.profile_picture.url }}" alt="{{ msg.sender.username }}">
@@ -442,15 +488,28 @@
                 <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
               </div>
             </div>
+            {% endif %}
           {% endfor %}
         </div>
 
+        {% if not active_room_is_active %}
+        <div class="chat-inactive-banner">
+          <i class="fas fa-info-circle"></i> This booking is no longer active. Chat history is preserved for reference.
+        </div>
+        {% endif %}
+
         <div class="chat-input-area">
+          {% if active_room_is_active %}
           <form class="chat-input-form" id="chatForm" onsubmit="return sendMessage(event)">
             {% csrf_token %}
             <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
             <button type="submit" class="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
           </form>
+          {% else %}
+          <div style="text-align:center;padding:8px;font-size:12px;color:rgba(0,0,0,0.35);font-weight:600;">
+            <i class="fas fa-lock"></i> Messaging is disabled for inactive bookings
+          </div>
+          {% endif %}
         </div>
 
       {% else %}
@@ -514,21 +573,33 @@
     // Append message to chat
     function appendMessage(msg){
       var row = document.createElement('div');
-      row.className = 'msg-row ' + (msg.is_mine ? 'mine' : 'theirs');
       row.setAttribute('data-msg-id', msg.id);
 
-      var initial = msg.sender_name.charAt(0).toUpperCase();
-      var avatarClass = msg.is_mine ? 'avatar-orange' : 'avatar-green';
-      var avatarContent = msg.profile_picture 
-        ? '<img src="' + msg.profile_picture + '" alt="' + msg.sender_name + '">'
-        : initial;
+      if(msg.message_type === 'cancellation' || msg.message_type === 'system'){
+        row.className = 'msg-row system-msg';
+        row.setAttribute('data-msg-type', msg.message_type);
+        row.innerHTML = '<div class="msg-content" style="width:100%">'
+          + '<span class="msg-sender"><i class="fas fa-ban"></i> System</span>'
+          + '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>'
+          + '<span class="msg-time">' + msg.time + '</span>'
+          + '</div>';
+      } else {
+        row.className = 'msg-row ' + (msg.is_mine ? 'mine' : 'theirs');
+        row.setAttribute('data-msg-type', 'normal');
 
-      row.innerHTML = '<div class="msg-avatar ' + avatarClass + '">' + avatarContent + '</div>'
-        + '<div class="msg-content">'
-        + '<span class="msg-sender">' + msg.sender_name + '</span>'
-        + '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>'
-        + '<span class="msg-time">' + msg.time + '</span>'
-        + '</div>';
+        var initial = msg.sender_name.charAt(0).toUpperCase();
+        var avatarClass = msg.is_mine ? 'avatar-orange' : 'avatar-green';
+        var avatarContent = msg.profile_picture 
+          ? '<img src="' + msg.profile_picture + '" alt="' + msg.sender_name + '">'
+          : initial;
+
+        row.innerHTML = '<div class="msg-avatar ' + avatarClass + '">' + avatarContent + '</div>'
+          + '<div class="msg-content">'
+          + '<span class="msg-sender">' + msg.sender_name + '</span>'
+          + '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>'
+          + '<span class="msg-time">' + msg.time + '</span>'
+          + '</div>';
+      }
 
       chatMessages.appendChild(row);
       lastMsgId = msg.id;

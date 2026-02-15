@@ -15,6 +15,7 @@ from .forms import (
 )
 from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPhoto, TrainerBooking
 from notifications.models import TrainerNotification, UserNotification
+from chat.models import ChatRoom, Message
 
 
 def trainer(request):
@@ -718,7 +719,6 @@ def book_trainer(request, trainer_id):
 
 @login_required
 def update_booking_status(request, booking_id):
-    """Trainer accepts or rejects a booking."""
     booking = get_object_or_404(TrainerBooking, id=booking_id)
 
     if booking.trainer.user != request.user:
@@ -727,6 +727,8 @@ def update_booking_status(request, booking_id):
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
+        cancellation_reason = request.POST.get('cancellation_reason', '').strip()
+        rejection_reason = request.POST.get('rejection_reason', '').strip()
         if new_status in ('confirmed', 'rejected', 'cancelled'):
             old_status = booking.status
             booking.status = new_status
@@ -736,6 +738,16 @@ def update_booking_status(request, booking_id):
                 booking.payment_status = 'pending'
                 booking.payment_due_date = timezone.now() + timedelta(days=2)
                 booking.amount = booking.trainer.monthly_price
+            
+            # If rejected, store the reason
+            if new_status == 'rejected':
+                booking.cancellation_reason = rejection_reason or 'No reason provided'
+                booking.cancelled_by = 'trainer'
+            
+            # If cancelled, store the reason
+            if new_status == 'cancelled':
+                booking.cancellation_reason = cancellation_reason or 'No reason provided'
+                booking.cancelled_by = 'trainer'
             
             booking.save()
             messages.success(request, f"Booking {new_status} successfully!")
@@ -752,21 +764,37 @@ def update_booking_status(request, booking_id):
                     message=f'Great news! {trainer_name} has accepted your booking for {booking.booking_date.strftime("%b %d, %Y")}. Please complete your payment of ₹{booking.amount} by {payment_due_str}. Check your dashboard for payment details.'
                 )
             elif new_status == 'rejected':
+                reason_text = rejection_reason or 'No reason provided'
                 UserNotification.objects.create(
                     user=booking.user,
                     booking=booking,
                     notif_type='booking_rejected',
                     title='Booking Declined',
-                    message=f'{trainer_name} was unable to accept your booking for {booking.booking_date.strftime("%b %d, %Y")}. You can try booking another trainer.'
+                    message=f'{trainer_name} was unable to accept your booking for {booking.booking_date.strftime("%b %d, %Y")}. Reason: {reason_text}'
                 )
             elif new_status == 'cancelled':
+                reason_text = cancellation_reason or 'No reason provided'
                 UserNotification.objects.create(
                     user=booking.user,
                     booking=booking,
                     notif_type='general',
                     title='Booking Cancelled',
-                    message=f'{trainer_name} has cancelled your booking for {booking.booking_date.strftime("%b %d, %Y")}. You can book another session or contact the trainer.'
+                    message=f'{trainer_name} has cancelled your booking for {booking.booking_date.strftime("%b %d, %Y")}. Reason: {reason_text}'
                 )
+                # Post a system message to the chat room
+                chat_room = ChatRoom.objects.filter(
+                    trainer=booking.trainer,
+                    client=booking.user
+                ).first()
+                if chat_room:
+                    Message.objects.create(
+                        room=chat_room,
+                        sender=request.user,
+                        content=f'⚠️ Booking Cancelled by Trainer\nReason: {reason_text}',
+                        message_type='cancellation'
+                    )
+                    chat_room.updated_at = timezone.now()
+                    chat_room.save(update_fields=['updated_at'])
         else:
             messages.error(request, "Invalid action.")
 
@@ -775,22 +803,38 @@ def update_booking_status(request, booking_id):
 
 @login_required
 def user_cancel_booking(request, booking_id):
-    """User cancels their own pending or confirmed (unpaid) booking."""
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
-    
     # Allow canceling pending bookings or confirmed bookings that haven't been paid
     if booking.status == 'pending' or (booking.status == 'confirmed' and booking.payment_status == 'pending'):
+        cancellation_reason = request.POST.get('cancellation_reason', '').strip() if request.method == 'POST' else ''
         booking.status = 'cancelled'
+        booking.cancellation_reason = cancellation_reason or 'Cancelled by user'
+        booking.cancelled_by = 'user'
         booking.save()
         # Notify trainer
         user_name = request.user.get_full_name() or request.user.username
+        reason_text = cancellation_reason or 'No reason provided'
         TrainerNotification.objects.create(
             trainer=booking.trainer,
             booking=booking,
             notif_type='cancellation',
             title='Booking Cancelled',
-            message=f'{user_name} has cancelled their booking for {booking.booking_date.strftime("%b %d, %Y")}.'
+            message=f'{user_name} has cancelled their booking for {booking.booking_date.strftime("%b %d, %Y")}. Reason: {reason_text}'
         )
+        # Post a system message to the chat room
+        chat_room = ChatRoom.objects.filter(
+            trainer=booking.trainer,
+            client=request.user
+        ).first()
+        if chat_room:
+            Message.objects.create(
+                room=chat_room,
+                sender=request.user,
+                content=f'⚠️ Booking Cancelled by User\nReason: {reason_text}',
+                message_type='cancellation'
+            )
+            chat_room.updated_at = timezone.now()
+            chat_room.save(update_fields=['updated_at'])
         messages.success(request, "Booking cancelled successfully.")
     else:
         messages.error(request, "Only pending or unpaid confirmed bookings can be cancelled.")

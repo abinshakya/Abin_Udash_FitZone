@@ -33,6 +33,12 @@ class ChatRoom(models.Model):
 
 
 class Message(models.Model):
+    MESSAGE_TYPES = [
+        ('normal', 'Normal'),
+        ('system', 'System'),
+        ('cancellation', 'Cancellation'),
+    ]
+
     room = models.ForeignKey(
         ChatRoom,
         on_delete=models.CASCADE,
@@ -44,6 +50,7 @@ class Message(models.Model):
         related_name='sent_messages'
     )
     content = models.TextField()
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='normal')
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
