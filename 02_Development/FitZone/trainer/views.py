@@ -316,44 +316,25 @@ TEMPLATES = {
 class TrainerRegistrationWizard(SessionWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp_wizard'))
     
-    def process_step(self, form):
-        """Override to handle multiple file uploads correctly"""
-        # Get the standard processed data
-        step_data = super().process_step(form)
-        
-        # Get current step
+    def process_step_files(self, form):
         step = self.steps.current
-        
-        # Handle file fields with multiple file uploads
-        for field_name, field in form.fields.items():
-            # Check if it's a file field
-            if hasattr(field.widget, 'needs_multipart_form') and field.widget.needs_multipart_form:
-                # Get all files for this field (getlist handles multiple files)
-                field_files = self.request.FILES.getlist(f'{step}-{field_name}')
-                
-                print(f"DEBUG: Field {field_name} received {len(field_files)} files")
-                
-                if len(field_files) > 1:
-                    # The parent class only saves the LAST file via form.files[key]
-                    # (Django MultiValueDict returns the last value for a key)
-                    # We need to save ALL files explicitly with correct keys
-                    existing_files = self.storage.get_step_files(step) or {}
-                    
-                    # Save the FIRST file as the base key (overwrite what parent saved)
-                    base_key = f'{step}-{field_name}'
-                    existing_files[base_key] = field_files[0]
-                    print(f"DEBUG: Saved first file {base_key}: {field_files[0].name}")
-                    
-                    # Save remaining files with numbered keys
-                    for index in range(1, len(field_files)):
-                        file_key = f'{step}-{field_name}-{index}'
-                        existing_files[file_key] = field_files[index]
-                        print(f"DEBUG: Added additional file {file_key}: {field_files[index].name}")
-                    
-                    # Set all files back
-                    self.storage.set_step_files(step, existing_files)
-        
-        return step_data
+        files = {}
+
+        for field_name in form.fields:
+            field_key = f'{step}-{field_name}'
+            field_files = self.request.FILES.getlist(field_key)
+
+            if not field_files:
+                continue
+
+            # First (or only) file uses the base key
+            files[field_key] = field_files[0]
+
+            # Additional files get numbered keys
+            for i in range(1, len(field_files)):
+                files[f'{field_key}-{i}'] = field_files[i]
+
+        return files
 
     def _sanitize_wizard_storage(self):
         step_files = None
@@ -417,12 +398,6 @@ class TrainerRegistrationWizard(SessionWizardView):
         cert_data = form_data[1]
         docs_data = form_data[2]
         
-        # Debug: Print what's in cleaned_data
-        print(f"DEBUG: cert_data keys: {cert_data.keys()}")
-        print(f"DEBUG: cert_data['certification'] type: {type(cert_data.get('certification'))}")
-        print(f"DEBUG: cert_data['certification'] value: {cert_data.get('certification')}")
-        print(f"DEBUG: docs_data keys: {docs_data.keys()}")
-        
         # Convert specialization list to comma-separated string
         specialization_list = basic_info['specialization']
         specialization_str = ', '.join(specialization_list) if isinstance(specialization_list, list) else specialization_list
@@ -458,10 +433,7 @@ class TrainerRegistrationWizard(SessionWizardView):
             step_files = self.storage.get_step_files(step) or {}
             
             if not step_files:
-                print(f"DEBUG: No files in storage for step {step}")
                 return files
-            
-            print(f"DEBUG: Storage keys for {step}: {list(step_files.keys())}")
             
             # Look for base key and numbered keys
             base_key = f'{step}-{field_name}'
@@ -469,25 +441,21 @@ class TrainerRegistrationWizard(SessionWizardView):
             # Check base key first (for single file or first file)
             if base_key in step_files:
                 files.append(step_files[base_key])
-                print(f"DEBUG: Retrieved file from {base_key}: {step_files[base_key].name}")
             
-            # Check numbered keys in wizard storage (for multiple files - old approach)
+            # Check numbered keys for additional files
             index = 1
             while True:
                 numbered_key = f'{base_key}-{index}'
                 if numbered_key in step_files:
                     files.append(step_files[numbered_key])
-                    print(f"DEBUG: Retrieved file from {numbered_key}: {step_files[numbered_key].name}")
                     index += 1
                 else:
                     break
             
-            print(f"DEBUG: Total files retrieved for {field_name}: {len(files)}")
             return files
         
         # Get certification files
         cert_files = get_files_from_storage('certification', 'certification')
-        print(f"DEBUG: Certification files count: {len(cert_files)}")
         
         # Get profile pic
         profile_files = get_files_from_storage('certification', 'profile_pic')
@@ -495,11 +463,9 @@ class TrainerRegistrationWizard(SessionWizardView):
         
         # Get identity proof files
         id_files = get_files_from_storage('documents', 'identity_proof')
-        print(f"DEBUG: Identity proof files count: {len(id_files)}")
         
         # Get experience verification files
         exp_files = get_files_from_storage('documents', 'experience_verification')
-        print(f"DEBUG: Experience files count: {len(exp_files)}")
         
         # Map doc_type to a short label for filenames
         doc_type_labels = {
@@ -528,7 +494,6 @@ class TrainerRegistrationWizard(SessionWizardView):
                     )
                     # Save file with custom name
                     doc.file.save(new_filename, f, save=True)
-                    print(f"DEBUG: Saved {doc_type} #{index}: {doc.id} as {new_filename}")
         
         save_docs(cert_files, "certification")
         if profile_file:

@@ -25,13 +25,16 @@ class MultipleFileInput(forms.ClearableFileInput):
 
 
 class MultipleFileField(forms.FileField):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, max_files=None, **kwargs):
+        self.max_files = max_files
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
         single_file_clean = super().clean
         if isinstance(data, (list, tuple)):
+            if self.max_files and len(data) > self.max_files:
+                raise ValidationError(f"You can upload a maximum of {self.max_files} files.")
             result = [single_file_clean(d, initial) for d in data]
         else:
             result = single_file_clean(data, initial)
@@ -168,8 +171,9 @@ class Step1BasicInfoForm(forms.Form):
 class Step2CertificationForm(forms.Form):
     certification = MultipleFileField(
         label="Certification Documents",
-        help_text="Upload your fitness certifications (PDF or images, multiple files allowed)",
+        help_text="Upload your fitness certifications (PDF or images, up to 5 files)",
         required=True,
+        max_files=5,
         widget=MultipleFileInput(attrs={
             'accept': 'image/*,application/pdf',
             'class': 'file-input'
@@ -190,8 +194,9 @@ class Step2CertificationForm(forms.Form):
 class Step3DocumentsForm(forms.Form):
     identity_proof = MultipleFileField(
         label="Identity Proof",
-        help_text="Government-issued ID (License, Passport, etc., multiple files allowed)",
+        help_text="Government-issued ID (License, Passport, etc., up to 5 files)",
         required=True,
+        max_files=5,
         widget=MultipleFileInput(attrs={
             'accept': 'image/*,application/pdf',
             'class': 'file-input'
@@ -200,8 +205,9 @@ class Step3DocumentsForm(forms.Form):
     
     experience_verification = MultipleFileField(
         label="Experience Verification",
-        help_text="Previous employment letters or gym certifications (multiple files allowed)",
+        help_text="Previous employment letters or gym certifications (up to 5 files)",
         required=True,
+        max_files=5,
         widget=MultipleFileInput(attrs={
             'accept': 'image/*,application/pdf',
             'class': 'file-input'

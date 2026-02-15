@@ -332,7 +332,7 @@ input[type="file"]{
         <label for="{{ form.identity_proof.id_for_label }}" class="file-upload-box">
           <i class="fas fa-id-card"></i>
           <p>Click to upload ID documents</p>
-          <p class="file-help-text">License, Passport, etc. (Multiple files allowed)</p>
+          <p class="file-help-text">License, Passport, etc. (up to 5 files)</p>
           <div class="file-selected" id="id-selected"></div>
         </label>
 
@@ -348,7 +348,7 @@ input[type="file"]{
         <label for="{{ form.experience_verification.id_for_label }}" class="file-upload-box">
           <i class="fas fa-briefcase"></i>
           <p>Click to upload experience proof</p>
-          <p class="file-help-text">Employment letters, references (Multiple files allowed)</p>
+          <p class="file-help-text">Employment letters, references (up to 5 files)</p>
           <div class="file-selected" id="exp-selected"></div>
         </label>
 
@@ -373,6 +373,7 @@ input[type="file"]{
 
 <script>
 // Store selected files
+const MAX_FILES = 5;
 let identityFiles = [];
 let experienceFiles = [];
 
@@ -437,9 +438,14 @@ document.getElementById('{{ form.identity_proof.id_for_label }}').addEventListen
     const newFiles = Array.from(e.target.files);
     newFiles.forEach(file => {
         if (!identityFiles.some(f => f.name === file.name && f.size === file.size)) {
-            identityFiles.push(file);
+            if (identityFiles.length < MAX_FILES) {
+                identityFiles.push(file);
+            }
         }
     });
+    if (identityFiles.length >= MAX_FILES) {
+        alert(`Maximum ${MAX_FILES} identity proof files allowed.`);
+    }
     updateIdentityInput();
     renderIdentityPreviews();
 });
@@ -466,9 +472,14 @@ document.getElementById('{{ form.experience_verification.id_for_label }}').addEv
     const newFiles = Array.from(e.target.files);
     newFiles.forEach(file => {
         if (!experienceFiles.some(f => f.name === file.name && f.size === file.size)) {
-            experienceFiles.push(file);
+            if (experienceFiles.length < MAX_FILES) {
+                experienceFiles.push(file);
+            }
         }
     });
+    if (experienceFiles.length >= MAX_FILES) {
+        alert(`Maximum ${MAX_FILES} experience verification files allowed.`);
+    }
     updateExperienceInput();
     renderExperiencePreviews();
 });

@@ -299,7 +299,7 @@ input[type="file"] {
 
                 <label for="{{ form.certification.id_for_label }}" class="file-upload-box">
                     <i class="fas fa-file"></i>
-                    <p>Click to upload certifications</p>
+                    <p>Click to upload certifications (max 5 files)</p>
                     <div class="file-selected" id="cert-selected"></div>
                 </label>
 
@@ -344,6 +344,7 @@ input[type="file"] {
 
 <script>
 // Store selected files
+const MAX_CERT_FILES = 5;
 let certificationFiles = [];
 let profilePicFile = null;
 
@@ -411,13 +412,19 @@ document.getElementById('{{ form.certification.id_for_label }}')
   .addEventListener('change', function(e) {
     const newFiles = Array.from(e.target.files);
     
-    // Add new files to existing files
+    // Add new files to existing files (up to max)
     newFiles.forEach(file => {
         // Check if file already exists
         if (!certificationFiles.some(f => f.name === file.name && f.size === file.size)) {
-            certificationFiles.push(file);
+            if (certificationFiles.length < MAX_CERT_FILES) {
+                certificationFiles.push(file);
+            }
         }
     });
+    
+    if (certificationFiles.length >= MAX_CERT_FILES) {
+        alert(`Maximum ${MAX_CERT_FILES} certification files allowed.`);
+    }
     
     updateCertificationInput();
     renderCertificationPreviews();
