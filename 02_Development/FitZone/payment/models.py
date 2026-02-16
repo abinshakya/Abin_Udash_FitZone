@@ -1,9 +1,15 @@
 from django.db import models
 from django.conf import settings
 from membership.models import MembershipPlan
+from trainer.models import TrainerBooking
 
 
 class KhaltiPayment(models.Model):
+    PAYMENT_TYPE_CHOICES = (
+        ('membership', 'Membership'),
+        ('booking', 'Trainer Booking'),
+    )
+
     STATUS_CHOICES = (
         ('Initiated', 'Initiated'),
         ('Pending', 'Pending'),
@@ -16,7 +22,9 @@ class KhaltiPayment(models.Model):
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    membership_plan = models.ForeignKey(MembershipPlan, on_delete=models.SET_NULL, null=True)
+    membership_plan = models.ForeignKey(MembershipPlan, on_delete=models.SET_NULL, null=True, blank=True)
+    booking = models.ForeignKey(TrainerBooking, on_delete=models.SET_NULL, null=True, blank=True)
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES, default='membership')
     
     pidx = models.CharField(max_length=255, unique=True, db_index=True)
     transaction_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)

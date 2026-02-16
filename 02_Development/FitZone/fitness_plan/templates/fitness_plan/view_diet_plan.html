@@ -1,0 +1,303 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ plan.title }} - Diet Plan - FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --orange: #ff7a18;
+      --orange2: #ff9a3c;
+      --bg0: #f8f9fa;
+      --text: #1a1a1a;
+      --muted: rgba(0, 0, 0, 0.55);
+      --border: rgba(0, 0, 0, 0.10);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1000px 520px at 18% 0%, rgba(255, 122, 24, 0.18), transparent 60%),
+                  radial-gradient(900px 450px at 85% 10%, rgba(255, 154, 60, 0.10), transparent 60%),
+                  linear-gradient(135deg, var(--bg0) 0%, #fff 100%);
+      min-height: 100vh;
+    }
+
+    .page-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: color .2s;
+    }
+
+    .back-link:hover {
+      color: var(--orange);
+    }
+
+    .plan-header {
+      margin-bottom: 32px;
+    }
+
+    .plan-header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin: 0 0 8px;
+    }
+
+    .plan-header p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .macro-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 20px 0 32px;
+    }
+
+    .macro-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    }
+
+    .macro-card .macro-val {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--orange);
+    }
+
+    .macro-card .macro-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .meal-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .meal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .meal-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meal-type-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 122, 24, 0.1);
+      color: var(--orange);
+    }
+
+    .meal-body {
+      padding: 20px 24px;
+    }
+
+    .meal-body h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .meal-body p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .meal-macros {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .meal-macros span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .meal-macros span i {
+      color: var(--orange);
+      font-size: 11px;
+    }
+
+    .time-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .notes-section {
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.06), rgba(255, 154, 60, 0.03));
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 8px;
+      margin-bottom: 24px;
+    }
+
+    .notes-section h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notes-section h4 i {
+      color: var(--orange);
+    }
+
+    .notes-section p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <a href="{% url 'my_plans' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to My Plans</a>
+
+    <div class="plan-header">
+      <h1><i class="fas fa-utensils me-2" style="color:var(--orange)"></i>{{ plan.title }}</h1>
+      {% if plan.description %}<p>{{ plan.description }}</p>{% endif %}
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <span style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(0,0,0,0.05)"><i class="fas fa-calendar-alt me-1"></i> {{ plan.duration_weeks }} weeks</span>
+        <span style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(0,0,0,0.05)"><i class="fas fa-user-tie me-1"></i> {{ plan.trainer.user.get_full_name|default:plan.trainer.user.username }}</span>
+      </div>
+    </div>
+
+    {% if plan.daily_calories or plan.protein_grams or plan.carbs_grams or plan.fat_grams %}
+    <div class="macro-cards">
+      {% if plan.daily_calories %}
+      <div class="macro-card">
+        <div class="macro-val">{{ plan.daily_calories }}</div>
+        <div class="macro-label"><i class="fas fa-fire me-1"></i>Calories/day</div>
+      </div>
+      {% endif %}
+      {% if plan.protein_grams %}
+      <div class="macro-card">
+        <div class="macro-val">{{ plan.protein_grams }}g</div>
+        <div class="macro-label"><i class="fas fa-drumstick-bite me-1"></i>Protein</div>
+      </div>
+      {% endif %}
+      {% if plan.carbs_grams %}
+      <div class="macro-card">
+        <div class="macro-val">{{ plan.carbs_grams }}g</div>
+        <div class="macro-label"><i class="fas fa-bread-slice me-1"></i>Carbs</div>
+      </div>
+      {% endif %}
+      {% if plan.fat_grams %}
+      <div class="macro-card">
+        <div class="macro-val">{{ plan.fat_grams }}g</div>
+        <div class="macro-label"><i class="fas fa-droplet me-1"></i>Fat</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if plan.notes %}
+    <div class="notes-section">
+      <h4><i class="fas fa-sticky-note"></i> Trainer Notes</h4>
+      <p>{{ plan.notes }}</p>
+    </div>
+    {% endif %}
+
+    <h2 style="font-size:1.2rem;font-weight:900;margin:24px 0 16px"><i class="fas fa-list-ul me-2" style="color:var(--orange)"></i>Daily Meals</h2>
+
+    {% for meal in meals %}
+    <div class="meal-card">
+      <div class="meal-header">
+        <h3>
+          <i class="fas fa-{% if meal.meal_type == 'breakfast' %}sun{% elif meal.meal_type == 'lunch' %}cloud-sun{% elif meal.meal_type == 'dinner' %}moon{% else %}cookie{% endif %}" style="color:var(--orange)"></i>
+          {{ meal.title }}
+        </h3>
+        <div style="display:flex;gap:10px;align-items:center">
+          {% if meal.time %}<span class="time-badge"><i class="fas fa-clock"></i> {{ meal.time }}</span>{% endif %}
+          <span class="meal-type-badge">{{ meal.get_meal_type_display }}</span>
+        </div>
+      </div>
+      <div class="meal-body">
+        {% if meal.description %}
+        <p>{{ meal.description }}</p>
+        {% endif %}
+        {% if meal.calories or meal.protein or meal.carbs or meal.fat %}
+        <div class="meal-macros">
+          {% if meal.calories %}<span><i class="fas fa-fire"></i> {{ meal.calories }} kcal</span>{% endif %}
+          {% if meal.protein %}<span><i class="fas fa-drumstick-bite"></i> {{ meal.protein }}g protein</span>{% endif %}
+          {% if meal.carbs %}<span><i class="fas fa-bread-slice"></i> {{ meal.carbs }}g carbs</span>{% endif %}
+          {% if meal.fat %}<span><i class="fas fa-droplet"></i> {{ meal.fat }}g fat</span>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div style="text-align:center;padding:48px;color:var(--muted)">
+      <i class="fas fa-utensils d-block" style="font-size:48px;opacity:0.15;margin-bottom:16px"></i>
+      <h3 style="font-weight:700">No Meals Added Yet</h3>
+      <p>Your trainer is still building this diet plan.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

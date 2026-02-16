@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'trainer',
     'notifications',
     'chat',
+    'fitness_plan',
 ]
 
 MIDDLEWARE = [

@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import timedelta
+from trainer.models import TrainerBooking
 
 
 @login_required
@@ -199,34 +200,40 @@ def verify_payment(request, pidx):
             payment.save()
             
             if payment.status == 'Completed':
-                # Activate membership for user - change role to 'member'
-                try:
-                    user_profile = UserProfile.objects.get(user=request.user)
-                    
-                    # Create UserMembership record
-                    if payment.membership_plan:
-                        # Calculate end date based on plan duration
-                        end_date = timezone.now() + timedelta(days=payment.membership_plan.get_duration_days())
+                # Check payment type and handle accordingly
+                if payment.payment_type == 'booking' and payment.booking:
+                    # Handle booking payment completion
+                    booking = payment.booking
+                    booking.payment_status = 'completed'
+                    booking.save()
+                    messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")
+                    return render(request, 'payment_success.html', {'payment': payment})
+                else:
+                    # Handle membership payment completion
+                    try:
+                        user_profile = UserProfile.objects.get(user=request.user)
                         
-                        # Create or update membership
-                        UserMembership.objects.create(
-                            user=request.user,
-                            membership_plan=payment.membership_plan,
-                            end_date=end_date,
-                            is_active=True
-                        )
+                        # Create UserMembership record
+                        if payment.membership_plan:
+                            end_date = timezone.now() + timedelta(days=payment.membership_plan.get_duration_days())
+                            UserMembership.objects.create(
+                                user=request.user,
+                                membership_plan=payment.membership_plan,
+                                end_date=end_date,
+                                is_active=True
+                            )
+                        
+                        # Change role to member
+                        if user_profile.role == 'user':
+                            user_profile.role = 'member'
+                            user_profile.save()
+                            messages.success(request, "Payment successful! Your membership has been activated. You are now a member!")
+                        else:
+                            messages.success(request, "Payment successful! Your membership has been renewed.")
+                    except UserProfile.DoesNotExist:
+                        messages.success(request, "Payment successful!")
                     
-                    # Change role to member
-                    if user_profile.role == 'user':
-                        user_profile.role = 'member'
-                        user_profile.save()
-                        messages.success(request, "Payment successful! Your membership has been activated. You are now a member!")
-                    else:
-                        messages.success(request, "Payment successful! Your membership has been renewed.")
-                except UserProfile.DoesNotExist:
-                    messages.success(request, "Payment successful!")
-                
-                return render(request, 'payment_success.html', {'payment': payment})
+                    return render(request, 'payment_success.html', {'payment': payment})
             else:
                 messages.warning(request, f"Payment status: {payment.status}")
                 return render(request, 'payment_failed.html', {'payment': payment})
@@ -243,3 +250,125 @@ def verify_payment(request, pidx):
 def payment_failed(request, pidx):
     payment = get_object_or_404(KhaltiPayment, pidx=pidx, user=request.user)
     return render(request, 'payment_failed.html', {'payment': payment})
+
+
+# ──────────────────────────────────────────────
+#  TRAINER BOOKING PAYMENT
+# ──────────────────────────────────────────────
+
+@login_required
+# Checkout page for a trainer booking payment
+def booking_checkout(request, booking_id):
+    booking = get_object_or_404(
+        TrainerBooking,
+        id=booking_id,
+        user=request.user,
+        status='confirmed',
+        payment_status='pending'
+    )
+    
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if not profile.email_verified:
+            messages.error(request, "Please verify your email address before making a payment.")
+            return redirect('verify_otp')
+    except UserProfile.DoesNotExist:
+        messages.error(request, "Profile not found. Please complete your registration.")
+        return redirect('register')
+    
+    context = {
+        'booking': booking,
+        'user': request.user,
+    }
+    return render(request, 'booking_checkout.html', context)
+
+
+@login_required
+# Initiate Khalti payment for a trainer booking
+def initiate_booking_payment(request, booking_id):
+    booking = get_object_or_404(
+        TrainerBooking,
+        id=booking_id,
+        user=request.user,
+        status='confirmed',
+        payment_status='pending'
+    )
+    
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if not profile.email_verified:
+            messages.error(request, "Please verify your email to proceed with payment.")
+            return redirect('verify_otp')
+    except UserProfile.DoesNotExist:
+        messages.error(request, "Profile not found.")
+        return redirect('register')
+    
+    if not booking.amount or booking.amount <= 0:
+        messages.error(request, "Invalid booking amount. Please contact the trainer.")
+        return redirect('trainer_client_dashboard')
+    
+    # Generate unique purchase order ID
+    purchase_order_id = f"FZB-{request.user.id}-{booking.id}-{uuid.uuid4().hex[:8].upper()}"
+    
+    # Amount in paisa (NPR * 100)
+    amount_in_paisa = int(booking.amount * 100)
+    
+    trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+    
+    # Build return URL
+    return_url = request.build_absolute_uri(reverse('payment_callback'))
+    website_url = request.build_absolute_uri('/')
+    
+    # Prepare payload for Khalti
+    payload = {
+        "return_url": return_url,
+        "website_url": website_url,
+        "amount": amount_in_paisa,
+        "purchase_order_id": purchase_order_id,
+        "purchase_order_name": f"Trainer Booking - {trainer_name}",
+        "customer_info": {
+            "name": request.user.get_full_name() or request.user.username,
+            "email": request.user.email,
+            "phone": getattr(profile, 'phone', "9800000000")
+        }
+    }
+    
+    # Khalti API headers
+    headers = {
+        "Authorization": f"key {settings.KHALTI_SECRET_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        api_url = f"{settings.KHALTI_API_URL}/epayment/initiate/"
+        response = requests.post(api_url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Save payment record
+            payment = KhaltiPayment.objects.create(
+                user=request.user,
+                booking=booking,
+                payment_type='booking',
+                pidx=data['pidx'],
+                purchase_order_id=purchase_order_id,
+                purchase_order_name=payload['purchase_order_name'],
+                amount=amount_in_paisa,
+                payment_url=data['payment_url'],
+                status='Initiated',
+                expires_at=timezone.now() + timedelta(minutes=10)
+            )
+            
+            # Redirect to Khalti payment page
+            return redirect(data['payment_url'])
+        else:
+            messages.error(request, "Payment initialization failed. Please try again or contact support.")
+            return redirect('booking_checkout', booking_id=booking_id)
+            
+    except requests.RequestException as e:
+        messages.error(request, "Payment gateway connection error. Please try again.")
+        return redirect('booking_checkout', booking_id=booking_id)
+    except Exception as e:
+        messages.error(request, "An unexpected error occurred. Please try again.")
+        return redirect('booking_checkout', booking_id=booking_id)

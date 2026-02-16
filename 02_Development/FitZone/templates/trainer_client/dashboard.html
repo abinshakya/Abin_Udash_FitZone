@@ -26,6 +26,12 @@
 
       --shadow: 0 22px 70px rgba(0,0,0,0.12);
       --shadowSoft: 0 16px 45px rgba(0,0,0,0.08);
+
+      --red:#ef4444;
+      --green:#22c55e;
+      --gray100:#f3f4f6;
+      --gray200:#e5e7eb;
+      --redDark:#dc2626;
     }
 
     *{ box-sizing: border-box; }
@@ -41,9 +47,7 @@
     }
 
     /* ---------- Layout ---------- */
-    .dash{
-      min-height: 100vh;
-    }
+    .dash{ min-height: 100vh; }
 
     /* ---------- Sidebar ---------- */
     .sidebar{
@@ -77,7 +81,23 @@
     .nav a i{width:18px;text-align:center;font-size:14px}
     .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(0,0,0,0.06)}
     .logout{display:flex;align-items:center;gap:10px;color:rgba(0,0,0,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
-    .logout:hover{color:#ef4444}
+    .logout:hover{color:var(--red)}
+
+    /* Sidebar unread badge (Chat) */
+    .nav-badge{
+      margin-left:auto;
+      min-width:20px;
+      height:20px;
+      border-radius:50%;
+      background:var(--orange);
+      color:#fff;
+      font-size:10px;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 5px;
+    }
 
     /* ---------- Main ---------- */
     .main{
@@ -137,17 +157,10 @@
       gap: 10px;
     }
 
-    .card-icon-orange{
-      color: var(--orange);
-    }
+    .card-icon-orange{ color: var(--orange); }
 
-    .card-body{
-      padding: 24px;
-    }
-
-    .card-body-flush{
-      padding: 0;
-    }
+    .card-body{ padding: 24px; }
+    .card-body-flush{ padding: 0; }
 
     /* ---------- Payment Alert ---------- */
     .payment-alert{
@@ -159,6 +172,16 @@
       display: flex;
       align-items: center;
       gap: 16px;
+    }
+
+    /* Message variations (Django messages) */
+    .payment-alert.is-error{
+      border-color: rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.1);
+    }
+    .payment-alert.is-success{
+      border-color: rgba(34,197,94,0.3);
+      background: rgba(34,197,94,0.1);
     }
 
     .payment-alert-icon{
@@ -173,10 +196,10 @@
       color: #fff;
       flex-shrink: 0;
     }
+    .payment-alert-icon.is-error{ background: var(--red); }
+    .payment-alert-icon.is-success{ background: var(--green); }
 
-    .payment-alert-content{
-      flex: 1;
-    }
+    .payment-alert-content{ flex: 1; }
 
     .payment-alert-title{
       font-size: 18px;
@@ -203,9 +226,7 @@
       border-left: 4px solid var(--orange);
     }
 
-    .payment-item:last-child{
-      border-bottom: none;
-    }
+    .payment-item:last-child{ border-bottom: none; }
 
     .payment-left{
       display: flex;
@@ -262,6 +283,12 @@
       text-shadow: 0 0 20px rgba(255,122,24,0.3);
     }
 
+    /* Buttons row on payment item right */
+    .payment-actions{
+      display:flex;
+      gap:10px;
+    }
+
     .pay-btn{
       display: inline-flex;
       align-items: center;
@@ -275,11 +302,24 @@
       font-size: 14px;
       box-shadow: 0 8px 24px rgba(255,122,24,0.3);
       transition: all 0.2s;
+      border: none;
+      cursor: pointer;
     }
 
     .pay-btn:hover{
       transform: translateY(-2px);
       box-shadow: 0 12px 32px rgba(255,122,24,0.4);
+    }
+
+    /* Cancel button (styled like pay-btn but red) */
+    .pay-btn-cancel{
+      background: rgba(239,68,68,0.15);
+      color: var(--red);
+      box-shadow: 0 8px 24px rgba(239,68,68,0.2);
+    }
+    .pay-btn-cancel:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(239,68,68,0.28);
     }
 
     /* ---------- Trainer Cards ---------- */
@@ -370,6 +410,10 @@
       text-align: center;
       transition: all 0.2s;
       border: 1px solid;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
     }
 
     .trainer-btn-primary{
@@ -389,15 +433,10 @@
       border-color: rgba(0,0,0,0.1);
     }
 
-    .trainer-btn-secondary:hover{
-      background: rgba(0,0,0,0.06);
-    }
+    .trainer-btn-secondary:hover{ background: rgba(0,0,0,0.06); }
 
     /* ---------- Booking List ---------- */
-    .booking-list{
-      display: grid;
-      gap: 0;
-    }
+    .booking-list{ display: grid; gap: 0; }
 
     .booking-item{
       padding: 18px 24px;
@@ -407,9 +446,7 @@
       gap: 14px;
     }
 
-    .booking-item:last-child{
-      border-bottom: none;
-    }
+    .booking-item:last-child{ border-bottom: none; }
 
     .booking-avatar{
       width: 46px;
@@ -426,9 +463,7 @@
       border: 1px solid rgba(255,122,24,0.2);
     }
 
-    .booking-info{
-      flex: 1;
-    }
+    .booking-info{ flex: 1; }
 
     .booking-name{
       font-size: 15px;
@@ -448,6 +483,7 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 700;
+      white-space:nowrap;
     }
 
     .status-pending{
@@ -474,9 +510,7 @@
       border: 1px solid rgba(156,163,175,0.25);
     }
 
-    .cancel-form{
-      margin: 0;
-    }
+    .cancel-form{ margin: 0; }
 
     .cancel-btn{
       width: 36px;
@@ -493,18 +527,33 @@
       transition: all 0.2s;
     }
 
-    .cancel-btn:hover{
-      background: rgba(239,68,68,0.2);
+    .cancel-btn:hover{ background: rgba(239,68,68,0.2); }
+
+    /* Booking cancellation reason (moved from inline) */
+    .booking-cancel-reason{
+      padding: 4px 16px 10px 70px;
+      font-size: 12px;
+      color: #b91c1c;
+      font-weight: 600;
     }
 
     /* Cancel Modal */
     .cancel-modal-overlay{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
-      z-index:9999;align-items:center;justify-content:center;
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
     }
     .cancel-modal-overlay.open{display:flex}
     .cancel-modal{
-      background:#fff;border-radius:16px;padding:28px 32px;width:100%;max-width:440px;
+      background:#fff;
+      border-radius:16px;
+      padding:28px 32px;
+      width:100%;
+      max-width:440px;
       box-shadow:0 20px 60px rgba(0,0,0,0.2);
     }
     .cancel-modal h3{
@@ -514,20 +563,33 @@
     .cancel-modal h3 i{color:#ef4444;font-size:20px}
     .cancel-modal p{font-size:13px;color:rgba(0,0,0,0.55);margin-bottom:16px}
     .cancel-modal textarea{
-      width:100%;min-height:90px;padding:12px 14px;border:1px solid rgba(0,0,0,0.12);
-      border-radius:10px;font-family:inherit;font-size:13px;resize:vertical;
-      outline:none;transition:border-color .2s;
+      width:100%;
+      min-height:90px;
+      padding:12px 14px;
+      border:1px solid rgba(0,0,0,0.12);
+      border-radius:10px;
+      font-family:inherit;
+      font-size:13px;
+      resize:vertical;
+      outline:none;
+      transition:border-color .2s;
     }
     .cancel-modal textarea:focus{border-color:rgba(239,68,68,0.5)}
     .cancel-modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
     .cancel-modal-btn{
-      padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;
-      cursor:pointer;border:none;transition:all .2s;font-family:inherit;
+      padding:10px 22px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      border:none;
+      transition:all .2s;
+      font-family:inherit;
     }
-    .cancel-modal-btn.secondary{background:#f3f4f6;color:#6b7280}
-    .cancel-modal-btn.secondary:hover{background:#e5e7eb}
-    .cancel-modal-btn.danger{background:#ef4444;color:#fff}
-    .cancel-modal-btn.danger:hover{background:#dc2626}
+    .cancel-modal-btn.secondary{background:var(--gray100);color:#6b7280}
+    .cancel-modal-btn.secondary:hover{background:var(--gray200)}
+    .cancel-modal-btn.danger{background:var(--red);color:#fff}
+    .cancel-modal-btn.danger:hover{background:var(--redDark)}
 
     /* ---------- Empty State ---------- */
     .empty-state{
@@ -603,9 +665,7 @@
       color: #fbbf24;
     }
 
-    .notif-content{
-      flex: 1;
-    }
+    .notif-content{ flex: 1; }
 
     .notif-title{
       font-size: 14px;
@@ -637,9 +697,7 @@
       margin-top: 4px;
     }
 
-    .notif-time i{
-      margin-right: 4px;
-    }
+    .notif-time i{ margin-right: 4px; }
 
     .mark-read-link{
       font-size: 12px;
@@ -649,9 +707,7 @@
       font-weight: 700;
     }
 
-    .mark-read-link:hover{
-      text-decoration: underline;
-    }
+    .mark-read-link:hover{ text-decoration: underline; }
 
     .chip{
       padding: 6px 12px;
@@ -661,6 +717,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      text-decoration:none;
+      border: 1px solid transparent;
     }
 
     .chip.error{
@@ -685,6 +743,17 @@
       margin-left: 8px;
     }
 
+    /* Two-column grid wrapper (moved from inline) */
+    .two-col-grid{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    /* Small helper: forms that previously had inline margin:0 */
+    .form-no-margin{ margin:0; }
+
     /* ---------- Responsive ---------- */
     @media (max-width: 900px) {
       .sidebar{width:64px}
@@ -692,6 +761,7 @@
       .nav a{justify-content:center;padding:12px}
       .main{margin-left:64px}
     }
+
     @media (max-width: 600px) {
       .sidebar{display:none}
       .main{margin-left:0}
@@ -701,9 +771,7 @@
         align-items: flex-start;
       }
 
-      .trainer-grid {
-        grid-template-columns: 1fr;
-      }
+      .trainer-grid { grid-template-columns: 1fr; }
 
       .payment-item {
         flex-direction: column;
@@ -732,9 +800,16 @@
 
       <nav class="nav">
         <a href="{% url 'trainer_client_dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a href="{% url 'client_chat' %}"><i class="fa-solid fa-comments"></i> Chat {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
-        <a href="#"><i class="fa-solid fa-apple-whole"></i> Diet Plan</a>
-        <a href="#"><i class="fa-solid fa-dumbbell"></i> Workout Plan</a>
+
+        <a href="{% url 'client_chat' %}">
+          <i class="fa-solid fa-comments"></i> Chat
+          {% if chat_unread_count > 0 %}
+            <span class="nav-badge">{{ chat_unread_count }}</span>
+          {% endif %}
+        </a>
+
+        <a href="{% url 'my_plans' %}"><i class="fa-solid fa-clipboard-list"></i> My Plans</a>
+        <a href="{% url 'fitness_profile' %}"><i class="fa-solid fa-heartbeat"></i> Fitness Profile</a>
         <a href="/"><i class="fa-solid fa-home"></i> Home</a>
       </nav>
 
@@ -758,8 +833,8 @@
       <!-- Django Messages -->
       {% if messages %}
         {% for message in messages %}
-          <div class="payment-alert" style="{% if message.tags == 'error' %}border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.1);{% elif message.tags == 'success' %}border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.1);{% endif %}">
-            <div class="payment-alert-icon" style="{% if message.tags == 'error' %}background: #ef4444;{% elif message.tags == 'success' %}background: #22c55e;{% endif %}">
+          <div class="payment-alert {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
+            <div class="payment-alert-icon {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
               <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check{% else %}fa-info-circle{% endif %}"></i>
             </div>
             <div class="payment-alert-content">
@@ -771,116 +846,132 @@
 
       <!-- Payment Required Section -->
       {% if confirmed_bookings %}
-      <div class="payment-alert">
-        <div class="payment-alert-icon">
-          <i class="fas fa-exclamation-circle"></i>
+        <div class="payment-alert">
+          <div class="payment-alert-icon">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="payment-alert-content">
+            <h3 class="payment-alert-title">Payment Required!</h3>
+            <p class="payment-alert-text">
+              You have {{ confirmed_bookings|length }} confirmed booking(s) waiting for payment.
+              Complete payment within 2 days or your booking will be automatically cancelled.
+            </p>
+          </div>
         </div>
-        <div class="payment-alert-content">
-          <h3 class="payment-alert-title">Payment Required!</h3>
-          <p class="payment-alert-text">You have {{ confirmed_bookings|length }} confirmed booking(s) waiting for payment. Complete payment within 2 days or your booking will be automatically cancelled.</p>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="card-head">
-          <h2><i class="fa-solid fa-credit-card card-icon-orange"></i> Pending Payments</h2>
-          <span class="chip error">{{ confirmed_bookings|length }} Pending</span>
-        </div>
-        <div class="card-body card-body-flush">
-          {% for booking in confirmed_bookings %}
-            <div class="payment-item">
-              <div class="payment-left">
-                <div class="payment-avatar">
-                  {{ booking.trainer.user.username.0|upper }}
-                </div>
-                <div class="payment-info">
-                  <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
-                  <div class="payment-meta">
-                    <i class="fa-regular fa-calendar"></i> Training starts: {{ booking.booking_date|date:"M d, Y" }}
-                  </div>
-                  <div class="payment-due">
-                    <i class="fa-solid fa-clock"></i> Pay by: {{ booking.payment_due_date|date:"M d, Y, g:i A" }}
-                  </div>
-                </div>
-              </div>
-              <div class="payment-right">
-                <div class="payment-amount">₹{{ booking.amount }}</div>
-                <div style="display: flex; gap: 10px;">
-                  <a href="/payment/checkout/{{ booking.id }}/" class="pay-btn">
-                    <i class="fa-solid fa-lock"></i> Pay Now
-                  </a>
-                  <form method="post" action="{% url 'user_cancel_booking' booking.id %}" style="margin: 0;">
-                    {% csrf_token %}
-                    <button type="button" class="pay-btn" style="background: rgba(239,68,68,0.15); color: #ef4444; box-shadow: 0 8px 24px rgba(239,68,68,0.2);"
-                            onclick="openUserCancelModal({{ booking.id }})">
-                      <i class="fa-solid fa-times"></i> Cancel
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
+        <div class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-credit-card card-icon-orange"></i> Pending Payments</h2>
+            <span class="chip error">{{ confirmed_bookings|length }} Pending</span>
+          </div>
 
-      <!-- Active Trainers -->
-      {% if active_trainers %}
-      <div class="card">
-        <div class="card-head">
-          <h2><i class="fa-solid fa-dumbbell card-icon-orange"></i> My Active Trainers</h2>
-          <span class="chip gray">{{ active_trainers|length }} Active</span>
-        </div>
-        <div class="card-body">
-          <div class="trainer-grid">
-            {% for booking in active_trainers %}
-              <div class="trainer-card">
-                <div class="trainer-header">
-                  <div class="trainer-avatar-lg">
+          <div class="card-body card-body-flush">
+            {% for booking in confirmed_bookings %}
+              <div class="payment-item">
+                <div class="payment-left">
+                  <div class="payment-avatar">
                     {{ booking.trainer.user.username.0|upper }}
                   </div>
-                  <div class="trainer-header-info">
+
+                  <div class="payment-info">
                     <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
-                    <div class="trainer-spec">{{ booking.trainer.specialization }}</div>
+                    <div class="payment-meta">
+                      <i class="fa-regular fa-calendar"></i>
+                      Training starts: {{ booking.booking_date|date:"M d, Y" }}
+                    </div>
+                    <div class="payment-due">
+                      <i class="fa-solid fa-clock"></i>
+                      Pay by: {{ booking.payment_due_date|date:"M d, Y, g:i A" }}
+                    </div>
                   </div>
                 </div>
-                <div class="trainer-details">
-                  <div class="trainer-detail-row">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+
+                <div class="payment-right">
+                  <div class="payment-amount">Rs {{ booking.amount }}</div>
+
+                  <div class="payment-actions">
+                    <a href="{% url 'booking_checkout' booking.id %}" class="pay-btn">
+                      <i class="fa-solid fa-lock"></i> Pay Now
+                    </a>
+
+                    <form method="post" action="{% url 'user_cancel_booking' booking.id %}" class="form-no-margin">
+                      {% csrf_token %}
+                      <button
+                        type="button"
+                        class="pay-btn pay-btn-cancel"
+                        onclick="openUserCancelModal({{ booking.id }})"
+                      >
+                        <i class="fa-solid fa-times"></i> Cancel
+                      </button>
+                    </form>
                   </div>
-                  <div class="trainer-detail-row">
-                    <i class="fas fa-award"></i>
-                    <span>{{ booking.trainer.experience }} years experience</span>
-                  </div>
-                  <div class="trainer-detail-row">
-                    <i class="fas fa-rupee-sign"></i>
-                    <span>₹{{ booking.amount }}/month</span>
-                  </div>
-                </div>
-                <div class="trainer-actions">
-                  <a href="{% url 'start_chat_with_trainer' booking.trainer.id %}" class="trainer-btn trainer-btn-primary">
-                    <i class="fas fa-comments"></i> Message
-                  </a>
-                  <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
-                    <i class="fas fa-eye"></i> View Profile
-                  </a>
                 </div>
               </div>
             {% endfor %}
           </div>
         </div>
-      </div>
+      {% endif %}
+
+      <!-- Active Trainers -->
+      {% if active_trainers %}
+        <div class="card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-dumbbell card-icon-orange"></i> My Active Trainers</h2>
+            <span class="chip gray">{{ active_trainers|length }} Active</span>
+          </div>
+
+          <div class="card-body">
+            <div class="trainer-grid">
+              {% for booking in active_trainers %}
+                <div class="trainer-card">
+                  <div class="trainer-header">
+                    <div class="trainer-avatar-lg">
+                      {{ booking.trainer.user.username.0|upper }}
+                    </div>
+                    <div class="trainer-header-info">
+                      <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+                      <div class="trainer-spec">{{ booking.trainer.specialization }}</div>
+                    </div>
+                  </div>
+
+                  <div class="trainer-details">
+                    <div class="trainer-detail-row">
+                      <i class="fas fa-calendar-check"></i>
+                      <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="trainer-detail-row">
+                      <i class="fas fa-award"></i>
+                      <span>{{ booking.trainer.experience }} years experience</span>
+                    </div>
+                    <div class="trainer-detail-row">
+                      <i class="fas fa-rupee-sign"></i>
+                      <span>Rs {{ booking.amount }}/month</span>
+                    </div>
+                  </div>
+
+                  <div class="trainer-actions">
+                    <a href="{% url 'start_chat_with_trainer' booking.trainer.id %}" class="trainer-btn trainer-btn-primary">
+                      <i class="fas fa-comments"></i> Message
+                    </a>
+                    <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
+                      <i class="fas fa-eye"></i> View Profile
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
       {% endif %}
 
       <!-- All Bookings & Notifications -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-        
+      <div class="two-col-grid">
         <!-- All Bookings -->
         <div class="card">
           <div class="card-head">
             <h2><i class="fa-solid fa-calendar-check card-icon-orange"></i> All Bookings</h2>
           </div>
+
           <div class="card-body card-body-flush">
             {% if all_bookings %}
               <div class="booking-list">
@@ -889,26 +980,34 @@
                     <div class="booking-avatar">
                       {{ booking.trainer.user.username.0|upper }}
                     </div>
+
                     <div class="booking-info">
                       <div class="booking-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</div>
                       <div class="booking-date">
                         <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
                       </div>
                     </div>
+
                     <span class="status-badge status-{{ booking.status }}">
                       {{ booking.get_status_display }}
                     </span>
+
                     {% if booking.status == 'pending' or booking.status == 'confirmed' and booking.payment_status == 'pending' %}
-                      <button type="button" title="Cancel booking" class="cancel-btn"
-                              onclick="openUserCancelModal({{ booking.id }})">
+                      <button
+                        type="button"
+                        title="Cancel booking"
+                        class="cancel-btn"
+                        onclick="openUserCancelModal({{ booking.id }})"
+                      >
                         <i class="fas fa-times"></i>
                       </button>
                     {% endif %}
                   </div>
+
                   {% if booking.status == 'cancelled' and booking.cancellation_reason %}
-                  <div style="padding:4px 16px 10px 70px;font-size:12px;color:#b91c1c;font-weight:600;">
-                    <i class="fas fa-ban"></i> {{ booking.cancellation_reason }}
-                  </div>
+                    <div class="booking-cancel-reason">
+                      <i class="fas fa-ban"></i> {{ booking.cancellation_reason }}
+                    </div>
                   {% endif %}
                 {% endfor %}
               </div>
@@ -931,12 +1030,14 @@
                 <span class="unread-badge">{{ unread_count }}</span>
               {% endif %}
             </h2>
+
             {% if notifications %}
               <a href="{% url 'user_mark_all_notifications_read' %}" class="chip gray">
                 <i class="fa-solid fa-check-double"></i> Mark all read
               </a>
             {% endif %}
           </div>
+
           <div class="card-body card-body-flush">
             {% if notifications %}
               <div class="notif-list">
@@ -945,6 +1046,7 @@
                     <div class="notif-icon {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'payment_required' %}payment{% elif notif.notif_type == 'booking_rejected' %}rejected{% else %}general{% endif %}">
                       <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'booking_rejected' %}fa-times-circle{% elif notif.notif_type == 'payment_required' %}fa-credit-card{% else %}fa-info-circle{% endif %}"></i>
                     </div>
+
                     <div class="notif-content">
                       <div class="notif-title">
                         {{ notif.title }}
@@ -952,7 +1054,9 @@
                           <span class="notif-unread-dot"></span>
                         {% endif %}
                       </div>
+
                       <p class="notif-msg">{{ notif.message|truncatewords:25 }}</p>
+
                       <div class="notif-time">
                         <i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago
                         {% if not notif.is_read %}
@@ -972,9 +1076,7 @@
             {% endif %}
           </div>
         </div>
-
       </div>
-
     </main>
   </div>
 
@@ -983,9 +1085,11 @@
     <div class="cancel-modal">
       <h3><i class="fas fa-ban"></i> Cancel Booking</h3>
       <p>Please provide a reason for cancellation (optional). The trainer will see this message.</p>
+
       <form method="post" id="userCancelForm">
         {% csrf_token %}
         <textarea name="cancellation_reason" placeholder="e.g. Schedule conflict, found another trainer, financial reasons..."></textarea>
+
         <div class="cancel-modal-actions">
           <button type="button" class="cancel-modal-btn secondary" onclick="closeUserCancelModal()">Go Back</button>
           <button type="submit" class="cancel-modal-btn danger">Cancel Booking</button>
@@ -995,23 +1099,25 @@
   </div>
 
   <script>
-  function openUserCancelModal(bookingId){
-    var modal = document.getElementById('userCancelModal');
-    var form = document.getElementById('userCancelForm');
-    form.action = '/user/booking/' + bookingId + '/cancel/';
-    modal.classList.add('open');
-  }
-  function closeUserCancelModal(){
-    document.getElementById('userCancelModal').classList.remove('open');
-    document.getElementById('userCancelForm').querySelector('textarea').value = '';
-  }
-  document.getElementById('userCancelModal').addEventListener('click', function(e){
-    if(e.target === this) closeUserCancelModal();
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') closeUserCancelModal();
-  });
-  </script>
+    function openUserCancelModal(bookingId){
+      var modal = document.getElementById('userCancelModal');
+      var form = document.getElementById('userCancelForm');
+      form.action = '/user/booking/' + bookingId + '/cancel/';
+      modal.classList.add('open');
+    }
 
+    function closeUserCancelModal(){
+      document.getElementById('userCancelModal').classList.remove('open');
+      document.getElementById('userCancelForm').querySelector('textarea').value = '';
+    }
+
+    document.getElementById('userCancelModal').addEventListener('click', function(e){
+      if(e.target === this) closeUserCancelModal();
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') closeUserCancelModal();
+    });
+  </script>
 </body>
 </html>

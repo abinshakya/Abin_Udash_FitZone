@@ -31,6 +31,7 @@ urlpatterns = [
     path('', include('trainer.urls')),
     path('notifications/', include('notifications.urls')),
     path('', include('chat.urls')),
+    path('', include('fitness_plan.urls')),
 
 ]
 

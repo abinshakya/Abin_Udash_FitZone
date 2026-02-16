@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ plan.title }} - Workout Plan - FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --orange: #ff7a18;
+      --orange2: #ff9a3c;
+      --bg0: #f8f9fa;
+      --text: #1a1a1a;
+      --muted: rgba(0, 0, 0, 0.55);
+      --border: rgba(0, 0, 0, 0.10);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1000px 520px at 18% 0%, rgba(255, 122, 24, 0.18), transparent 60%),
+                  radial-gradient(900px 450px at 85% 10%, rgba(255, 154, 60, 0.10), transparent 60%),
+                  linear-gradient(135deg, var(--bg0) 0%, #fff 100%);
+      min-height: 100vh;
+    }
+
+    .page-wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: color .2s;
+    }
+
+    .back-link:hover {
+      color: var(--orange);
+    }
+
+    .plan-header {
+      margin-bottom: 32px;
+    }
+
+    .plan-header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin: 0 0 8px;
+    }
+
+    .plan-header p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .plan-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .meta-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .badge-beginner {
+      background: rgba(34, 197, 94, 0.12);
+      color: #16a34a;
+    }
+
+    .badge-intermediate {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+    }
+
+    .badge-advanced {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .day-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .day-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .day-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .day-header h3 i {
+      color: var(--orange);
+    }
+
+    .day-header .focus-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.04);
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .rest-badge {
+      background: rgba(34, 197, 94, 0.12);
+      color: #16a34a;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .exercise-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .exercise-table th {
+      padding: 12px 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.02);
+      text-align: left;
+    }
+
+    .exercise-table td {
+      padding: 14px 20px;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
+      font-size: 0.9rem;
+    }
+
+    .exercise-table tr:hover td {
+      background: rgba(255, 122, 24, 0.02);
+    }
+
+    .exercise-name {
+      font-weight: 700;
+    }
+
+    .exercise-notes {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .notes-section {
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.06), rgba(255, 154, 60, 0.03));
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .notes-section h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notes-section h4 i {
+      color: var(--orange);
+    }
+
+    .notes-section p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <a href="{% url 'my_plans' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to My Plans</a>
+
+    <div class="plan-header">
+      <h1><i class="fas fa-dumbbell me-2" style="color:var(--orange)"></i>{{ plan.title }}</h1>
+      {% if plan.description %}<p>{{ plan.description }}</p>{% endif %}
+      <div class="plan-meta">
+        <span class="meta-badge badge-{{ plan.difficulty }}">{{ plan.get_difficulty_display }}</span>
+        <span class="meta-badge"><i class="fas fa-calendar-alt me-1"></i> {{ plan.duration_weeks }} weeks</span>
+        <span class="meta-badge"><i class="fas fa-user-tie me-1"></i> {{ plan.trainer.user.get_full_name|default:plan.trainer.user.username }}</span>
+      </div>
+    </div>
+
+    {% if plan.notes %}
+    <div class="notes-section mb-4">
+      <h4><i class="fas fa-sticky-note"></i> Trainer Notes</h4>
+      <p>{{ plan.notes }}</p>
+    </div>
+    {% endif %}
+
+    {% for day in days %}
+    <div class="day-card">
+      <div class="day-header">
+        <h3><i class="fas fa-calendar-day"></i> {{ day.get_day_display }}</h3>
+        {% if day.is_rest_day %}
+          <span class="rest-badge"><i class="fas fa-bed me-1"></i> Rest Day</span>
+        {% else %}
+          <span class="focus-badge">{{ day.focus_area }}</span>
+        {% endif %}
+      </div>
+      {% if not day.is_rest_day and day.exercises.count > 0 %}
+      <table class="exercise-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Exercise</th>
+            <th>Sets</th>
+            <th>Reps</th>
+            <th>Rest</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ex in day.exercises.all %}
+          <tr>
+            <td style="font-weight:700;color:var(--orange)">{{ forloop.counter }}</td>
+            <td>
+              <div class="exercise-name">{{ ex.name }}</div>
+              {% if ex.notes %}<div class="exercise-notes">{{ ex.notes }}</div>{% endif %}
+            </td>
+            <td>{{ ex.sets }}</td>
+            <td>{{ ex.reps }}</td>
+            <td>{{ ex.rest_seconds }}s</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% elif day.is_rest_day %}
+        <div style="padding:24px;text-align:center;color:var(--muted)">
+          <i class="fas fa-spa" style="font-size:24px;opacity:0.3"></i>
+          <p style="margin:8px 0 0;font-weight:600">Take a break and recover!</p>
+        </div>
+      {% else %}
+        <div style="padding:24px;text-align:center;color:var(--muted)">
+          <p style="margin:0;font-weight:600">No exercises added yet</p>
+        </div>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div style="text-align:center;padding:48px;color:var(--muted)">
+      <i class="fas fa-calendar-times d-block" style="font-size:48px;opacity:0.15;margin-bottom:16px"></i>
+      <h3 style="font-weight:700">No Workout Days Added Yet</h3>
+      <p>Your trainer is still building this plan.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

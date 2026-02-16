@@ -8,7 +8,9 @@ class KhaltiPaymentAdmin(admin.ModelAdmin):
     list_display = [
         'purchase_order_id',
         'user',
+        'payment_type',
         'membership_plan',
+        'booking',
         'amount_display',
         'status_badge',
         'transaction_id',
@@ -17,6 +19,7 @@ class KhaltiPaymentAdmin(admin.ModelAdmin):
     
     list_filter = [
         'status',
+        'payment_type',
         'refunded',
         'created_at',
         'membership_plan'
@@ -42,7 +45,7 @@ class KhaltiPaymentAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('User Information', {
-            'fields': ('user', 'membership_plan')
+            'fields': ('user', 'payment_type', 'membership_plan', 'booking')
         }),
         ('Payment Details', {
             'fields': (

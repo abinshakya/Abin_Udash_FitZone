@@ -1,0 +1,464 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ client.get_full_name|default:client.username }} - Client Details - FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --orange: #ff7a18;
+      --orange2: #ff9a3c;
+      --bg0: #f8f9fa;
+      --text: #1a1a1a;
+      --muted: rgba(0, 0, 0, 0.55);
+      --border: rgba(0, 0, 0, 0.10);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1000px 520px at 18% 0%, rgba(255, 122, 24, 0.18), transparent 60%),
+                  radial-gradient(900px 450px at 85% 10%, rgba(255, 154, 60, 0.10), transparent 60%),
+                  linear-gradient(135deg, var(--bg0) 0%, #fff 100%);
+      min-height: 100vh;
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: color .2s;
+    }
+
+    .back-link:hover {
+      color: var(--orange);
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin: 0;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .card-custom {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .card-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-head h2 i {
+      color: var(--orange);
+    }
+
+    .card-body-inner {
+      padding: 24px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .profile-item label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .profile-item .val {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .bmi-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.1), rgba(255, 154, 60, 0.05));
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .bmi-inline .category {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .plan-item {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .plan-item:last-child {
+      border-bottom: none;
+    }
+
+    .plan-item:hover {
+      background: rgba(255, 122, 24, 0.02);
+    }
+
+    .plan-item h4 {
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .plan-item p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .plan-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .badge-beginner {
+      background: rgba(34, 197, 94, 0.12);
+      color: #16a34a;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-intermediate {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-advanced {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .btn-orange {
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-orange:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(255, 122, 24, 0.3);
+      color: #fff;
+    }
+
+    .btn-sm-outline {
+      color: var(--orange);
+      border: 1.5px solid var(--orange);
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sm-outline:hover {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn-sm-danger {
+      color: #dc2626;
+      border: 1.5px solid #dc2626;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sm-danger:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .alert-pending {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));
+      border: 2px solid rgba(251, 191, 36, 0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .alert-pending i {
+      font-size: 24px;
+      color: #f59e0b;
+    }
+
+    .alert-pending h4 {
+      margin: 0 0 4px;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .alert-pending p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 36px;
+      opacity: 0.15;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <a href="{% url 'trainer_client_list' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Clients</a>
+
+    <div class="page-header">
+      <h1><i class="fas fa-user me-2" style="color:var(--orange)"></i>{{ client.get_full_name|default:client.username }}</h1>
+      <div class="action-btns">
+        <a href="{% url 'create_workout_plan' client.id %}" class="btn-orange"><i class="fas fa-dumbbell"></i> Create Workout Plan</a>
+        <a href="{% url 'create_diet_plan' client.id %}" class="btn-orange"><i class="fas fa-utensils"></i> Create Diet Plan</a>
+      </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Fitness Profile Section -->
+    {% if fitness_profile %}
+    <div class="card-custom">
+      <div class="card-head">
+        <h2><i class="fas fa-heartbeat"></i> Client Fitness Profile</h2>
+        {% if fitness_profile.bmi %}
+        <div class="bmi-inline">
+          BMI {{ fitness_profile.bmi }}
+          <span class="category">&bull; {{ fitness_profile.bmi_category }}</span>
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-body-inner">
+        <div class="profile-grid">
+          <div class="profile-item">
+            <label><i class="fas fa-ruler-vertical me-1"></i>Height</label>
+            <div class="val">{{ fitness_profile.height_cm }} cm</div>
+          </div>
+          <div class="profile-item">
+            <label><i class="fas fa-weight me-1"></i>Weight</label>
+            <div class="val">{{ fitness_profile.weight_kg }} kg</div>
+          </div>
+          <div class="profile-item">
+            <label><i class="fas fa-birthday-cake me-1"></i>Age</label>
+            <div class="val">{{ fitness_profile.age }} years</div>
+          </div>
+          <div class="profile-item">
+            <label><i class="fas fa-bullseye me-1"></i>Goal</label>
+            <div class="val">{{ fitness_profile.get_fitness_goal_display }}</div>
+          </div>
+          <div class="profile-item">
+            <label><i class="fas fa-running me-1"></i>Activity Level</label>
+            <div class="val">{{ fitness_profile.get_activity_level_display }}</div>
+          </div>
+          <div class="profile-item">
+            <label><i class="fas fa-leaf me-1"></i>Diet Preference</label>
+            <div class="val">{{ fitness_profile.get_diet_preference_display }}</div>
+          </div>
+        </div>
+        {% if fitness_profile.medical_conditions %}
+        <div class="mt-3">
+          <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase"><i class="fas fa-notes-medical me-1"></i>Medical Conditions</label>
+          <p style="margin:4px 0 0;font-size:0.9rem">{{ fitness_profile.medical_conditions }}</p>
+        </div>
+        {% endif %}
+        {% if fitness_profile.allergies %}
+        <div class="mt-3">
+          <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase"><i class="fas fa-allergies me-1"></i>Allergies</label>
+          <p style="margin:4px 0 0;font-size:0.9rem">{{ fitness_profile.allergies }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="alert-pending">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div>
+        <h4>Fitness Profile Not Completed</h4>
+        <p>This client hasn't filled out their fitness profile yet. They need to complete it before you can create plans.</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Workout Plans -->
+    <div class="card-custom">
+      <div class="card-head">
+        <h2><i class="fas fa-dumbbell"></i> Workout Plans</h2>
+        {% if fitness_profile %}
+        <a href="{% url 'create_workout_plan' client.id %}" class="btn-sm-outline"><i class="fas fa-plus"></i> Add</a>
+        {% endif %}
+      </div>
+      {% if workout_plans %}
+        {% for plan in workout_plans %}
+        <div class="plan-item">
+          <div>
+            <h4>{{ plan.title }}</h4>
+            <p>{{ plan.duration_weeks }} weeks &bull; {{ plan.days.count }} days &bull; <span class="badge-{{ plan.difficulty }}">{{ plan.get_difficulty_display }}</span></p>
+          </div>
+          <div class="plan-actions">
+            <a href="{% url 'edit_workout_plan' plan.id %}" class="btn-sm-outline"><i class="fas fa-edit"></i> Edit</a>
+            <a href="{% url 'delete_workout_plan' plan.id %}" class="btn-sm-danger" onclick="return confirm('Delete this workout plan?')"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-dumbbell d-block"></i>
+          <p style="font-weight:600">No workout plans created yet</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Diet Plans -->
+    <div class="card-custom">
+      <div class="card-head">
+        <h2><i class="fas fa-utensils"></i> Diet Plans</h2>
+        {% if fitness_profile %}
+        <a href="{% url 'create_diet_plan' client.id %}" class="btn-sm-outline"><i class="fas fa-plus"></i> Add</a>
+        {% endif %}
+      </div>
+      {% if diet_plans %}
+        {% for plan in diet_plans %}
+        <div class="plan-item">
+          <div>
+            <h4>{{ plan.title }}</h4>
+            <p>{% if plan.daily_calories %}{{ plan.daily_calories }} kcal/day &bull; {% endif %}{{ plan.duration_weeks }} weeks</p>
+          </div>
+          <div class="plan-actions">
+            <a href="{% url 'edit_diet_plan' plan.id %}" class="btn-sm-outline"><i class="fas fa-edit"></i> Edit</a>
+            <a href="{% url 'delete_diet_plan' plan.id %}" class="btn-sm-danger" onclick="return confirm('Delete this diet plan?')"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-utensils d-block"></i>
+          <p style="font-weight:600">No diet plans created yet</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

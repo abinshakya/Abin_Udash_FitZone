@@ -1,0 +1,656 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitZone | Booking Checkout</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+:root{
+  --bg0:#f8f9fa;
+  --bg1:#ffffff;
+  --cardTop: rgba(255,255,255,0.95);
+  --cardBot: rgba(248,249,250,0.95);
+  --text:#1a1a1a;
+  --muted: rgba(0,0,0,0.55);
+  --border: rgba(0,0,0,0.10);
+  --orange:#ff7a18;
+  --orange2:#ff9a3c;
+  --shadow: 0 22px 70px rgba(0,0,0,0.08);
+  --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin: 0;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
+    radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+    linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+  min-height: 100vh;
+}
+
+.page{ padding: 36px 0 90px; }
+
+.checkout-container{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+.page-head{
+  text-align: center;
+  margin: 8px 0 34px;
+}
+
+.page-head h1{
+  margin: 0 0 10px;
+  font-size: clamp(2.05rem, 3vw, 2.7rem);
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  background: linear-gradient(135deg, #1a1a1a, var(--orange2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 12px 40px rgba(255,122,24,0.10);
+}
+
+.page-head p{
+  margin: 0;
+  color: rgba(0,0,0,0.55);
+  font-size: 1.05rem;
+}
+
+.checkout-grid{
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 22px;
+  align-items: start;
+}
+
+@media (max-width: 900px){
+  .checkout-grid{ grid-template-columns: 1fr; }
+}
+
+.card{
+  position: relative;
+  background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--shadowSoft);
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: 22px;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(255,122,24,0.22),
+    rgba(0,0,0,0.06),
+    rgba(255,154,60,0.18)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events:none;
+  opacity: 0.75;
+}
+
+.card-header{
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(0,0,0,0.02);
+}
+
+.card-header h2,
+.card-header h3{
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(0,0,0,0.85);
+}
+
+.card-body{ padding: 22px; }
+
+/* Trainer Info */
+.trainer-top{
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.trainer-avatar{
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 12px 30px rgba(255,122,24,0.25);
+}
+
+.trainer-avatar img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.trainer-name{
+  margin: 0 0 6px;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.trainer-specialty{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255,122,24,0.14);
+  border: 1px solid rgba(255,122,24,0.28);
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.price{
+  font-size: 2.15rem;
+  font-weight: 900;
+  color: var(--orange);
+  letter-spacing: 0.3px;
+  text-shadow: 0 10px 30px rgba(255,122,24,0.12);
+}
+
+/* Booking Details List */
+.booking-details{
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.booking-details li{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: rgba(0,0,0,0.75);
+  line-height: 1.35;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.025);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.booking-details i{
+  color: var(--orange);
+  width: 18px;
+  text-align: center;
+}
+
+.booking-details strong{
+  margin-left: auto;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+/* Due Warning */
+.due-warning{
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: rgba(0,0,0,0.7);
+}
+
+.due-warning i{
+  color: #ef4444;
+  font-size: 1.1rem;
+}
+
+/* Summary */
+.summary-row{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  color: rgba(0,0,0,0.75);
+}
+
+.summary-row span:first-child{
+  color: rgba(0,0,0,0.55);
+  font-weight: 600;
+}
+
+.divider{
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 12px 0;
+}
+
+.total{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 0 2px;
+}
+
+.total .label{
+  font-weight: 900;
+  color: rgba(0,0,0,0.80);
+}
+
+.total .value{
+  font-size: 1.85rem;
+  font-weight: 950;
+  color: var(--orange);
+}
+
+.customer{
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.info{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.75);
+  font-weight: 700;
+}
+
+.info i{ color: var(--orange); }
+
+.info .text{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Payment Method */
+.pm-title{
+  margin: 18px 0 10px;
+  font-size: 1.05rem;
+  font-weight: 950;
+  color: rgba(0,0,0,0.80);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm-grid{
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.pm-option{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.025);
+  border: 1px solid rgba(0,0,0,0.10);
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
+  user-select: none;
+}
+
+.pm-option:hover{
+  transform: translateY(-2px);
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(255,122,24,0.30);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.06);
+}
+
+.pm-left{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pm-radio{
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid rgba(0,0,0,0.25);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.pm-radio::after{
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: transparent;
+  transform: scale(0.6);
+  transition: background .15s ease, transform .15s ease;
+}
+
+.pm-name{
+  font-weight: 950;
+  color: rgba(0,0,0,0.85);
+}
+
+.pm-badge{
+  margin-left: 10px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,122,24,0.14);
+  border: 1px solid rgba(255,122,24,0.22);
+  color: #1a1a1a;
+}
+
+.pm-note{
+  font-size: 0.85rem;
+  color: rgba(0,0,0,0.50);
+}
+
+.pm-option input{
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pm-option:has(input:checked){
+  border-color: rgba(255,122,24,0.55);
+  background: rgba(255,122,24,0.08);
+  box-shadow: 0 18px 40px rgba(255,122,24,0.10);
+}
+
+.pm-option:has(input:checked) .pm-radio{
+  border-color: rgba(255,122,24,0.92);
+}
+
+.pm-option:has(input:checked) .pm-radio::after{
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  transform: scale(1);
+}
+
+/* Button */
+.btn-pay{
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 18px;
+  font-size: 1.05rem;
+  font-weight: 950;
+  letter-spacing: 0.2px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  border: 1px solid rgba(255,122,24,0.35);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+  margin-top: 18px;
+  text-decoration: none;
+}
+
+.btn-pay:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 22px 55px rgba(255,122,24,0.35);
+  filter: brightness(1.08);
+}
+
+.note{
+  margin-top: 12px;
+  color: rgba(0,0,0,0.50);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.btn-back{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.10);
+  color: rgba(0,0,0,0.7);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: all .2s ease;
+  margin-bottom: 20px;
+}
+
+.btn-back:hover{
+  background: rgba(0,0,0,0.08);
+  color: var(--orange);
+}
+
+.icon-accent { color: var(--orange); }
+.min-w-0 { min-width: 0; }
+.icon-muted { color: rgba(0,0,0,0.5); }
+
+  </style>
+</head>
+
+<body>
+  {% include 'navbar.html' %}
+
+  <main class="page">
+    <div class="checkout-container">
+
+      <a href="{% url 'trainer_client_dashboard' %}" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+      </a>
+
+      <header class="page-head">
+        <h1>Booking Checkout</h1>
+        <p>Review your trainer booking details and complete payment securely.</p>
+      </header>
+
+      {% if booking %}
+      <section class="checkout-grid">
+
+        <!-- LEFT: BOOKING DETAILS -->
+        <div class="card">
+          <div class="card-header">
+            <h2>
+              <i class="fa-solid fa-user-check icon-accent"></i>
+              Booking Details
+            </h2>
+            <span class="pill"><i class="fa-solid fa-shield-halved"></i> Secure Checkout</span>
+          </div>
+
+          <div class="card-body">
+            <div class="trainer-top">
+              <div class="trainer-avatar">
+                {% if booking.trainer.profile_picture %}
+                  <img src="{{ booking.trainer.profile_picture.url }}" alt="{{ booking.trainer.user.username }}">
+                {% else %}
+                  {{ booking.trainer.user.username.0|upper }}
+                {% endif %}
+              </div>
+              <div>
+                <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+                <div class="trainer-specialty">
+                  {% if booking.trainer.specialty %}
+                    <span class="pill"><i class="fa-solid fa-dumbbell"></i> {{ booking.trainer.specialty }}</span>
+                  {% endif %}
+                  {% if booking.trainer.experience %}
+                    <span class="pill"><i class="fa-solid fa-award"></i> {{ booking.trainer.experience }} yrs exp</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <ul class="booking-details">
+              <li>
+                <i class="fa-solid fa-calendar-day"></i>
+                Training Start Date
+                <strong>{{ booking.booking_date|date:"M d, Y" }}</strong>
+              </li>
+              <li>
+                <i class="fa-solid fa-clipboard-check"></i>
+                Booking Status
+                <strong style="color: #22c55e;">{{ booking.get_status_display }}</strong>
+              </li>
+              <li>
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+                Amount
+                <strong class="price" style="font-size: 1.3rem;">Rs {{ booking.amount }}</strong>
+              </li>
+              {% if booking.message %}
+              <li>
+                <i class="fa-solid fa-message"></i>
+                Your Message
+                <strong style="font-size: 0.88rem; font-weight: 600; max-width: 260px; text-align: right;">{{ booking.message|truncatewords:20 }}</strong>
+              </li>
+              {% endif %}
+            </ul>
+
+            {% if booking.payment_due_date %}
+            <div class="due-warning">
+              <i class="fa-solid fa-clock"></i>
+              <span>Payment must be completed by <strong>{{ booking.payment_due_date|date:"M d, Y, g:i A" }}</strong> or the booking will be automatically cancelled.</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY + PAYMENT -->
+        <div class="card">
+          <div class="card-header">
+            <h3>
+              <i class="fa-solid fa-receipt icon-accent"></i>
+              Order Summary
+            </h3>
+          </div>
+
+          <div class="card-body">
+            <div class="summary-row">
+              <span>Trainer</span>
+              <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>
+            </div>
+
+            <div class="summary-row">
+              <span>Start Date</span>
+              <strong>{{ booking.booking_date|date:"M d, Y" }}</strong>
+            </div>
+
+            <div class="summary-row">
+              <span>Training Fee</span>
+              <strong>Rs {{ booking.amount }}</strong>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="total">
+              <div class="label">Total</div>
+              <div class="value">Rs {{ booking.amount }}</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="customer">
+              <div class="info">
+                <i class="fa-solid fa-user"></i>
+                <div class="text">{{ user.get_full_name|default:user.username }}</div>
+              </div>
+              <div class="info">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="text">{{ user.email }}</div>
+              </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="pm-title">
+              <i class="fa-solid fa-credit-card icon-accent"></i>
+              Select Payment Method
+            </div>
+
+            <form action="{% url 'initiate_booking_payment' booking.id %}" method="get">
+              <div class="pm-grid">
+                <label class="pm-option">
+                  <input type="radio" name="payment_method" value="khalti" checked>
+                  <div class="pm-left">
+                    <div class="pm-radio"></div>
+                    <div class="min-w-0">
+                      <div class="pm-name">Khalti <span class="pm-badge">Popular</span></div>
+                      <div class="pm-note">Pay using Khalti wallet</div>
+                    </div>
+                  </div>
+                  <i class="fa-solid fa-wallet icon-muted"></i>
+                </label>
+              </div>
+
+              <button type="submit" class="btn-pay">
+                Pay NPR {{ booking.amount }} Now <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </form>
+
+            <p class="note">
+              By clicking "Pay Now", you agree to our terms and confirm your trainer booking payment.
+            </p>
+          </div>
+        </div>
+
+      </section>
+      {% else %}
+        <p style="text-align:center;color:var(--muted);padding:30px 0;">Booking not found or already paid.</p>
+      {% endif %}
+    </div>
+  </main>
+</body>
+</html>

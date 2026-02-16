@@ -1,0 +1,412 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Fitness Plans - FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --orange: #ff7a18;
+      --orange2: #ff9a3c;
+      --bg0: #f8f9fa;
+      --text: #1a1a1a;
+      --muted: rgba(0, 0, 0, 0.55);
+      --border: rgba(0, 0, 0, 0.10);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1000px 520px at 18% 0%, rgba(255, 122, 24, 0.18), transparent 60%),
+                  radial-gradient(900px 450px at 85% 10%, rgba(255, 154, 60, 0.10), transparent 60%),
+                  linear-gradient(135deg, var(--bg0) 0%, #fff 100%);
+      min-height: 100vh;
+    }
+
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #1a1a1a, var(--orange2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+
+    .card-custom {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .card-custom .card-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-custom .card-head h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-custom .card-head h2 i {
+      color: var(--orange);
+    }
+
+    .card-body-inner {
+      padding: 24px;
+    }
+
+    .profile-alert {
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.12), rgba(255, 154, 60, 0.06));
+      border: 2px solid rgba(255, 122, 24, 0.25);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .profile-alert-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .profile-alert h3 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .profile-alert p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .plan-card {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: background .2s;
+    }
+
+    .plan-card:last-child {
+      border-bottom: none;
+    }
+
+    .plan-card:hover {
+      background: rgba(255, 122, 24, 0.03);
+    }
+
+    .plan-info h4 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .plan-info p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .plan-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .badge-difficulty {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-beginner {
+      background: rgba(34, 197, 94, 0.12);
+      color: #16a34a;
+    }
+
+    .badge-intermediate {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+    }
+
+    .badge-advanced {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .btn-orange {
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-orange:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(255, 122, 24, 0.3);
+      color: #fff;
+    }
+
+    .btn-outline-orange {
+      color: var(--orange);
+      border: 2px solid var(--orange);
+      background: transparent;
+      padding: 8px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline-orange:hover {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      color: rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 8px;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: color .2s;
+    }
+
+    .back-link:hover {
+      color: var(--orange);
+    }
+
+    .bmi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .stat-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .stat-pill {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <a href="{% url 'trainer_client_dashboard' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <div class="page-header">
+      <h1><i class="fas fa-clipboard-list me-2"></i>My Fitness Plans</h1>
+      <a href="{% url 'fitness_profile' %}" class="btn-orange">
+        <i class="fas fa-heartbeat"></i> {% if has_fitness_profile %}Update{% else %}Fill{% endif %} Fitness Profile
+      </a>
+    </div>
+
+    {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not has_fitness_profile %}
+    <div class="profile-alert">
+      <div class="profile-alert-icon"><i class="fas fa-exclamation"></i></div>
+      <div>
+        <h3>Complete Your Fitness Profile First!</h3>
+        <p>Your trainer needs your body measurements and fitness goals to create personalized plans. <a href="{% url 'fitness_profile' %}" style="color:var(--orange);font-weight:700">Fill it now &rarr;</a></p>
+      </div>
+    </div>
+    {% else %}
+    <!-- Quick Profile Summary -->
+    <div class="card-custom mb-4">
+      <div class="card-body-inner">
+        <div class="d-flex align-items:center justify-content-between flex-wrap gap-3">
+          <div>
+            <h5 class="fw-bold mb-1"><i class="fas fa-user-check text-success me-2"></i>Profile Complete</h5>
+            <div class="stat-pills">
+              <span class="stat-pill"><i class="fas fa-ruler-vertical me-1"></i>{{ fitness_profile.height_cm }} cm</span>
+              <span class="stat-pill"><i class="fas fa-weight me-1"></i>{{ fitness_profile.weight_kg }} kg</span>
+              <span class="stat-pill"><i class="fas fa-birthday-cake me-1"></i>{{ fitness_profile.age }} yrs</span>
+              <span class="stat-pill"><i class="fas fa-bullseye me-1"></i>{{ fitness_profile.get_fitness_goal_display }}</span>
+            </div>
+          </div>
+          {% if fitness_profile.bmi %}
+          <span class="bmi-badge"><i class="fas fa-heartbeat"></i> BMI {{ fitness_profile.bmi }} &bull; {{ fitness_profile.bmi_category }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Workout Plans -->
+    <div class="card-custom">
+      <div class="card-head">
+        <h2><i class="fas fa-dumbbell"></i> My Workout Plans</h2>
+        <span style="font-size:12px;font-weight:700;color:var(--muted)">{{ workout_plans|length }} plan{{ workout_plans|length|pluralize }}</span>
+      </div>
+      {% if workout_plans %}
+        {% for plan in workout_plans %}
+        <div class="plan-card">
+          <div class="plan-info">
+            <h4>{{ plan.title }}</h4>
+            <p>{{ plan.duration_weeks }} weeks &bull; {{ plan.days.count }} days/week &bull; by {{ plan.trainer.user.get_full_name|default:plan.trainer.user.username }}</p>
+          </div>
+          <div class="plan-meta">
+            <span class="badge-difficulty badge-{{ plan.difficulty }}">{{ plan.get_difficulty_display }}</span>
+            <a href="{% url 'view_workout_plan' plan.id %}" class="btn-outline-orange"><i class="fas fa-eye"></i> View</a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-dumbbell d-block"></i>
+          <h3>No Workout Plans Yet</h3>
+          <p>Your trainer hasn't created a workout plan for you yet. Make sure your fitness profile is filled out!</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Diet Plans -->
+    <div class="card-custom">
+      <div class="card-head">
+        <h2><i class="fas fa-utensils"></i> My Diet Plans</h2>
+        <span style="font-size:12px;font-weight:700;color:var(--muted)">{{ diet_plans|length }} plan{{ diet_plans|length|pluralize }}</span>
+      </div>
+      {% if diet_plans %}
+        {% for plan in diet_plans %}
+        <div class="plan-card">
+          <div class="plan-info">
+            <h4>{{ plan.title }}</h4>
+            <p>{% if plan.daily_calories %}{{ plan.daily_calories }} kcal/day &bull; {% endif %}{{ plan.duration_weeks }} weeks &bull; by {{ plan.trainer.user.get_full_name|default:plan.trainer.user.username }}</p>
+          </div>
+          <div class="plan-meta">
+            <a href="{% url 'view_diet_plan' plan.id %}" class="btn-outline-orange"><i class="fas fa-eye"></i> View</a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-utensils d-block"></i>
+          <h3>No Diet Plans Yet</h3>
+          <p>Your trainer hasn't created a diet plan for you yet. Make sure your fitness profile is filled out!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

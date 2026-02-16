@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chat - My Trainers | FitZone</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root{
       --bg:#f8f9fa;
       --surface:#ffffff;
@@ -25,6 +28,7 @@
       --red:#ef4444;
       --blue:#3b82f6;
     }
+
     body{
       font-family:'Poppins',sans-serif;
       background:var(--bg);
@@ -44,27 +48,67 @@
       top:0;bottom:0;left:0;
       z-index:100;
     }
-    .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px}
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:22px 20px 18px;
+    }
+
     .brand-logo{
       width:40px;height:40px;border-radius:12px;
       background:linear-gradient(135deg,var(--orange),var(--orange2));
       display:flex;align-items:center;justify-content:center;
       font-size:18px;font-weight:900;color:#fff;
     }
+
     .brand-title{font-size:17px;font-weight:900;color:var(--text)}
     .brand-sub{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:1px}
-    .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
+
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      padding:0 10px;
+      flex:1;
+    }
+
     .nav a{
       display:flex;align-items:center;gap:12px;
       padding:11px 14px;border-radius:10px;
       color:var(--text2);text-decoration:none;
       font-size:13px;font-weight:600;transition:all .2s;
     }
+
     .nav a:hover{background:rgba(0,0,0,0.04);color:var(--text)}
     .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
     .nav a i{width:18px;text-align:center;font-size:14px}
+
+    /* Badge inside nav link (unread count) */
+    .nav-badge{
+      margin-left:auto;
+      min-width:20px;
+      height:20px;
+      border-radius:50%;
+      background:var(--orange);
+      color:#fff;
+      font-size:10px;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 5px;
+    }
+
     .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
-    .logout{display:flex;align-items:center;gap:10px;color:var(--text3);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
+
+    .logout{
+      display:flex;align-items:center;gap:10px;
+      color:var(--text3);text-decoration:none;
+      font-size:13px;font-weight:600;transition:color .2s;
+    }
+
     .logout:hover{color:var(--red)}
 
     /* ═══════ Main Layout ═══════ */
@@ -84,6 +128,7 @@
       flex-direction:column;
       height:100vh;
     }
+
     .chat-list-header{
       padding:20px 22px;
       border-bottom:1px solid var(--border);
@@ -91,10 +136,12 @@
       align-items:center;
       justify-content:space-between;
     }
+
     .chat-list-header h2{
       font-size:20px;font-weight:900;color:var(--text);
       display:flex;align-items:center;gap:10px;
     }
+
     .chat-list-header h2 i{color:var(--orange)}
 
     .chat-section-label{
@@ -104,14 +151,19 @@
       letter-spacing:0.8px;
       display:flex;align-items:center;gap:8px;
     }
+
     .chat-section-label .count{
-      background:rgba(255,122,24,0.15);color:var(--orange);
-      padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;
+      background:rgba(255,122,24,0.15);
+      color:var(--orange);
+      padding:2px 8px;border-radius:10px;
+      font-size:11px;font-weight:700;
     }
 
     .chat-list{
-      flex:1;overflow-y:auto;
+      flex:1;
+      overflow-y:auto;
     }
+
     .chat-list::-webkit-scrollbar{width:4px}
     .chat-list::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.1);border-radius:4px}
 
@@ -120,7 +172,10 @@
       padding:14px 22px;
       cursor:pointer;transition:all .2s;
       border-left:3px solid transparent;
+      text-decoration:none;
+      color:inherit;
     }
+
     .chat-item:hover{background:rgba(0,0,0,0.03)}
     .chat-item.active{
       background:rgba(255,122,24,0.06);
@@ -133,9 +188,16 @@
       font-size:16px;font-weight:800;color:#fff;flex-shrink:0;
       position:relative;overflow:hidden;
     }
-    .chat-avatar img,.chat-window-avatar img,.msg-avatar img{
-      width:100%;height:100%;object-fit:cover;border-radius:50%;
+
+    .chat-avatar img,
+    .chat-window-avatar img,
+    .msg-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:50%;
     }
+
     .avatar-green{background:#22c55e}
     .avatar-blue{background:#3b82f6}
     .avatar-purple{background:#8b5cf6}
@@ -146,17 +208,36 @@
     .avatar-yellow{background:#eab308}
 
     .chat-info{flex:1;min-width:0}
-    .chat-name{font-size:14px;font-weight:700;color:var(--text)}
+
+    .chat-name{
+      font-size:14px;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .trainer-inactive{
+      font-size:10px;
+      color:#9ca3af;
+      font-weight:600;
+      margin-left:4px;
+    }
+
     .chat-preview{
       font-size:12px;color:var(--text3);
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
       margin-top:2px;
     }
+
     .chat-meta{
-      display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
       flex-shrink:0;
     }
+
     .chat-time{font-size:11px;color:var(--text3);font-weight:600}
+
     .chat-unread{
       width:20px;height:20px;border-radius:50%;
       background:var(--orange);color:#fff;
@@ -165,36 +246,59 @@
     }
 
     .chat-list-empty{
-      padding:60px 30px;text-align:center;
+      padding:60px 30px;
+      text-align:center;
     }
-    .chat-list-empty i{font-size:48px;color:var(--text3);margin-bottom:14px}
-    .chat-list-empty h3{font-size:16px;font-weight:700;color:var(--text2);margin-bottom:6px}
+
+    .chat-list-empty i{
+      font-size:48px;
+      color:var(--text3);
+      margin-bottom:14px;
+    }
+
+    .chat-list-empty h3{
+      font-size:16px;font-weight:700;color:var(--text2);
+      margin-bottom:6px;
+    }
+
     .chat-list-empty p{font-size:13px;color:var(--text3)}
 
     /* ═══════ Chat Window ═══════ */
     .chat-window{
-      flex:1;display:flex;flex-direction:column;
-      background:var(--bg);height:100vh;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      background:var(--bg);
+      height:100vh;
     }
 
     .chat-window-header{
       padding:16px 24px;
       background:var(--surface);
       border-bottom:1px solid var(--border);
-      display:flex;align-items:center;gap:14px;
+      display:flex;
+      align-items:center;
+      gap:14px;
     }
+
     .chat-window-avatar{
       width:40px;height:40px;border-radius:50%;
       display:flex;align-items:center;justify-content:center;
       font-size:15px;font-weight:800;color:#fff;overflow:hidden;
     }
+
     .chat-window-info h3{font-size:15px;font-weight:800;color:var(--text);margin:0}
     .chat-window-info p{font-size:12px;color:var(--text2);margin:2px 0 0;font-weight:600}
 
     .chat-messages{
-      flex:1;overflow-y:auto;padding:24px;
-      display:flex;flex-direction:column;gap:16px;
+      flex:1;
+      overflow-y:auto;
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
     }
+
     .chat-messages::-webkit-scrollbar{width:5px}
     .chat-messages::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:4px}
 
@@ -209,13 +313,25 @@
       width:100%;
       margin-bottom:8px;
     }
+
     .chat-info-card h4{
       font-size:14px;font-weight:800;color:var(--text);
       text-align:center;margin-bottom:16px;
     }
+
     .chat-info-row{margin-bottom:10px}
-    .chat-info-label{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-    .chat-info-value{font-size:13px;color:var(--text);font-weight:600;margin-top:2px}
+
+    .chat-info-label{
+      font-size:11px;color:var(--text3);
+      font-weight:700;text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    .chat-info-value{
+      font-size:13px;color:var(--text);
+      font-weight:600;margin-top:2px;
+    }
+
     .chat-info-value a{color:var(--orange);text-decoration:none}
 
     /* Message bubbles */
@@ -226,8 +342,10 @@
     .msg-avatar{
       width:32px;height:32px;border-radius:50%;
       display:flex;align-items:center;justify-content:center;
-      font-size:12px;font-weight:800;color:#fff;flex-shrink:0;
-      margin-top:4px;overflow:hidden;
+      font-size:12px;font-weight:800;color:#fff;
+      flex-shrink:0;
+      margin-top:4px;
+      overflow:hidden;
     }
 
     .msg-content{display:flex;flex-direction:column}
@@ -237,31 +355,40 @@
     .msg-bubble{
       padding:10px 16px;
       border-radius:16px;
-      font-size:13px;line-height:1.5;
+      font-size:13px;
+      line-height:1.5;
       word-break:break-word;
     }
+
     .msg-row.theirs .msg-bubble{
       background:var(--surface2);
       border:1px solid var(--border2);
       color:var(--text);
       border-top-left-radius:4px;
     }
+
     .msg-row.mine .msg-bubble{
       background:linear-gradient(135deg,var(--orange),var(--orange2));
-      color:#fff;font-weight:600;
+      color:#fff;
+      font-weight:600;
       border-top-right-radius:4px;
     }
 
     .msg-time{
-      font-size:10px;color:var(--text3);margin-top:4px;
+      font-size:10px;
+      color:var(--text3);
+      margin-top:4px;
       font-weight:600;
     }
+
     .msg-row.mine .msg-time{text-align:right}
 
     /* System / Cancellation messages */
     .msg-row.system-msg{
-      align-self:center;max-width:90%;
+      align-self:center;
+      max-width:90%;
     }
+
     .msg-row.system-msg .msg-bubble{
       background:rgba(239,68,68,0.08);
       border:1px solid rgba(239,68,68,0.2);
@@ -271,12 +398,15 @@
       font-weight:600;
       white-space:pre-line;
     }
+
     .msg-row.system-msg .msg-avatar{display:none}
+
     .msg-row.system-msg .msg-sender{
       text-align:center;
       color:#ef4444;
       font-weight:800;
     }
+
     .msg-row.system-msg .msg-time{text-align:center}
 
     /* Inactive chat banner */
@@ -285,9 +415,15 @@
       background:rgba(239,68,68,0.06);
       border-bottom:1px solid rgba(239,68,68,0.15);
       text-align:center;
-      font-size:12px;font-weight:600;color:#b91c1c;
-      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:12px;
+      font-weight:600;
+      color:#b91c1c;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
     }
+
     .chat-inactive-banner i{font-size:14px}
 
     /* Chat input */
@@ -296,19 +432,27 @@
       background:var(--surface);
       border-top:1px solid var(--border);
     }
+
     .chat-input-form{
-      display:flex;gap:10px;align-items:center;
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
+
     .chat-input{
-      flex:1;padding:12px 18px;
+      flex:1;
+      padding:12px 18px;
       background:var(--surface3);
       border:1px solid var(--border2);
       border-radius:14px;
-      color:var(--text);font-size:13px;font-family:inherit;
+      color:var(--text);
+      font-size:13px;
+      font-family:inherit;
       font-weight:500;
       transition:border-color .2s;
       outline:none;
     }
+
     .chat-input:focus{border-color:rgba(255,122,24,0.4)}
     .chat-input::placeholder{color:var(--text3)}
 
@@ -320,13 +464,31 @@
       display:flex;align-items:center;justify-content:center;
       font-size:16px;flex-shrink:0;
     }
-    .chat-send-btn:hover{transform:scale(1.05);box-shadow:0 4px 16px rgba(255,122,24,0.3)}
+
+    .chat-send-btn:hover{
+      transform:scale(1.05);
+      box-shadow:0 4px 16px rgba(255,122,24,0.3);
+    }
+
+    /* Inactive messaging block */
+    .chat-locked{
+      text-align:center;
+      padding:8px;
+      font-size:12px;
+      color:rgba(0,0,0,0.35);
+      font-weight:600;
+    }
 
     /* No chat selected */
     .no-chat-selected{
-      flex:1;display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:14px;
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:14px;
     }
+
     .no-chat-selected i{font-size:64px;color:var(--text3)}
     .no-chat-selected h3{font-size:18px;font-weight:700;color:var(--text2)}
     .no-chat-selected p{font-size:13px;color:var(--text3)}
@@ -339,6 +501,7 @@
       .main{margin-left:64px}
       .chat-list-panel{width:260px}
     }
+
     @media(max-width:600px){
       .chat-list-panel{width:100%}
       .chat-window{display:none}
@@ -346,8 +509,8 @@
     }
   </style>
 </head>
-<body>
 
+<body>
   <!-- ═══════ Sidebar ═══════ -->
   <aside class="sidebar">
     <div class="brand">
@@ -359,24 +522,40 @@
     </div>
 
     <nav class="nav">
-      <a href="{% url 'trainer_client_dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
-      <a href="{% url 'client_chat' %}" class="active"><i class="fa-solid fa-comments"></i> Chat {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
-      <a href="#"><i class="fa-solid fa-apple-whole"></i> Diet Plan</a>
-      <a href="#"><i class="fa-solid fa-dumbbell"></i> Workout Plan</a>
-      <a href="/"><i class="fa-solid fa-home"></i> Home</a>
+      <a href="{% url 'trainer_client_dashboard' %}">
+        <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+      </a>
+
+      <a href="{% url 'client_chat' %}" class="active">
+        <i class="fa-solid fa-comments"></i> <span>Chat</span>
+        {% if chat_unread_count > 0 %}
+          <span class="nav-badge">{{ chat_unread_count }}</span>
+        {% endif %}
+      </a>
+
+      <a href="{% url 'my_plans' %}">
+        <i class="fa-solid fa-clipboard-list"></i> <span>My Plans</span>
+      </a>
+
+      <a href="{% url 'fitness_profile' %}">
+        <i class="fa-solid fa-heartbeat"></i> <span>Fitness Profile</span>
+      </a>
+
+      <a href="/">
+        <i class="fa-solid fa-home"></i> <span>Home</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
       <a href="{% url 'logout' %}" class="logout">
         <i class="fa-solid fa-right-from-bracket"></i>
-        Logout
+        <span>Logout</span>
       </a>
     </div>
   </aside>
 
   <!-- ═══════ Main ═══════ -->
   <div class="main">
-
     <!-- Chat List Panel -->
     <div class="chat-list-panel">
       <div class="chat-list-header">
@@ -392,34 +571,40 @@
         {% if chat_rooms %}
           {% for room in chat_rooms %}
             {% with last_msg=room.get_last_message %}
-            <a href="?room={{ room.id }}" class="chat-item {% if active_room and active_room.id == room.id %}active{% endif %}" style="text-decoration:none;color:inherit;">
-              <div class="chat-avatar {% if room.trainer_id in active_trainer_ids %}avatar-blue{% else %}avatar-red{% endif %}">
-                {% if room.trainer.user.userprofile.profile_picture %}
-                  <img src="{{ room.trainer.user.userprofile.profile_picture.url }}" alt="{{ room.trainer.user.username }}">
-                {% else %}
-                  {{ room.trainer.user.first_name|first|default:room.trainer.user.username|first|upper }}
-                {% endif %}
-              </div>
-              <div class="chat-info">
-                <div class="chat-name">
-                  {{ room.trainer.user.get_full_name|default:room.trainer.user.username }}
-                  {% if room.trainer_id not in active_trainer_ids %}
-                    <span style="font-size:10px;color:#9ca3af;font-weight:600;margin-left:4px;">Inactive</span>
+              <a href="?room={{ room.id }}" class="chat-item {% if active_room and active_room.id == room.id %}active{% endif %}">
+                <div class="chat-avatar {% if room.trainer_id in active_trainer_ids %}avatar-blue{% else %}avatar-red{% endif %}">
+                  {% if room.trainer.user.userprofile.profile_picture %}
+                    <img src="{{ room.trainer.user.userprofile.profile_picture.url }}" alt="{{ room.trainer.user.username }}">
+                  {% else %}
+                    {{ room.trainer.user.first_name|first|default:room.trainer.user.username|first|upper }}
                   {% endif %}
                 </div>
-                <div class="chat-preview">
-                  {% if last_msg %}{{ last_msg.content|truncatechars:35 }}{% else %}No messages yet{% endif %}
+
+                <div class="chat-info">
+                  <div class="chat-name">
+                    {{ room.trainer.user.get_full_name|default:room.trainer.user.username }}
+                    {% if room.trainer_id not in active_trainer_ids %}
+                      <span class="trainer-inactive">Inactive</span>
+                    {% endif %}
+                  </div>
+                  <div class="chat-preview">
+                    {% if last_msg %}
+                      {{ last_msg.content|truncatechars:35 }}
+                    {% else %}
+                      No messages yet
+                    {% endif %}
+                  </div>
                 </div>
-              </div>
-              <div class="chat-meta">
-                {% if last_msg %}
-                  <span class="chat-time">{{ last_msg.created_at|timesince }} ago</span>
-                {% endif %}
-                {% if room.unread > 0 %}
-                  <span class="chat-unread">{{ room.unread }}</span>
-                {% endif %}
-              </div>
-            </a>
+
+                <div class="chat-meta">
+                  {% if last_msg %}
+                    <span class="chat-time">{{ last_msg.created_at|timesince }} ago</span>
+                  {% endif %}
+                  {% if room.unread > 0 %}
+                    <span class="chat-unread">{{ room.unread }}</span>
+                  {% endif %}
+                </div>
+              </a>
             {% endwith %}
           {% endfor %}
         {% else %}
@@ -443,6 +628,7 @@
               {{ active_room.trainer.user.first_name|first|default:active_room.trainer.user.username|first|upper }}
             {% endif %}
           </div>
+
           <div class="chat-window-info">
             <h3>{{ active_room.trainer.user.get_full_name|default:active_room.trainer.user.username }}</h3>
             <p>Trainer &bull; {{ active_room.trainer.specialization|truncatechars:40 }}</p>
@@ -453,14 +639,21 @@
           <!-- Trainer info card -->
           <div class="chat-info-card">
             <h4>Trainer Info</h4>
+
             <div class="chat-info-row">
               <div class="chat-info-label">Name</div>
-              <div class="chat-info-value">{{ active_room.trainer.user.get_full_name|default:active_room.trainer.user.username }}</div>
+              <div class="chat-info-value">
+                {{ active_room.trainer.user.get_full_name|default:active_room.trainer.user.username }}
+              </div>
             </div>
+
             <div class="chat-info-row">
               <div class="chat-info-label">E-mail</div>
-              <div class="chat-info-value"><a href="mailto:{{ active_room.trainer.user.email }}">{{ active_room.trainer.user.email }}</a></div>
+              <div class="chat-info-value">
+                <a href="mailto:{{ active_room.trainer.user.email }}">{{ active_room.trainer.user.email }}</a>
+              </div>
             </div>
+
             <div class="chat-info-row">
               <div class="chat-info-label">Specialization</div>
               <div class="chat-info-value">{{ active_room.trainer.specialization }}</div>
@@ -469,52 +662,55 @@
 
           {% for msg in messages %}
             {% if msg.message_type == 'cancellation' or msg.message_type == 'system' %}
-            <div class="msg-row system-msg" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
-              <div class="msg-content" style="width:100%">
-                <span class="msg-sender"><i class="fas fa-ban"></i> System</span>
-                <div class="msg-bubble">{{ msg.content }}</div>
-                <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
+              <div class="msg-row system-msg" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
+                <div class="msg-content msg-content-full">
+                  <span class="msg-sender"><i class="fas fa-ban"></i> System</span>
+                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
+                </div>
               </div>
-            </div>
             {% else %}
-            <div class="msg-row {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
-              <div class="msg-avatar {% if msg.sender == request.user %}avatar-orange{% else %}avatar-blue{% endif %}">
-                {% if msg.sender.userprofile.profile_picture %}
-                  <img src="{{ msg.sender.userprofile.profile_picture.url }}" alt="{{ msg.sender.username }}">
-                {% else %}
-                  {{ msg.sender.first_name|first|default:msg.sender.username|first|upper }}
-                {% endif %}
+              <div class="msg-row {% if msg.sender == request.user %}mine{% else %}theirs{% endif %}" data-msg-id="{{ msg.id }}" data-msg-type="{{ msg.message_type }}">
+                <div class="msg-avatar {% if msg.sender == request.user %}avatar-orange{% else %}avatar-blue{% endif %}">
+                  {% if msg.sender.userprofile.profile_picture %}
+                    <img src="{{ msg.sender.userprofile.profile_picture.url }}" alt="{{ msg.sender.username }}">
+                  {% else %}
+                    {{ msg.sender.first_name|first|default:msg.sender.username|first|upper }}
+                  {% endif %}
+                </div>
+
+                <div class="msg-content">
+                  <span class="msg-sender">{{ msg.sender.get_full_name|default:msg.sender.username }}</span>
+                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
+                </div>
               </div>
-              <div class="msg-content">
-                <span class="msg-sender">{{ msg.sender.get_full_name|default:msg.sender.username }}</span>
-                <div class="msg-bubble">{{ msg.content }}</div>
-                <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
-              </div>
-            </div>
             {% endif %}
           {% endfor %}
         </div>
 
         {% if not active_room_is_active %}
-        <div class="chat-inactive-banner">
-          <i class="fas fa-info-circle"></i> This booking is no longer active. Chat history is preserved for reference.
-        </div>
+          <div class="chat-inactive-banner">
+            <i class="fas fa-info-circle"></i>
+            This booking is no longer active. Chat history is preserved for reference.
+          </div>
         {% endif %}
 
         <div class="chat-input-area">
           {% if active_room_is_active %}
-          <form class="chat-input-form" id="chatForm" onsubmit="return sendMessage(event)">
-            {% csrf_token %}
-            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
-            <button type="submit" class="chat-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-          </form>
+            <form class="chat-input-form" id="chatForm" onsubmit="return sendMessage(event)">
+              {% csrf_token %}
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
+              <button type="submit" class="chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </form>
           {% else %}
-          <div style="text-align:center;padding:8px;font-size:12px;color:rgba(0,0,0,0.35);font-weight:600;">
-            <i class="fas fa-lock"></i> Messaging is disabled for inactive bookings
-          </div>
+            <div class="chat-locked">
+              <i class="fas fa-lock"></i> Messaging is disabled for inactive bookings
+            </div>
           {% endif %}
         </div>
-
       {% else %}
         <div class="no-chat-selected">
           <i class="fa-solid fa-comments"></i>
@@ -523,7 +719,6 @@
         </div>
       {% endif %}
     </div>
-
   </div>
 
   {% if active_room %}
@@ -570,6 +765,7 @@
           input.focus();
         }
       });
+
       return false;
     }
 
@@ -581,27 +777,29 @@
       if(msg.message_type === 'cancellation' || msg.message_type === 'system'){
         row.className = 'msg-row system-msg';
         row.setAttribute('data-msg-type', msg.message_type);
-        row.innerHTML = '<div class="msg-content" style="width:100%">'
-          + '<span class="msg-sender"><i class="fas fa-ban"></i> System</span>'
-          + '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>'
-          + '<span class="msg-time">' + msg.time + '</span>'
-          + '</div>';
+        row.innerHTML =
+          '<div class="msg-content msg-content-full">' +
+            '<span class="msg-sender"><i class="fas fa-ban"></i> System</span>' +
+            '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>' +
+            '<span class="msg-time">' + msg.time + '</span>' +
+          '</div>';
       } else {
         row.className = 'msg-row ' + (msg.is_mine ? 'mine' : 'theirs');
         row.setAttribute('data-msg-type', 'normal');
 
         var initial = msg.sender_name.charAt(0).toUpperCase();
         var avatarClass = msg.is_mine ? 'avatar-orange' : 'avatar-blue';
-        var avatarContent = msg.profile_picture 
+        var avatarContent = msg.profile_picture
           ? '<img src="' + msg.profile_picture + '" alt="' + msg.sender_name + '">'
           : initial;
 
-        row.innerHTML = '<div class="msg-avatar ' + avatarClass + '">' + avatarContent + '</div>'
-          + '<div class="msg-content">'
-          + '<span class="msg-sender">' + msg.sender_name + '</span>'
-          + '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>'
-          + '<span class="msg-time">' + msg.time + '</span>'
-          + '</div>';
+        row.innerHTML =
+          '<div class="msg-avatar ' + avatarClass + '">' + avatarContent + '</div>' +
+          '<div class="msg-content">' +
+            '<span class="msg-sender">' + msg.sender_name + '</span>' +
+            '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>' +
+            '<span class="msg-time">' + msg.time + '</span>' +
+          '</div>';
       }
 
       chatMessages.appendChild(row);
@@ -631,6 +829,5 @@
     }, 3000);
   </script>
   {% endif %}
-
 </body>
 </html>
