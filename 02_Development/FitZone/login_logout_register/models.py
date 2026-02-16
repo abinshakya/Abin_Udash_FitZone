@@ -1,6 +1,12 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+# Custom upload path: saves as profile_pictures/username_profilepicture.ext
+def profile_picture_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    return f'profile_pictures/{instance.user.username}_profilepicture{ext}'
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
@@ -29,7 +35,7 @@ class UserProfile(models.Model):
         choices=ROLE_CHOICES,
         default='user'
     )
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to=profile_picture_path, blank=True, null=True)
     email_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, blank=True, null=True)
     otp_created_at = models.DateTimeField(blank=True, null=True)

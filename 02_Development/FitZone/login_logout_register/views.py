@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils import timezone
 import random
 import string
+import os
 
 def register(request):
     if request.method == "POST":
@@ -142,6 +143,11 @@ def edit_profile(request):
         
         # Handle profile picture upload
         if 'profile_picture' in request.FILES:
+            # Delete old profile picture file if it exists
+            if profile.profile_picture:
+                old_path = profile.profile_picture.path
+                if os.path.isfile(old_path):
+                    os.remove(old_path)
             profile.profile_picture = request.FILES['profile_picture']
         
         # Update profile information

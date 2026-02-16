@@ -213,7 +213,6 @@
                     </div>
                 {% endif %}
             </div>
-            <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" class="file-input-hidden">
             <button type="button" class="change-picture-btn" onclick="document.getElementById('profilePictureInput').click()">
                 <i class="fas fa-camera"></i> Change Picture
             </button>
@@ -258,6 +257,7 @@
         <div class="tab-content active" id="profile">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
+                <input type="file" id="profilePictureInput" name="profile_picture" accept="image/*" class="file-input-hidden">
 
                 <!-- Full Name -->
                 <div class="form-row">
