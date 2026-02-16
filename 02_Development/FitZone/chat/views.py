@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
+from django.utils.timesince import timesince as django_timesince
 from django.db.models import Q, Max, Count, Subquery, OuterRef
 from .models import ChatRoom, Message
 from trainer.models import TrainerRegistration, TrainerBooking
@@ -257,3 +258,61 @@ def start_chat_with_trainer(request, trainer_id):
     )
 
     return redirect(f'/chat/client/?room={room.id}')
+
+
+def _smart_time_ago(dt):
+    if dt is None:
+        return ''
+    delta = timezone.now() - dt
+    if delta.total_seconds() < 60:
+        return 'just now'
+    return django_timesince(dt) + ' ago'
+
+
+@login_required
+def fetch_chat_list(request):
+    role = request.GET.get('role', 'client')
+    user = request.user
+
+    if role == 'trainer':
+        registration = TrainerRegistration.objects.filter(user=user).first()
+        if not registration:
+            return JsonResponse({'rooms': [], 'total_unread': 0})
+
+        chat_rooms = ChatRoom.objects.filter(trainer=registration).annotate(
+            last_message_time=Max('messages__created_at'),
+            unread=Count(
+                'messages',
+                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)
+            )
+        ).order_by('-last_message_time')
+    else:
+        chat_rooms = ChatRoom.objects.filter(client=user).annotate(
+            last_message_time=Max('messages__created_at'),
+            unread=Count(
+                'messages',
+                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)
+            )
+        ).order_by('-last_message_time')
+
+    rooms_data = []
+    for room in chat_rooms:
+        last_msg = room.get_last_message()
+        if last_msg:
+            time_display = _smart_time_ago(last_msg.created_at)
+            preview = last_msg.content[:35]
+            if len(last_msg.content) > 35:
+                preview += '...'
+        else:
+            time_display = ''
+            preview = 'No messages yet'
+
+        rooms_data.append({
+            'id': room.id,
+            'last_message': preview,
+            'time': time_display,
+            'unread': room.unread,
+        })
+
+    total_unread = sum(r['unread'] for r in rooms_data)
+    return JsonResponse({'rooms': rooms_data, 'total_unread': total_unread})

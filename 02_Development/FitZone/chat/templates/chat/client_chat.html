@@ -571,7 +571,7 @@
         {% if chat_rooms %}
           {% for room in chat_rooms %}
             {% with last_msg=room.get_last_message %}
-              <a href="?room={{ room.id }}" class="chat-item {% if active_room and active_room.id == room.id %}active{% endif %}">
+              <a href="?room={{ room.id }}" class="chat-item {% if active_room and active_room.id == room.id %}active{% endif %}" data-room-id="{{ room.id }}">
                 <div class="chat-avatar {% if room.trainer_id in active_trainer_ids %}avatar-blue{% else %}avatar-red{% endif %}">
                   {% if room.trainer.user.userprofile.profile_picture %}
                     <img src="{{ room.trainer.user.userprofile.profile_picture.url }}" alt="{{ room.trainer.user.username }}">
@@ -599,6 +599,8 @@
                 <div class="chat-meta">
                   {% if last_msg %}
                     <span class="chat-time">{{ last_msg.created_at|timesince }} ago</span>
+                  {% else %}
+                    <span class="chat-time"></span>
                   {% endif %}
                   {% if room.unread > 0 %}
                     <span class="chat-unread">{{ room.unread }}</span>
@@ -829,5 +831,76 @@
     }, 3000);
   </script>
   {% endif %}
+
+  <script>
+    // ═══════ "just now" fix & live sidebar refresh ═══════
+
+    // Replace "0\u00a0minutes ago" with "just now" on page load
+    function fixJustNow() {
+      document.querySelectorAll('.chat-time').forEach(function(el) {
+        var text = el.textContent.trim();
+        if (text === '0\u00a0minutes ago' || text === '0 minutes ago') {
+          el.textContent = 'just now';
+        }
+      });
+    }
+    fixJustNow();
+
+    // Poll sidebar chat list every 5 seconds for live refresh
+    setInterval(function() {
+      fetch('/chat/fetch-list/?role=client')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.rooms) return;
+
+          data.rooms.forEach(function(room) {
+            var item = document.querySelector('.chat-item[data-room-id="' + room.id + '"]');
+            if (!item) return;
+
+            // Update preview text
+            var preview = item.querySelector('.chat-preview');
+            if (preview) preview.textContent = room.last_message || 'No messages yet';
+
+            // Update time
+            var timeEl = item.querySelector('.chat-time');
+            if (timeEl) timeEl.textContent = room.time;
+
+            // Update unread badge
+            var meta = item.querySelector('.chat-meta');
+            var badge = item.querySelector('.chat-unread');
+            if (room.unread > 0) {
+              if (badge) {
+                badge.textContent = room.unread;
+              } else {
+                badge = document.createElement('span');
+                badge.className = 'chat-unread';
+                badge.textContent = room.unread;
+                meta.appendChild(badge);
+              }
+            } else {
+              if (badge) badge.remove();
+            }
+          });
+
+          // Update nav badge
+          var navBadge = document.querySelector('.nav-badge');
+          if (data.total_unread > 0) {
+            if (navBadge) {
+              navBadge.textContent = data.total_unread;
+            } else {
+              var chatLink = document.querySelector('a.active');
+              if (chatLink) {
+                navBadge = document.createElement('span');
+                navBadge.className = 'nav-badge';
+                navBadge.textContent = data.total_unread;
+                chatLink.appendChild(navBadge);
+              }
+            }
+          } else {
+            if (navBadge) navBadge.remove();
+          }
+        });
+    }, 5000);
+  </script>
 </body>
 </html>
