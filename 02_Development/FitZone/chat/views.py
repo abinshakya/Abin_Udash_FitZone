@@ -166,7 +166,6 @@ def client_chat(request):
 
 @login_required
 def send_message(request, room_id):
-    """Send a message in a chat room (AJAX)."""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST only'}, status=405)
 
@@ -177,13 +176,24 @@ def send_message(request, room_id):
         return JsonResponse({'error': 'Access denied'}, status=403)
 
     content = request.POST.get('content', '').strip()
-    if not content:
+    image = request.FILES.get('image')
+
+    if not content and not image:
         return JsonResponse({'error': 'Empty message'}, status=400)
+
+    # Validate image if provided
+    if image:
+        allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        if image.content_type not in allowed_types:
+            return JsonResponse({'error': 'Only JPEG, PNG, GIF, and WebP images are allowed.'}, status=400)
+        if image.size > 5 * 1024 * 1024:  # 5 MB limit
+            return JsonResponse({'error': 'Image must be under 5 MB.'}, status=400)
 
     msg = Message.objects.create(
         room=room,
         sender=request.user,
-        content=content
+        content=content,
+        image=image,
     )
     room.updated_at = timezone.now()
     room.save(update_fields=['updated_at'])
@@ -195,6 +205,7 @@ def send_message(request, room_id):
             'sender': msg.sender.username,
             'sender_name': msg.sender.get_full_name() or msg.sender.username,
             'content': msg.content,
+            'image_url': msg.image.url if msg.image else '',
             'message_type': msg.message_type,
             'time': msg.created_at.strftime('%I:%M %p'),
             'is_mine': True,
@@ -229,6 +240,7 @@ def fetch_messages(request, room_id):
             'sender': msg.sender.username,
             'sender_name': msg.sender.get_full_name() or msg.sender.username,
             'content': msg.content,
+            'image_url': msg.image.url if msg.image else '',
             'message_type': msg.message_type,
             'time': msg.created_at.strftime('%I:%M %p'),
             'is_mine': msg.sender == request.user,

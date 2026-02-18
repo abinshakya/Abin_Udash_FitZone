@@ -470,6 +470,80 @@
       box-shadow:0 4px 16px rgba(255,122,24,0.3);
     }
 
+    /* Image upload button */
+    .chat-img-btn{
+      width:44px;height:44px;border-radius:12px;
+      background:var(--surface3);
+      border:1px solid var(--border2);
+      color:var(--text2);
+      cursor:pointer;transition:all .2s;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;flex-shrink:0;
+    }
+    .chat-img-btn:hover{background:var(--surface2);color:var(--orange)}
+
+    /* Image preview bar */
+    .image-preview-bar{
+      display:none;
+      padding:8px 24px;
+      background:var(--surface);
+      border-top:1px solid var(--border);
+      align-items:center;
+      gap:10px;
+    }
+    .image-preview-bar.active{display:flex}
+    .image-preview-bar img{
+      width:60px;height:60px;object-fit:cover;border-radius:10px;
+      border:2px solid var(--border2);
+    }
+    .image-preview-bar .preview-name{
+      flex:1;font-size:12px;font-weight:600;color:var(--text2);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .image-preview-bar .preview-remove{
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(239,68,68,0.1);border:none;
+      color:var(--red);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;transition:background .2s;
+    }
+    .image-preview-bar .preview-remove:hover{background:rgba(239,68,68,0.2)}
+
+    /* Chat image in message bubble */
+    .msg-image{
+      max-width:260px;
+      max-height:260px;
+      border-radius:12px;
+      margin-top:4px;
+      cursor:pointer;
+      object-fit:cover;
+      display:block;
+    }
+    .msg-row.mine .msg-image{margin-left:auto}
+
+    /* Remove bubble background/padding when image is present */
+    .msg-bubble.has-image{
+      background:none !important;
+      border:none !important;
+      padding:0;
+    }
+    .msg-bubble.has-image .msg-image{margin-top:0}
+
+    /* Lightbox overlay */
+    .chat-lightbox{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,0.85);
+      z-index:9999;
+      align-items:center;justify-content:center;
+      cursor:zoom-out;
+    }
+    .chat-lightbox.active{display:flex}
+    .chat-lightbox img{
+      max-width:90vw;max-height:90vh;
+      border-radius:12px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    }
+
     /* Inactive messaging block */
     .chat-locked{
       text-align:center;
@@ -683,7 +757,12 @@
 
                 <div class="msg-content">
                   <span class="msg-sender">{{ msg.sender.get_full_name|default:msg.sender.username }}</span>
-                  <div class="msg-bubble">{{ msg.content }}</div>
+                  <div class="msg-bubble{% if msg.image %} has-image{% endif %}">
+                    {% if msg.content %}{{ msg.content }}{% endif %}
+                    {% if msg.image %}
+                      <img src="{{ msg.image.url }}" alt="Shared image" class="msg-image" onclick="openLightbox(this.src)">
+                    {% endif %}
+                  </div>
                   <span class="msg-time">{{ msg.created_at|time:"h:i A" }}</span>
                 </div>
               </div>
@@ -698,11 +777,23 @@
           </div>
         {% endif %}
 
+        <div class="image-preview-bar" id="imagePreviewBar">
+          <img id="imagePreviewThumb" src="" alt="preview">
+          <span class="preview-name" id="imagePreviewName"></span>
+          <button type="button" class="preview-remove" id="imagePreviewRemove" title="Remove image">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
         <div class="chat-input-area">
           {% if active_room_is_active %}
             <form class="chat-input-form" id="chatForm" onsubmit="return sendMessage(event)">
               {% csrf_token %}
-              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
+              <input type="file" id="imageInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">
+              <button type="button" class="chat-img-btn" id="imageBtn" title="Send an image">
+                <i class="fa-solid fa-image"></i>
+              </button>
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off">
               <button type="submit" class="chat-send-btn">
                 <i class="fa-solid fa-paper-plane"></i>
               </button>
@@ -721,6 +812,11 @@
         </div>
       {% endif %}
     </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="chat-lightbox" id="chatLightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="Full size">
   </div>
 
   {% if active_room %}
@@ -749,26 +845,63 @@
       e.preventDefault();
       var input = document.getElementById('chatInput');
       var content = input.value.trim();
-      if(!content) return false;
+      var imageInput = document.getElementById('imageInput');
+      var file = imageInput.files[0];
+
+      if(!content && !file) return false;
+
+      var formData = new FormData();
+      if(content) formData.append('content', content);
+      if(file) formData.append('image', file);
 
       fetch('/chat/send/' + roomId + '/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
           'X-CSRFToken': csrfToken
         },
-        body: 'content=' + encodeURIComponent(content)
+        body: formData
       })
       .then(function(r){ return r.json(); })
       .then(function(data){
         if(data.status === 'ok'){
           appendMessage(data.message);
           input.value = '';
+          clearImagePreview();
           input.focus();
+        } else if(data.error){
+          alert(data.error);
         }
       });
 
       return false;
+    }
+
+    // Image upload handling
+    document.getElementById('imageBtn').addEventListener('click', function(){
+      document.getElementById('imageInput').click();
+    });
+
+    document.getElementById('imageInput').addEventListener('change', function(){
+      var file = this.files[0];
+      if(!file) return;
+      var bar = document.getElementById('imagePreviewBar');
+      var thumb = document.getElementById('imagePreviewThumb');
+      var name = document.getElementById('imagePreviewName');
+      thumb.src = URL.createObjectURL(file);
+      name.textContent = file.name;
+      bar.classList.add('active');
+    });
+
+    document.getElementById('imagePreviewRemove').addEventListener('click', function(){
+      clearImagePreview();
+    });
+
+    function clearImagePreview(){
+      var imageInput = document.getElementById('imageInput');
+      imageInput.value = '';
+      document.getElementById('imagePreviewBar').classList.remove('active');
+      document.getElementById('imagePreviewThumb').src = '';
+      document.getElementById('imagePreviewName').textContent = '';
     }
 
     // Append message to chat
@@ -795,11 +928,16 @@
           ? '<img src="' + msg.profile_picture + '" alt="' + msg.sender_name + '">'
           : initial;
 
+        var bubbleClass = 'msg-bubble' + (msg.image_url ? ' has-image' : '');
+
         row.innerHTML =
           '<div class="msg-avatar ' + avatarClass + '">' + avatarContent + '</div>' +
           '<div class="msg-content">' +
             '<span class="msg-sender">' + msg.sender_name + '</span>' +
-            '<div class="msg-bubble">' + escapeHtml(msg.content) + '</div>' +
+            '<div class="' + bubbleClass + '">' +
+              (msg.content ? escapeHtml(msg.content) : '') +
+              (msg.image_url ? '<img src="' + msg.image_url + '" alt="Shared image" class="msg-image" onclick="openLightbox(this.src)">' : '') +
+            '</div>' +
             '<span class="msg-time">' + msg.time + '</span>' +
           '</div>';
       }
@@ -813,6 +951,15 @@
       var d = document.createElement('div');
       d.textContent = text;
       return d.innerHTML;
+    }
+
+    function openLightbox(src){
+      var lb = document.getElementById('chatLightbox');
+      document.getElementById('lightboxImg').src = src;
+      lb.classList.add('active');
+    }
+    function closeLightbox(){
+      document.getElementById('chatLightbox').classList.remove('active');
     }
 
     // Poll for new messages every 3 seconds
