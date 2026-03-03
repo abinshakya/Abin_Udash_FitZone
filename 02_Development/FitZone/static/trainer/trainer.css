@@ -96,6 +96,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   transform: scale(1.02);
   transition: transform 0.5s ease;
   display: block;
@@ -127,44 +128,55 @@
   left: 14px;
   right: 14px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: space-between;
+  align-items: flex-start;
   z-index: 2;
 }
 
 .badge-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.75rem;
+  font-weight: 700;
   letter-spacing: 0.2px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0,0,0,0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.08);
   color: #333;
-  background: rgba(255,255,255,0.7);
-  white-space: nowrap;
+  background: rgba(255,255,255,0.82);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .badge-verified {
   border-color: rgba(34,197,94,0.35);
-  background: rgba(34,197,94,0.14);
+  background: rgba(34,197,94,0.18);
+  color: #166534;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .badge-verified .dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   background: var(--green);
-  box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+  flex-shrink: 0;
 }
 
 .badge-role {
-  border-color: rgba(255,122,24,0.35);
-  background: rgba(255,122,24,0.14);
+  border-color: rgba(255,122,24,0.3);
+  background: rgba(255,255,255,0.85);
+  color: #9a3412;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+  font-size: 0.72rem;
 }
 
 /* Bottom overlay */
@@ -179,12 +191,15 @@
 .trainer-name-v2 {
   margin: 0 0 6px 0;
   color: #1a1a1a;
-  font-weight: 950;
-  letter-spacing: 0.6px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  font-size: 1.05rem;
-  line-height: 1.15;
+  font-size: 1rem;
+  line-height: 1.2;
   text-shadow: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .trainer-meta {
@@ -222,12 +237,13 @@
 .trainer-bio-v2 {
   margin: 0;
   color: #6c757d !important;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  min-height: 4.65em;
 
   /* clamp bio to keep all cards same height */
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -411,12 +427,12 @@
   text-align: center;
 }
 
-.booking-info-card.orange { !important;
+.booking-info-card.orange {
+  background: linear-gradient(135deg, rgba(255,122,24,0.08), rgba(255,122,24,0.02));
   border: 1px solid rgba(255,122,24,0.2);
 }
 
 .booking-info-card.green {
-  background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02)) !important
   background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02));
   border: 1px solid rgba(34,197,94,0.2);
 }
@@ -453,7 +469,7 @@
 
 .booking-info-value {
   font-size: 22px;
-  font-weight !important: 800;
+  font-weight: 800;
   color: #1a1a1a;
 }
 

@@ -251,11 +251,7 @@ def payment_failed(request, pidx):
     payment = get_object_or_404(KhaltiPayment, pidx=pidx, user=request.user)
     return render(request, 'payment_failed.html', {'payment': payment})
 
-
-# ──────────────────────────────────────────────
 #  TRAINER BOOKING PAYMENT
-# ──────────────────────────────────────────────
-
 @login_required
 # Checkout page for a trainer booking payment
 def booking_checkout(request, booking_id):

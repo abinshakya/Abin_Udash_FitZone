@@ -122,6 +122,23 @@
       background: rgba(255, 122, 24, 0.02);
     }
 
+    .meal-item-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meal-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
     .meal-info h4 {
       margin: 0 0 4px;
       font-size: 0.95rem;
@@ -237,7 +254,7 @@
         <h2><i class="fas fa-plus-circle"></i> Add Meal</h2>
       </div>
       <div class="card-body-inner">
-        <form method="post" action="{% url 'add_meal' plan.id %}">
+        <form method="post" action="{% url 'add_meal' plan.id %}" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row g-3">
             <div class="col-md-4">
@@ -255,6 +272,10 @@
             <div class="col-12">
               <label class="form-label fw-bold">Description / Recipe</label>
               {{ meal_form.description }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Meal Image <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">(optional)</span></label>
+              {{ meal_form.image }}
             </div>
             <div class="col-md-3">
               <label class="form-label fw-bold">Calories</label>
@@ -288,7 +309,11 @@
       {% if meals %}
         {% for meal in meals %}
         <div class="meal-item">
-          <div class="meal-info">
+          <div class="meal-item-content">
+            {% if meal.image %}
+            <img src="{{ meal.image.url }}" alt="{{ meal.title }}" class="meal-thumb">
+            {% endif %}
+            <div class="meal-info">
             <h4>
               <i class="fas fa-{% if meal.meal_type == 'breakfast' %}sun{% elif meal.meal_type == 'lunch' %}cloud-sun{% elif meal.meal_type == 'dinner' %}moon{% else %}cookie{% endif %}" style="color:var(--orange);font-size:14px"></i>
               {{ meal.title }}
@@ -304,6 +329,7 @@
               {% if meal.fat %}<span><i class="fas fa-droplet"></i> {{ meal.fat }}g fat</span>{% endif %}
             </div>
             {% endif %}
+            </div>
           </div>
           <a href="{% url 'delete_meal' meal.id %}" class="btn-danger-sm" onclick="return confirm('Remove this meal?')"><i class="fas fa-times"></i></a>
         </div>

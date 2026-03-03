@@ -131,7 +131,7 @@ class DietPlanForm(forms.ModelForm):
 class MealForm(forms.ModelForm):
     class Meta:
         model = Meal
-        fields = ['meal_type', 'title', 'description', 'calories', 'protein', 'carbs', 'fat', 'time']
+        fields = ['meal_type', 'title', 'description', 'image', 'calories', 'protein', 'carbs', 'fat', 'time']
         widgets = {
             'meal_type': forms.Select(attrs={'class': 'form-select'}),
             'title': forms.TextInput(attrs={
@@ -139,6 +139,9 @@ class MealForm(forms.ModelForm):
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control', 'rows': 2, 'placeholder': 'Ingredients & recipe...'
+            }),
+            'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control', 'accept': 'image/*'
             }),
             'calories': forms.NumberInput(attrs={
                 'class': 'form-control', 'placeholder': 'kcal', 'min': '0'

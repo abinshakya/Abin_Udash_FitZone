@@ -173,6 +173,18 @@ class DietPlan(models.Model):
         return f"{self.title} - {self.client.username}"
 
 
+# Custom upload path: meal_images/trainername_clientname_meal_N.ext
+def meal_image_upload_path(instance, filename):
+    import os
+    ext = os.path.splitext(filename)[1].lower()
+    trainer_name = instance.diet_plan.trainer.user.get_full_name() or instance.diet_plan.trainer.user.username
+    client_name = instance.diet_plan.client.get_full_name() or instance.diet_plan.client.username
+    trainer_name = trainer_name.replace(' ', '_').lower()
+    client_name = client_name.replace(' ', '_').lower()
+    meal_number = instance.order or (instance.diet_plan.meals.count() + 1)
+    return f"meal_images/{trainer_name}_{client_name}_meal_{meal_number}{ext}"
+
+
 # A meal within a diet plan
 class Meal(models.Model):
     MEAL_TYPE_CHOICES = [
@@ -188,6 +200,7 @@ class Meal(models.Model):
     meal_type = models.CharField(max_length=20, choices=MEAL_TYPE_CHOICES)
     title = models.CharField(max_length=200, help_text="e.g., Oatmeal with Fruits")
     description = models.TextField(blank=True, null=True, help_text="Detailed description/recipe")
+    image = models.ImageField(upload_to=meal_image_upload_path, blank=True, null=True, help_text="Optional meal photo")
     calories = models.PositiveIntegerField(blank=True, null=True)
     protein = models.PositiveIntegerField(blank=True, null=True, help_text="Protein in grams")
     carbs = models.PositiveIntegerField(blank=True, null=True, help_text="Carbs in grams")

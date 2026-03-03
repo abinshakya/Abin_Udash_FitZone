@@ -452,7 +452,7 @@ def add_meal(request, plan_id):
     plan = get_object_or_404(DietPlan, id=plan_id, trainer=registration)
 
     if request.method == 'POST':
-        form = MealForm(request.POST)
+        form = MealForm(request.POST, request.FILES)
         if form.is_valid():
             meal = form.save(commit=False)
             meal.diet_plan = plan
