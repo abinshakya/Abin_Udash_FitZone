@@ -3,7 +3,6 @@ from django.conf import settings
 
 
 class TrainerNotification(models.Model):
-    """Notifications for trainers"""
     NOTIF_TYPES = [
         ('booking', 'New Booking'),
         ('cancellation', 'Booking Cancelled'),
@@ -30,11 +29,15 @@ class TrainerNotification(models.Model):
 
 
 class UserNotification(models.Model):
-    """Notifications for users/members"""
     NOTIF_TYPES = [
         ('booking_confirmed', 'Booking Confirmed'),
         ('booking_rejected', 'Booking Rejected'),
         ('payment_required', 'Payment Required'),
+        ('workout_plan', 'Workout Plan Update'),
+        ('diet_plan', 'Diet Plan Update'),
+        ('meal_added', 'Meal Added'),
+        ('exercise_added', 'Exercise Added'),
+        ('plan_deleted', 'Plan Deleted'),
         ('general', 'General'),
     ]
 

@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 
 def cancel_overdue_bookings(user):
-    from notifications.models import UserNotification
+    from notifications.models import UserNotification, TrainerNotification
     from trainer.models import TrainerBooking
 
     overdue = TrainerBooking.objects.filter(
@@ -18,15 +20,66 @@ def cancel_overdue_bookings(user):
     for booking in overdue:
         booking.status = 'cancelled'
         booking.payment_status = 'overdue'
+        booking.cancelled_by = 'system'
+        booking.cancellation_reason = 'Payment not completed within the due date.'
         booking.save()
         trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+        user_name = user.get_full_name() or user.username
+        booking_date_str = booking.booking_date.strftime("%b %d, %Y")
+
+        # Notify user
         UserNotification.objects.create(
             user=user,
             booking=booking,
             notif_type='general',
             title='Booking Cancelled - Payment Overdue',
-            message=f'Your booking with {trainer_name} for {booking.booking_date.strftime("%b %d, %Y")} was cancelled because payment was not completed within 2 days.',
+            message=f'Your booking with {trainer_name} for {booking_date_str} was cancelled because payment was not completed within 2 days.',
         )
+
+        # Notify trainer
+        TrainerNotification.objects.create(
+            trainer=booking.trainer,
+            booking=booking,
+            notif_type='cancellation',
+            title='Booking Cancelled - Payment Overdue',
+            message=f'{user_name}\'s booking for {booking_date_str} was automatically cancelled due to non-payment.',
+        )
+
+        # Email to user
+        try:
+            send_mail(
+                subject='FitZone: Booking Cancelled - Payment Overdue',
+                message=(
+                    f'Hi {user_name},\n\n'
+                    f'Your booking with {trainer_name} for {booking_date_str} has been automatically cancelled '
+                    f'because payment was not completed within the due date.\n\n'
+                    f'If you\'d like to continue training, please book again and complete payment on time.\n\n'
+                    f'Best regards,\nFitZone Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+        # Email to trainer
+        try:
+            send_mail(
+                subject=f'FitZone: Booking Cancelled - {user_name} Payment Overdue',
+                message=(
+                    f'Hi {trainer_name},\n\n'
+                    f'{user_name}\'s booking with you for {booking_date_str} has been automatically cancelled '
+                    f'because the payment was not completed within 2 days.\n\n'
+                    f'No action is required on your end.\n\n'
+                    f'Best regards,\nFitZone Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[booking.trainer.user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
 
 def home(request):
     return render(request,'index.html')

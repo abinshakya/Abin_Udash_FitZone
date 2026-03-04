@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 
 from trainer.models import TrainerRegistration, TrainerBooking
+from notifications.utils import create_user_notification
 from .models import (
     ClientFitnessProfile, WorkoutPlan, WorkoutDay, Exercise, DietPlan, Meal
 )
@@ -12,8 +13,6 @@ from .forms import (
     ExerciseForm, DietPlanForm, MealForm
 )
 
-
-# ─── Helper: Check if user has paid booking with a given trainer ───
 # Return True if the user has a confirmed+paid booking with this trainer
 def has_paid_booking(user, trainer_reg):
     return TrainerBooking.objects.filter(
@@ -33,11 +32,6 @@ def get_paid_booking(user, trainer_reg):
         payment_status='completed',
     ).first()
 
-
-# ════════════════════════════════════════════════════════
-#  CLIENT FITNESS PROFILE  (User fills out their data)
-# ════════════════════════════════════════════════════════
-
 @login_required
 # View/edit the user's fitness profile. Only accessible with a paid booking
 def fitness_profile(request):
@@ -49,7 +43,7 @@ def fitness_profile(request):
     ).first()
 
     if not paid_booking:
-        messages.warning(request, "You need an active paid trainer booking to access fitness plans. Please book and pay a trainer first.")
+        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to access fitness plans.")
         return redirect('trainer')
 
     profile = ClientFitnessProfile.objects.filter(user=request.user).first()
@@ -73,9 +67,6 @@ def fitness_profile(request):
     return render(request, 'fitness_plan/fitness_profile.html', context)
 
 
-# ════════════════════════════════════════════════════════
-#  VIEW MY PLANS (Client views plans assigned to them)
-# ════════════════════════════════════════════════════════
 
 @login_required
 # Client views their workout and diet plans
@@ -87,7 +78,7 @@ def my_plans(request):
     ).first()
 
     if not paid_booking:
-        messages.warning(request, "You need an active paid trainer booking to access fitness plans.")
+        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to access fitness plans.")
         return redirect('trainer')
 
     workout_plans = WorkoutPlan.objects.filter(client=request.user, is_active=True).prefetch_related('days__exercises')
@@ -106,6 +97,13 @@ def my_plans(request):
 @login_required
 # Client views a specific workout plan
 def view_workout_plan(request, plan_id):
+    paid_booking = TrainerBooking.objects.filter(
+        user=request.user, status='confirmed', payment_status='completed',
+    ).exists()
+    if not paid_booking:
+        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to view workout plans.")
+        return redirect('trainer')
+
     plan = get_object_or_404(WorkoutPlan, id=plan_id, client=request.user)
     days = plan.days.prefetch_related('exercises').all()
 
@@ -119,6 +117,13 @@ def view_workout_plan(request, plan_id):
 @login_required
 # Client views a specific diet plan
 def view_diet_plan(request, plan_id):
+    paid_booking = TrainerBooking.objects.filter(
+        user=request.user, status='confirmed', payment_status='completed',
+    ).exists()
+    if not paid_booking:
+        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to view diet plans.")
+        return redirect('trainer')
+
     plan = get_object_or_404(DietPlan, id=plan_id, client=request.user)
     meals = plan.meals.all()
 
@@ -128,10 +133,6 @@ def view_diet_plan(request, plan_id):
     }
     return render(request, 'fitness_plan/view_diet_plan.html', context)
 
-
-# ════════════════════════════════════════════════════════
-#  TRAINER: CLIENT LIST (all paid clients)
-# ════════════════════════════════════════════════════════
 
 @login_required
 # Trainer sees all clients who have paid bookings
@@ -176,11 +177,6 @@ def trainer_client_list(request):
     }
     return render(request, 'fitness_plan/trainer_client_list.html', context)
 
-
-# ════════════════════════════════════════════════════════
-#  TRAINER: VIEW CLIENT PROFILE
-# ════════════════════════════════════════════════════════
-
 @login_required
 # Trainer views a client's fitness profile and existing plans
 def trainer_view_client(request, user_id):
@@ -213,11 +209,6 @@ def trainer_view_client(request, user_id):
         'registration': registration,
     }
     return render(request, 'fitness_plan/trainer_view_client.html', context)
-
-
-# ════════════════════════════════════════════════════════
-#  TRAINER: CREATE WORKOUT PLAN
-# ════════════════════════════════════════════════════════
 
 @login_required
 # Trainer creates a workout plan for a specific client
@@ -253,6 +244,12 @@ def create_workout_plan(request, user_id):
             plan.client = client
             plan.booking = booking
             plan.save()
+            create_user_notification(
+                user=client,
+                notif_type='workout_plan',
+                title='New Workout Plan',
+                message=f'Your trainer {request.user.get_full_name() or request.user.username} created a new workout plan: "{plan.title}".',
+            )
             messages.success(request, f"Workout plan '{plan.title}' created! Now add workout days.")
             return redirect('edit_workout_plan', plan_id=plan.id)
     else:
@@ -307,6 +304,12 @@ def add_workout_day(request, plan_id):
             day.workout_plan = plan
             try:
                 day.save()
+                create_user_notification(
+                    user=plan.client,
+                    notif_type='workout_plan',
+                    title='Workout Day Added',
+                    message=f'Your trainer {request.user.get_full_name() or request.user.username} added {day.get_day_display()} to your workout plan "{plan.title}".',
+                )
                 messages.success(request, f"{day.get_day_display()} added!")
             except Exception:
                 messages.error(request, "This day already exists in the plan.")
@@ -329,6 +332,12 @@ def add_exercise(request, day_id):
             exercise.workout_day = day
             exercise.order = day.exercises.count() + 1
             exercise.save()
+            create_user_notification(
+                user=day.workout_plan.client,
+                notif_type='exercise_added',
+                title='New Exercise Added',
+                message=f'Your trainer {request.user.get_full_name() or request.user.username} added "{exercise.name}" to {day.get_day_display()} in your workout plan "{day.workout_plan.title}".',
+            )
             messages.success(request, f"Exercise '{exercise.name}' added!")
         else:
             messages.error(request, "Invalid data.")
@@ -342,7 +351,16 @@ def delete_exercise(request, exercise_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     exercise = get_object_or_404(Exercise, id=exercise_id, workout_day__workout_plan__trainer=registration)
     plan_id = exercise.workout_day.workout_plan.id
+    client = exercise.workout_day.workout_plan.client
+    plan_title = exercise.workout_day.workout_plan.title
+    exercise_name = exercise.name
     exercise.delete()
+    create_user_notification(
+        user=client,
+        notif_type='plan_deleted',
+        title='Exercise Removed',
+        message=f'Your trainer {request.user.get_full_name() or request.user.username} removed an exercise "{exercise_name}" from your workout plan "{plan_title}".',
+    )
     messages.success(request, "Exercise removed.")
     return redirect('edit_workout_plan', plan_id=plan_id)
 
@@ -353,7 +371,16 @@ def delete_workout_day(request, day_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     day = get_object_or_404(WorkoutDay, id=day_id, workout_plan__trainer=registration)
     plan_id = day.workout_plan.id
+    client = day.workout_plan.client
+    plan_title = day.workout_plan.title
+    day_label = day.get_day_display()
     day.delete()
+    create_user_notification(
+        user=client,
+        notif_type='plan_deleted',
+        title='Workout Day Removed',
+        message=f'Your trainer {request.user.get_full_name() or request.user.username} removed {day_label} from your workout plan "{plan_title}".',
+    )
     messages.success(request, "Workout day removed.")
     return redirect('edit_workout_plan', plan_id=plan_id)
 
@@ -364,14 +391,17 @@ def delete_workout_plan(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(WorkoutPlan, id=plan_id, trainer=registration)
     user_id = plan.client.id
+    client = plan.client
+    plan_title = plan.title
     plan.delete()
+    create_user_notification(
+        user=client,
+        notif_type='plan_deleted',
+        title='Workout Plan Deleted',
+        message=f'Your trainer {request.user.get_full_name() or request.user.username} deleted your workout plan "{plan_title}".',
+    )
     messages.success(request, "Workout plan deleted.")
     return redirect('trainer_view_client', user_id=user_id)
-
-
-# ════════════════════════════════════════════════════════
-#  TRAINER: CREATE DIET PLAN
-# ════════════════════════════════════════════════════════
 
 @login_required
 # Trainer creates a diet plan for a specific client
@@ -406,6 +436,12 @@ def create_diet_plan(request, user_id):
             plan.client = client
             plan.booking = booking
             plan.save()
+            create_user_notification(
+                user=client,
+                notif_type='diet_plan',
+                title='New Diet Plan',
+                message=f'Your trainer {request.user.get_full_name() or request.user.username} created a new diet plan: "{plan.title}".',
+            )
             messages.success(request, f"Diet plan '{plan.title}' created! Now add meals.")
             return redirect('edit_diet_plan', plan_id=plan.id)
     else:
@@ -458,6 +494,12 @@ def add_meal(request, plan_id):
             meal.diet_plan = plan
             meal.order = plan.meals.count() + 1
             meal.save()
+            create_user_notification(
+                user=plan.client,
+                notif_type='meal_added',
+                title='New Meal Added',
+                message=f'Your trainer {request.user.get_full_name() or request.user.username} added "{meal.title}" to your diet plan "{plan.title}".',
+            )
             messages.success(request, f"Meal '{meal.title}' added!")
         else:
             messages.error(request, "Invalid data.")
@@ -471,7 +513,16 @@ def delete_meal(request, meal_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     meal = get_object_or_404(Meal, id=meal_id, diet_plan__trainer=registration)
     plan_id = meal.diet_plan.id
+    client = meal.diet_plan.client
+    plan_title = meal.diet_plan.title
+    meal_title = meal.title
     meal.delete()
+    create_user_notification(
+        user=client,
+        notif_type='plan_deleted',
+        title='Meal Removed',
+        message=f'Your trainer {request.user.get_full_name() or request.user.username} removed "{meal_title}" from your diet plan "{plan_title}".',
+    )
     messages.success(request, "Meal removed.")
     return redirect('edit_diet_plan', plan_id=plan_id)
 
@@ -482,6 +533,14 @@ def delete_diet_plan(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(DietPlan, id=plan_id, trainer=registration)
     user_id = plan.client.id
+    client = plan.client
+    plan_title = plan.title
     plan.delete()
+    create_user_notification(
+        user=client,
+        notif_type='plan_deleted',
+        title='Diet Plan Deleted',
+        message=f'Your trainer {request.user.get_full_name() or request.user.username} deleted your diet plan "{plan_title}".',
+    )
     messages.success(request, "Diet plan deleted.")
     return redirect('trainer_view_client', user_id=user_id)

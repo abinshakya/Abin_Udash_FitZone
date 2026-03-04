@@ -10,7 +10,6 @@ from login_logout_register.models import UserProfile
 
 
 def get_profile_picture_url(user):
-    """Get profile picture URL for a user, or empty string if none."""
     try:
         profile = user.userprofile
         if profile.profile_picture:
@@ -174,6 +173,15 @@ def send_message(request, room_id):
     # Verify user is part of this chat
     if request.user != room.client and request.user != room.trainer.user:
         return JsonResponse({'error': 'Access denied'}, status=403)
+
+    # Block messaging if no active booking exists
+    has_active = TrainerBooking.objects.filter(
+        trainer=room.trainer,
+        user=room.client,
+        status='confirmed',
+    ).exists()
+    if not has_active:
+        return JsonResponse({'error': 'Booking is no longer active. Book again to access this feature.'}, status=403)
 
     content = request.POST.get('content', '').strip()
     image = request.FILES.get('image')

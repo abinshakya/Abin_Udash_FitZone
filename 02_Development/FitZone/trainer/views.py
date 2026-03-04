@@ -8,6 +8,7 @@ from datetime import timedelta
 from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from django.core.mail import send_mail
 import os
 
 from .forms import (
@@ -676,6 +677,25 @@ def book_trainer(request, trainer_id):
             message=f'Your booking request to {trainer_name} for {booking_date} has been sent. You\'ll be notified once the trainer responds.',
         )
 
+        # Send email to the trainer
+        try:
+            send_mail(
+                subject=f'FitZone: New Booking Request from {user_full_name}',
+                message=(
+                    f'Hi {trainer_name},\n\n'
+                    f'{user_full_name} has requested to book a training session with you.\n\n'
+                    f'Preferred Start Date: {booking_date}\n'
+                    + (f'Message: "{user_message}"\n' if user_message else '')
+                    + f'\nPlease log in to your FitZone dashboard to accept or decline this booking.\n\n'
+                    f'Best regards,\nFitZone Team'
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[trainer_reg.user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
         messages.success(request, "Your booking request has been sent to the trainer!")
         return redirect('trainer_client_dashboard')
 
@@ -719,6 +739,7 @@ def update_booking_status(request, booking_id):
 
             # Notify the user
             trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+            user_name = booking.user.get_full_name() or booking.user.username
             if new_status == 'confirmed':
                 payment_due_str = booking.payment_due_date.strftime("%b %d, %Y at %I:%M %p")
                 UserNotification.objects.create(
@@ -728,6 +749,25 @@ def update_booking_status(request, booking_id):
                     title='Booking Confirmed - Payment Required!',
                     message=f'Great news! {trainer_name} has accepted your booking for {booking.booking_date.strftime("%b %d, %Y")}. Please complete your payment of ₹{booking.amount} by {payment_due_str}. Check your dashboard for payment details.'
                 )
+                # Send email to the client
+                try:
+                    send_mail(
+                        subject=f'FitZone: Booking Confirmed by {trainer_name}!',
+                        message=(
+                            f'Hi {user_name},\n\n'
+                            f'Great news! {trainer_name} has accepted your booking request.\n\n'
+                            f'Booking Date: {booking.booking_date.strftime("%b %d, %Y")}\n'
+                            f'Amount: ₹{booking.amount}\n'
+                            f'Payment Due By: {payment_due_str}\n\n'
+                            f'Please log in to your FitZone dashboard to complete the payment.\n\n'
+                            f'Best regards,\nFitZone Team'
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[booking.user.email],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
             elif new_status == 'rejected':
                 reason_text = rejection_reason or 'No reason provided'
                 UserNotification.objects.create(

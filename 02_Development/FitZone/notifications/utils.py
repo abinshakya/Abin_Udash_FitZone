@@ -19,7 +19,7 @@ def create_user_notification(user, notif_type, title, message, booking=None):
         notif_type=notif_type,
         title=title,
         message=message
-    )
+    ) 
 
 
 def mark_trainer_notifications_as_read(trainer, notification_ids=None):
