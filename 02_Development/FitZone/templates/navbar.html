@@ -183,12 +183,11 @@
           {% endif %}
 
           <div class="dropdown">
-            <button class="btn fz-btn fz-btn-primary dropdown-toggle"
+            <button class="btn fz-btn fz-btn-primary dropdown-toggle fz-user-dropdown"
                     type="button"
                     id="userDropdown"
                     data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    class="fz-user-dropdown">
+                    aria-expanded="false">
               {% if request.user.userprofile.profile_picture %}
                 <img src="{{ request.user.userprofile.profile_picture.url }}" 
                      alt="{{ request.user.username }}" 

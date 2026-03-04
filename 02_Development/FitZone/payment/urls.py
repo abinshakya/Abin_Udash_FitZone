@@ -12,4 +12,7 @@ urlpatterns = [
     # Trainer booking payment
     path('booking-checkout/<int:booking_id>/', views.booking_checkout, name='booking_checkout'),
     path('booking-initiate/<int:booking_id>/', views.initiate_booking_payment, name='initiate_booking_payment'),
+
+    # Trainer payment request
+    path('trainer/request-payment/', views.request_payment, name='request_payment'),
 ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import KhaltiPayment
+from .models import KhaltiPayment, TrainerPaymentRequest
 from django.utils.html import format_html
 
 
@@ -97,3 +97,37 @@ class KhaltiPaymentAdmin(admin.ModelAdmin):
             obj.status
         )
     status_badge.short_description = 'Status'
+
+
+@admin.register(TrainerPaymentRequest)
+class TrainerPaymentRequestAdmin(admin.ModelAdmin):
+    list_display = ['trainer', 'get_client', 'amount', 'status', 'has_receipt', 'created_at']
+    list_filter = ['status', 'created_at']
+    list_editable = ['status']
+    search_fields = ['trainer__user__username', 'booking__user__username', 'bank_name', 'account_holder_name']
+    readonly_fields = ['trainer', 'booking', 'amount', 'bank_name', 'account_holder_name', 'account_number', 'bank_qr', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Request Info', {
+            'fields': ('trainer', 'booking', 'amount', 'status')
+        }),
+        ('Trainer Bank Details', {
+            'fields': ('bank_name', 'account_holder_name', 'account_number', 'bank_qr')
+        }),
+        ('Admin Action', {
+            'fields': ('receipt', 'admin_note')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+    def get_client(self, obj):
+        return obj.booking.user.get_full_name() or obj.booking.user.username
+    get_client.short_description = 'Client'
+
+    def has_receipt(self, obj):
+        if obj.receipt:
+            return format_html('<span style="color:{};font-weight:700;">{}</span>', '#16a34a', '✓ Uploaded')
+        return format_html('<span style="color:{};">{}</span>', '#d97706', '—')
+    has_receipt.short_description = 'Receipt'

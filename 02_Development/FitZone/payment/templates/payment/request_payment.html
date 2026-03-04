@@ -1,0 +1,614 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Payment - FitZone</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+  --orange: #ff7a18;
+  --orange2: #ff9a3c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  color: #1a1a1a;
+  min-height: 100vh;
+}
+
+.page-wrap {
+  max-width: 960px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(0, 0, 0, 0.55);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 16px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--orange);
+}
+
+/* Info banner */
+.info-banner {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1.5px solid rgba(59, 130, 246, 0.2);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.6;
+}
+
+.info-banner i {
+  color: #3b82f6;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+/* Cards */
+.section-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.section-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-card h3 i {
+  color: var(--orange);
+}
+
+/* Booking selector */
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.booking-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #fff;
+}
+
+.booking-option:hover {
+  border-color: rgba(255, 122, 24, 0.4);
+}
+
+.booking-option.selected {
+  border-color: var(--orange);
+  background: rgba(255, 122, 24, 0.05);
+  box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.12);
+}
+
+.booking-option input[type="radio"] {
+  display: none;
+}
+
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.booking-option.selected .radio-circle {
+  border-color: var(--orange);
+}
+
+.radio-circle::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--orange);
+  transform: scale(0);
+  transition: transform 0.2s;
+}
+
+.booking-option.selected .radio-circle::after {
+  transform: scale(1);
+}
+
+.booking-details {
+  flex: 1;
+}
+
+.booking-client {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.booking-meta {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-top: 4px;
+}
+
+.booking-payout {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+.booking-payout small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.empty-state i {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.empty-state p {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Bank form */
+.bank-form-group {
+  margin-bottom: 18px;
+}
+
+.bank-form-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.bank-form-group .form-control {
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.bank-form-group .form-control:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.1);
+}
+
+.or-divider {
+  text-align: center;
+  padding: 14px 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+  position: relative;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 30px);
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.or-divider::before {
+  left: 0;
+}
+
+.or-divider::after {
+  right: 0;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255, 122, 24, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Error list */
+.form-errors {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-errors ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Past requests table */
+.req-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.req-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.req-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-badge.pending {
+  background: rgba(251, 191, 36, 0.15);
+  color: #d97706;
+}
+
+.status-badge.approved {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.status-badge.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Receipt link */
+.receipt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.08);
+  transition: all 0.2s;
+}
+
+.receipt-link:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.receipt-link i {
+  font-size: 14px;
+}
+
+/* Messages */
+.msg-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 400px;
+}
+
+.alert-msg {
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alert-msg.success {
+  background: rgba(34, 197, 94, 0.92);
+  color: #fff;
+}
+
+.alert-msg.warning {
+  background: rgba(251, 191, 36, 0.92);
+  color: #1a1a1a;
+}
+
+.alert-msg.error {
+  background: rgba(239, 68, 68, 0.92);
+  color: #fff;
+}
+
+.alert-msg .close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .booking-option {
+    flex-wrap: wrap;
+  }
+
+  .booking-payout {
+    width: 100%;
+    text-align: right;
+    margin-top: 8px;
+  }
+}
+  </style>
+</head>
+<body>
+
+  {% if messages %}
+  <div class="msg-box">
+    {% for message in messages %}
+    <div class="alert-msg {% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}error{% endif %}">
+      <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-times-circle{% endif %}"></i>
+      {{ message }}
+      <button class="close-btn" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    </div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(function(){document.querySelectorAll('.alert-msg').forEach(function(a){a.style.transition='opacity .3s';a.style.opacity='0';setTimeout(function(){a.remove()},300)})},5000);</script>
+  {% endif %}
+
+  <div class="page-wrap">
+    <a href="{% url 'trainer_dashboard' %}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <h1 class="page-title"><i class="fas fa-money-bill-transfer"></i> Request Payment</h1>
+
+    <div class="info-banner">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        You can request payment for bookings where the client has completed payment.
+        A <strong>10% platform fee</strong> is deducted — you receive <strong>90%</strong> of the booking amount.
+        Provide your bank details or upload a bank QR code for the transfer.
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="paymentForm">
+      {% csrf_token %}
+
+      <!-- Step 1: Select Booking -->
+      <div class="section-card">
+        <h3><i class="fas fa-calendar-check"></i> Select a Booking</h3>
+
+        {% if eligible_bookings %}
+          <div class="booking-list">
+            {% for item in eligible_bookings %}
+              <label class="booking-option" id="opt-{{ item.booking.id }}">
+                <input type="radio" name="booking_id" value="{{ item.booking.id }}"
+                       onchange="selectBooking(this)" {% if selected_booking and selected_booking.id == item.booking.id %}checked{% endif %}>
+                <div class="radio-circle"></div>
+                <div class="booking-details">
+                  <div class="booking-client">{{ item.booking.user.get_full_name|default:item.booking.user.username }}</div>
+                  <div class="booking-meta">
+                    Booked {{ item.booking.booking_date|date:"M d, Y" }}
+                    &middot; Paid ₹{{ item.booking.amount }}
+                  </div>
+                </div>
+                <div class="booking-payout">
+                  ₹{{ item.payout_amount }}
+                  <small>Your payout</small>
+                </div>
+              </label>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <p>No eligible bookings found. Clients need to complete payment before you can request a payout.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Step 2: Bank Details -->
+      {% if eligible_bookings %}
+      <div class="section-card" id="bankSection">
+        <h3><i class="fas fa-university"></i> Payment Details</h3>
+
+        {% if form.non_field_errors %}
+          <div class="form-errors">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="bank-form-group">
+          <label>Bank Name</label>
+          {{ form.bank_name }}
+          {% if form.bank_name.errors %}<div class="form-errors" style="margin-top:6px">{{ form.bank_name.errors }}</div>{% endif %}
+        </div>
+
+        <div class="bank-form-group">
+          <label>Account Holder Name</label>
+          {{ form.account_holder_name }}
+          {% if form.account_holder_name.errors %}<div class="form-errors" style="margin-top:6px">{{ form.account_holder_name.errors }}</div>{% endif %}
+        </div>
+
+        <div class="bank-form-group">
+          <label>Account Number</label>
+          {{ form.account_number }}
+          {% if form.account_number.errors %}<div class="form-errors" style="margin-top:6px">{{ form.account_number.errors }}</div>{% endif %}
+        </div>
+
+        <div class="or-divider">OR</div>
+
+        <div class="bank-form-group">
+          <label>Upload Bank QR Code</label>
+          {{ form.bank_qr }}
+          {% if form.bank_qr.errors %}<div class="form-errors" style="margin-top:6px">{{ form.bank_qr.errors }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn" disabled>
+          <i class="fas fa-paper-plane"></i> Submit Payment Request
+        </button>
+      </div>
+      {% endif %}
+    </form>
+
+    <!-- Past Requests -->
+    {% if past_requests %}
+    <div class="section-card">
+      <h3><i class="fas fa-history"></i> Your Payment Requests</h3>
+      <div style="overflow-x:auto">
+        <table class="req-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Receipt</th>
+              <th>Requested</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in past_requests %}
+            <tr>
+              <td>{{ req.booking.user.get_full_name|default:req.booking.user.username }}</td>
+              <td style="font-weight:700;color:var(--orange)">₹{{ req.amount }}</td>
+              <td><span class="status-badge {{ req.status }}">{{ req.get_status_display }}</span></td>
+              <td>
+                {% if req.receipt %}
+                  <a href="{{ req.receipt.url }}" target="_blank" class="receipt-link" title="View Receipt">
+                    <i class="fas fa-file-image"></i> View Receipt
+                  </a>
+                {% else %}
+                  <span style="color:rgba(0,0,0,.3);font-size:13px">—</span>
+                {% endif %}
+              </td>
+              <td style="color:rgba(0,0,0,.45);font-size:13px">{{ req.created_at|date:"M d, Y" }}</td>
+              <td style="font-size:13px;color:rgba(0,0,0,.55)">{{ req.admin_note|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+    function selectBooking(radio) {
+      document.querySelectorAll('.booking-option').forEach(function(el) {
+        el.classList.remove('selected');
+      });
+      radio.closest('.booking-option').classList.add('selected');
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    // Restore selection on page reload (validation error)
+    document.addEventListener('DOMContentLoaded', function() {
+      var checked = document.querySelector('input[name=booking_id]:checked');
+      if (checked) {
+        checked.closest('.booking-option').classList.add('selected');
+        document.getElementById('submitBtn').disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

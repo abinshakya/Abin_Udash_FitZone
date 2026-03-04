@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from membership.models import MembershipPlan, UserMembership
 from django.contrib import messages
 from login_logout_register.models import UserProfile
-from .models import KhaltiPayment
+from .models import KhaltiPayment, TrainerPaymentRequest
+from .forms import TrainerPaymentRequestForm
 from django.conf import settings
 import requests
 import uuid
@@ -12,7 +13,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import timedelta
-from trainer.models import TrainerBooking
+from decimal import Decimal
+from trainer.models import TrainerBooking, TrainerRegistration
 
 
 @login_required
@@ -368,3 +370,86 @@ def initiate_booking_payment(request, booking_id):
     except Exception as e:
         messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('booking_checkout', booking_id=booking_id)
+
+
+@login_required
+def request_payment(request):
+    # Verify trainer role
+    try:
+        profile = request.user.userprofile
+        if profile.role != 'trainer':
+            messages.warning(request, "Access denied. Trainers only!")
+            return redirect('/')
+    except Exception:
+        messages.warning(request, "Access denied.")
+        return redirect('/')
+
+    registration = TrainerRegistration.objects.filter(user=request.user).first()
+    if not registration:
+        messages.error(request, "Trainer registration not found.")
+        return redirect('/')
+
+    # Get all confirmed + paid bookings for this trainer
+    paid_bookings = TrainerBooking.objects.filter(
+        trainer=registration,
+        status='confirmed',
+        payment_status='completed',
+    ).select_related('user').order_by('-updated_at')
+
+    # Build list of eligible bookings (no existing pending/approved request)
+    eligible_bookings = []
+    for booking in paid_bookings:
+        existing = TrainerPaymentRequest.objects.filter(
+            booking=booking,
+            status__in=['pending', 'approved'],
+        ).exists()
+        if not existing:
+            payout = booking.amount * Decimal('0.90')  # 90% (minus 10% platform fee)
+            eligible_bookings.append({
+                'booking': booking,
+                'payout_amount': payout.quantize(Decimal('0.01')),
+            })
+
+    # Past payment requests
+    past_requests = TrainerPaymentRequest.objects.filter(trainer=registration)
+
+    # Handle form submission
+    selected_booking = None
+    payout_amount = None
+    if request.method == 'POST':
+        booking_id = request.POST.get('booking_id')
+        if booking_id:
+            selected_booking = get_object_or_404(
+                TrainerBooking, id=booking_id, trainer=registration,
+                status='confirmed', payment_status='completed'
+            )
+            # Make sure no duplicate request
+            if TrainerPaymentRequest.objects.filter(booking=selected_booking, status__in=['pending', 'approved']).exists():
+                messages.warning(request, "A payment request already exists for this booking.")
+                return redirect('request_payment')
+
+            payout_amount = (selected_booking.amount * Decimal('0.90')).quantize(Decimal('0.01'))
+            form = TrainerPaymentRequestForm(request.POST, request.FILES)
+            if form.is_valid():
+                pr = form.save(commit=False)
+                pr.trainer = registration
+                pr.booking = selected_booking
+                pr.amount = payout_amount
+                pr.save()
+                messages.success(request, f"Payment request of ₹{payout_amount} submitted successfully! The admin will review it shortly.")
+                return redirect('request_payment')
+        else:
+            form = TrainerPaymentRequestForm()
+            messages.error(request, "Please select a booking.")
+    else:
+        form = TrainerPaymentRequestForm()
+
+    context = {
+        'form': form,
+        'eligible_bookings': eligible_bookings,
+        'past_requests': past_requests,
+        'registration': registration,
+        'selected_booking': selected_booking,
+        'payout_amount': payout_amount,
+    }
+    return render(request, 'payment/request_payment.html', context)
