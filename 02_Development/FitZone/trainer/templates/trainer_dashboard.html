@@ -8,6 +8,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
 
   <style>
     :root{
@@ -392,44 +393,6 @@
       font-size: 14px;
     }
 
-    .notif-dropdown-wrap{position:relative;display:inline-flex}
-    .notif-bell-btn{background:none;border:1px solid rgba(0,0,0,0.12);color:rgba(0,0,0,.85);cursor:pointer;position:relative;padding:10px 16px;border-radius:14px;transition:all .25s;display:flex;align-items:center;gap:8px;font-family:inherit;font-weight:700;font-size:14px}
-    .notif-bell-btn:hover{border-color:rgba(255,122,24,0.4);color:#ff9a3c;background:rgba(255,122,24,0.08)}
-    .notif-bell-btn .bell-icon{font-size:16px}
-    .notif-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:20px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1;border:2px solid var(--bg1);animation:bellPulse 2s infinite}
-    @keyframes bellPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-
-    .notif-panel{position:absolute;top:calc(100% + 12px);right:0;width:380px;background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:16px;box-shadow:0 25px 60px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);opacity:0;visibility:hidden;transform:translateY(8px) scale(.97);transition:all .25s cubic-bezier(.4,0,.2,1);z-index:9999;overflow:hidden}
-    .notif-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
-    .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid rgba(0,0,0,.06)}
-    .notif-panel-head h4{margin:0;font-size:16px;font-weight:800;color:#1a1a1a}
-    .notif-panel-head .mark-all{font-size:12px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
-    .notif-panel-head .mark-all:hover{color:#ff7a18}
-    .notif-list{max-height:380px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.08) transparent}
-    .notif-list::-webkit-scrollbar{width:4px}
-    .notif-list::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:10px}
-    .notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.04);transition:background .2s;cursor:default}
-    .notif-item:last-child{border-bottom:none}
-    .notif-item.unread{background:rgba(255,122,24,.04)}
-    .notif-item:hover{background:rgba(0,0,0,.03)}
-    .notif-icon-wrap{flex-shrink:0;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
-    .notif-icon-wrap.confirmed{background:rgba(34,197,94,.12);color:#22c55e}
-    .notif-icon-wrap.rejected{background:rgba(239,68,68,.12);color:#ef4444}
-    .notif-icon-wrap.booking{background:rgba(59,130,246,.12);color:#3b82f6}
-    .notif-icon-wrap.cancellation{background:rgba(251,191,36,.12);color:#fbbf24}
-    .notif-icon-wrap.general{background:rgba(139,92,246,.12);color:#8b5cf6}
-    .notif-content{flex:1;min-width:0}
-    .notif-content .notif-text{margin:0;font-size:13px;color:rgba(0,0,0,.65);line-height:1.45}
-    .notif-content .notif-text strong{color:#1a1a1a;font-weight:700}
-    .notif-content .notif-time{font-size:11px;color:rgba(0,0,0,.3);margin-top:4px;font-weight:600}
-    .notif-unread-dot{width:8px;height:8px;border-radius:50%;background:#ff7a18;flex-shrink:0;margin-top:6px}
-    .notif-panel-foot{padding:12px 20px;border-top:1px solid rgba(0,0,0,.06);text-align:center}
-    .notif-panel-foot a{font-size:13px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
-    .notif-panel-foot a:hover{color:#ff7a18}
-    .notif-empty{text-align:center;padding:40px 20px}
-    .notif-empty i{font-size:28px;color:rgba(0,0,0,.15);margin-bottom:10px}
-    .notif-empty p{margin:0;font-size:13px;color:rgba(0,0,0,.35)}
-
     .booking-message{
       padding: 4px 24px 14px 74px;
       border-bottom: 1px solid rgba(0,0,0,0.04);
@@ -623,52 +586,9 @@
         </div>
 
         <!-- Notification Bell -->
-        <div class="notif-dropdown-wrap">
-          <button class="notif-bell-btn" id="notifBellBtn" type="button" title="Notifications">
-            <i class="fas fa-bell bell-icon"></i> Notifications
-            {% if user_unread_notif_count > 0 %}
-              <span class="notif-badge">{{ user_unread_notif_count }}</span>
-            {% endif %}
-          </button>
-
-          <div class="notif-panel" id="notifPanel">
-            <div class="notif-panel-head">
-              <h4>Notifications</h4>
-              {% if user_unread_notif_count > 0 %}
-                <a href="{% url 'mark_all_notifications_read' %}" class="mark-all">Mark all read</a>
-              {% endif %}
-            </div>
-            <div class="notif-list">
-              {% if navbar_notifications %}
-                {% for notif in navbar_notifications %}
-                  <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
-                    <div class="notif-icon-wrap {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'confirmed' or notif.notif_type == 'approved' %}confirmed{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}rejected{% elif notif.notif_type == 'booking' %}booking{% elif notif.notif_type == 'cancellation' %}cancellation{% else %}general{% endif %}">
-                      <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'approved' %}fa-trophy{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}fa-times-circle{% elif notif.notif_type == 'booking' %}fa-calendar-plus{% elif notif.notif_type == 'cancellation' %}fa-ban{% else %}fa-info-circle{% endif %}"></i>
-                    </div>
-                    <div class="notif-content">
-                      <p class="notif-text"><strong>{{ notif.title }}</strong></p>
-                      <p class="notif-text">{{ notif.message|truncatewords:18 }}</p>
-                      <div class="notif-time"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</div>
-                    </div>
-                    {% if not notif.is_read %}
-                      <span class="notif-unread-dot"></span>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              {% else %}
-                <div class="notif-empty">
-                  <i class="fa-solid fa-bell-slash"></i>
-                  <p>No notifications yet</p>
-                </div>
-              {% endif %}
-            </div>
-            {% if navbar_notifications %}
-              <div class="notif-panel-foot">
-                <a href="{% url 'trainer_dashboard' %}">View all <i class="fas fa-arrow-right"></i></a>
-              </div>
-            {% endif %}
-          </div>
-        </div>
+        {% url 'mark_all_notifications_read' as trainer_mark_all_url %}
+        {% url 'trainer_dashboard' as trainer_view_all_url %}
+        {% include 'notifications/notification.html' with bell_button_class='notif-bell-btn' bell_icon_class='fas fa-bell bell-icon' bell_label='Notifications' unread_count=user_unread_notif_count notification_items=navbar_notifications mark_all_url=trainer_mark_all_url view_all_url=trainer_view_all_url view_all_label='View all' view_all_arrow='fas fa-arrow-right' icon_wrap_class='notif-icon-wrap' %}
       </div>
 
       <!-- Toast Messages -->
@@ -799,15 +719,13 @@
                             <i class="fas fa-check"></i>
                           </button>
                         </form>
-                        <button type="button" class="action-btn reject" title="Reject booking"
-                                onclick="openRejectModal({{ booking.id }})">
+                        <a class="action-btn reject" title="Reject booking" href="{% url 'trainer_reject_booking' booking.id %}">
                           <i class="fas fa-times"></i>
-                        </button>
+                        </a>
                       {% elif booking.status == 'confirmed' %}
-                        <button type="button" class="action-btn cancel" title="Cancel booking"
-                                onclick="openCancelModal({{ booking.id }})">
+                        <a class="action-btn cancel" title="Cancel booking" href="{% url 'trainer_cancel_booking' booking.id %}">
                           <i class="fas fa-ban"></i>
-                        </button>
+                        </a>
                       {% endif %}
                     </div>
                   </div>
@@ -852,92 +770,7 @@
     </main>
   </div>
 
-  <!-- Reject Booking Modal -->
-  <div class="cancel-modal-overlay" id="rejectModal">
-    <div class="cancel-modal">
-      <h3><i class="fas fa-times-circle" style="color:#ef4444"></i> Reject Booking</h3>
-      <p>Please provide a reason for rejecting this booking. The client will be notified.</p>
-      <form method="post" id="rejectForm">
-        {% csrf_token %}
-        <input type="hidden" name="status" value="rejected">
-        <textarea name="rejection_reason" placeholder="e.g. Fully booked, schedule conflict, not a good fit..." required></textarea>
-        <div class="cancel-modal-actions">
-          <button type="button" class="cancel-modal-btn secondary" onclick="closeRejectModal()">Go Back</button>
-          <button type="submit" class="cancel-modal-btn danger">Reject Booking</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Cancel Booking Modal -->
-  <div class="cancel-modal-overlay" id="cancelModal">
-    <div class="cancel-modal">
-      <h3><i class="fas fa-ban"></i> Cancel Booking</h3>
-      <p>Please provide a reason for cancelling this booking. The client will see this message in the chat.</p>
-      <form method="post" id="cancelForm">
-        {% csrf_token %}
-        <input type="hidden" name="status" value="cancelled">
-        <textarea name="cancellation_reason" placeholder="e.g. Schedule conflict, payment issue, personal reasons..." required></textarea>
-        <div class="cancel-modal-actions">
-          <button type="button" class="cancel-modal-btn secondary" onclick="closeCancelModal()">Go Back</button>
-          <button type="submit" class="cancel-modal-btn danger">Cancel Booking</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script>
-  // Notification dropdown toggle
-  (function(){
-    var btn = document.getElementById('notifBellBtn');
-    var panel = document.getElementById('notifPanel');
-    if(!btn || !panel) return;
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      panel.classList.toggle('open');
-    });
-    document.addEventListener('click', function(e){
-      if(!panel.contains(e.target) && e.target !== btn){
-        panel.classList.remove('open');
-      }
-    });
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape') panel.classList.remove('open');
-    });
-  })();
-
-  // Reject modal
-  function openRejectModal(bookingId){
-    var modal = document.getElementById('rejectModal');
-    var form = document.getElementById('rejectForm');
-    form.action = '/trainer/booking/' + bookingId + '/update/';
-    modal.classList.add('open');
-  }
-  function closeRejectModal(){
-    document.getElementById('rejectModal').classList.remove('open');
-    document.getElementById('rejectForm').querySelector('textarea').value = '';
-  }
-  document.getElementById('rejectModal').addEventListener('click', function(e){
-    if(e.target === this) closeRejectModal();
-  });
-
-  // Cancel modal
-  function openCancelModal(bookingId){
-    var modal = document.getElementById('cancelModal');
-    var form = document.getElementById('cancelForm');
-    form.action = '/trainer/booking/' + bookingId + '/update/';
-    modal.classList.add('open');
-  }
-  function closeCancelModal(){
-    document.getElementById('cancelModal').classList.remove('open');
-    document.getElementById('cancelForm').querySelector('textarea').value = '';
-  }
-  document.getElementById('cancelModal').addEventListener('click', function(e){
-    if(e.target === this) closeCancelModal();
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') { closeCancelModal(); closeRejectModal(); }
-  });
   </script>
 
 </body>

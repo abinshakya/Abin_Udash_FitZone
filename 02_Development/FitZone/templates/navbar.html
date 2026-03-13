@@ -9,59 +9,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{% static 'Navbar.css' %}">
+<link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
 
 <style>
-  /* ── Notification Dropdown ── */
-  .notif-dropdown-wrap{position:relative}
-  .notif-bell{background:none;border:none;color:rgba(0,0,0,.65);font-size:18px;cursor:pointer;position:relative;padding:4px;transition:color .2s}
-  .notif-bell:hover{color:#ff9a3c}
-  .notif-badge{position:absolute;top:-4px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:20px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1;border:2px solid #ffffff;animation:bellPulse 2s infinite}
-  @keyframes bellPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-
-  .notif-panel{
-    position:absolute;top:calc(100% + 12px);right:-20px;width:380px;
-    background:#ffffff;border:1px solid rgba(0,0,0,.08);border-radius:16px;
-    box-shadow:0 25px 60px rgba(0,0,0,.10),0 0 0 1px rgba(0,0,0,.04);
-    opacity:0;visibility:hidden;transform:translateY(8px) scale(.97);
-    transition:all .25s cubic-bezier(.4,0,.2,1);z-index:9999;overflow:hidden
-  }
-  .notif-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
-
-  .notif-panel-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid rgba(0,0,0,.06)}
-  .notif-panel-head h4{margin:0;font-size:16px;font-weight:800;color:#1a1a1a}
-  .notif-panel-head .mark-all{font-size:12px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
-  .notif-panel-head .mark-all:hover{color:#ff7a18}
-
-  .notif-list{max-height:380px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.08) transparent}
-  .notif-list::-webkit-scrollbar{width:4px}
-  .notif-list::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:10px}
-
-  .notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.04);transition:background .2s;cursor:default}
-  .notif-item:last-child{border-bottom:none}
-  .notif-item.unread{background:rgba(255,122,24,.04)}
-  .notif-item:hover{background:rgba(0,0,0,.02)}
-
-  .notif-icon{flex-shrink:0;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px}
-  .notif-icon.confirmed{background:rgba(34,197,94,.12);color:#22c55e}
-  .notif-icon.rejected{background:rgba(239,68,68,.12);color:#ef4444}
-  .notif-icon.booking{background:rgba(59,130,246,.12);color:#3b82f6}
-  .notif-icon.cancellation{background:rgba(251,191,36,.12);color:#fbbf24}
-  .notif-icon.general{background:rgba(139,92,246,.12);color:#8b5cf6}
-
-  .notif-content{flex:1;min-width:0}
-  .notif-content .notif-text{margin:0;font-size:13px;color:rgba(0,0,0,.55);line-height:1.45}
-  .notif-content .notif-text strong{color:#1a1a1a;font-weight:700}
-  .notif-content .notif-time{font-size:11px;color:rgba(0,0,0,.3);margin-top:4px;font-weight:600}
-  .notif-unread-dot{width:8px;height:8px;border-radius:50%;background:#ff7a18;flex-shrink:0;margin-top:6px}
-
-  .notif-panel-foot{padding:12px 20px;border-top:1px solid rgba(0,0,0,.06);text-align:center}
-  .notif-panel-foot a{font-size:13px;font-weight:700;color:#ff9a3c;text-decoration:none;transition:color .2s}
-  .notif-panel-foot a:hover{color:#ff7a18}
-
-  .notif-empty{text-align:center;padding:40px 20px}
-  .notif-empty i{font-size:28px;color:rgba(0,0,0,.12);margin-bottom:10px}
-  .notif-empty p{margin:0;font-size:13px;color:rgba(0,0,0,.30)}
-
   /* Navbar inline overrides */
   .notif-panel-foot .fa-arrow-right{font-size:11px;margin-left:4px}
   .fz-verify-email-btn{background:linear-gradient(135deg,#ffc107,#ff9800);color:#1a1a1a;border:none}
@@ -122,56 +72,16 @@
       <div class="d-flex align-items-center gap-3">
         {% if request.user.is_authenticated %}
           <!-- Notification Bell Dropdown -->
-          <div class="notif-dropdown-wrap">
-            <button class="notif-bell" id="notifBellBtn" type="button" title="Notifications">
-              <i class="fas fa-bell"></i>
-              {% if user_unread_notif_count > 0 %}
-                <span class="notif-badge">{{ user_unread_notif_count }}</span>
-              {% endif %}
-            </button>
-
-            <div class="notif-panel" id="notifPanel">
-              <div class="notif-panel-head">
-                <h4>Notifications</h4>
-                {% if user_unread_notif_count > 0 %}
-                  <a href="{% if request.user.userprofile.role == 'trainer' %}{% url 'mark_all_notifications_read' %}{% else %}{% url 'user_mark_all_notifications_read' %}{% endif %}" class="mark-all">Mark all read</a>
-                {% endif %}
-              </div>
-
-              <div class="notif-list">
-                {% if navbar_notifications %}
-                  {% for notif in navbar_notifications %}
-                    <div class="notif-item {% if not notif.is_read %}unread{% endif %}">
-                      <div class="notif-icon {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'confirmed' %}confirmed{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}rejected{% elif notif.notif_type == 'booking' %}booking{% elif notif.notif_type == 'cancellation' %}cancellation{% else %}general{% endif %}">
-                        <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'booking_rejected' %}fa-times-circle{% elif notif.notif_type == 'booking' %}fa-calendar-plus{% elif notif.notif_type == 'cancellation' %}fa-ban{% else %}fa-info-circle{% endif %}"></i>
-                      </div>
-                      <div class="notif-content">
-                        <p class="notif-text"><strong>{{ notif.title }}</strong></p>
-                        <p class="notif-text">{{ notif.message|truncatewords:18 }}</p>
-                        <div class="notif-time"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</div>
-                      </div>
-                      {% if not notif.is_read %}
-                        <span class="notif-unread-dot"></span>
-                      {% endif %}
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  <div class="notif-empty">
-                    <i class="fa-solid fa-bell-slash"></i>
-                    <p>No notifications yet</p>
-                  </div>
-                {% endif %}
-              </div>
-
-              {% if navbar_notifications %}
-                <div class="notif-panel-foot">
-                  <a href="{% if request.user.userprofile.role == 'member' %}{% url 'user_dashboard' %}{% elif request.user.userprofile.role == 'trainer' %}{% url 'trainer_dashboard' %}{% else %}#{% endif %}">
-                    View all notifications <i class="fas fa-arrow-right"></i>
-                  </a>
-                </div>
-              {% endif %}
-            </div>
-          </div>
+          {% if request.user.userprofile.role == 'trainer' %}
+            {% url 'mark_all_notifications_read' as navbar_mark_all_url %}
+            {% url 'trainer_dashboard' as navbar_view_all_url %}
+          {% elif request.user.userprofile.role == 'member' %}
+            {% url 'user_mark_all_notifications_read' as navbar_mark_all_url %}
+            {% url 'user_dashboard' as navbar_view_all_url %}
+          {% else %}
+            {% url 'user_mark_all_notifications_read' as navbar_mark_all_url %}
+          {% endif %}
+          {% include 'notifications/notification.html' with bell_button_class='notif-bell' bell_icon_class='fas fa-bell' unread_count=user_unread_notif_count notification_items=navbar_notifications mark_all_url=navbar_mark_all_url view_all_url=navbar_view_all_url view_all_label='View all notifications' view_all_arrow='fas fa-arrow-right' panel_class='notif-panel notif-panel-nav' %}
           {% if request.user.userprofile.email_verified %}
             <a href="{% url 'trainerregestration' %}" class="btn fz-btn fz-btn-outline d-none d-lg-inline-flex">
               Become a Trainer
@@ -305,29 +215,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  // Notification dropdown toggle
-  (function(){
-    const btn = document.getElementById('notifBellBtn');
-    const panel = document.getElementById('notifPanel');
-    if(!btn || !panel) return;
-
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      panel.classList.toggle('open');
-    });
-
-    document.addEventListener('click', function(e){
-      if(!panel.contains(e.target) && e.target !== btn){
-        panel.classList.remove('open');
-      }
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape') panel.classList.remove('open');
-    });
-  })();
-</script>
 </body>
 </html>

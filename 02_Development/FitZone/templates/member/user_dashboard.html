@@ -8,6 +8,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
 
   <style>
     :root{
@@ -39,13 +40,9 @@
         linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
       min-height: 100vh;
     }
-
-    /* ---------- Layout ---------- */
     .dash{
       min-height: 100vh;
     }
-
-    /* ---------- Sidebar ---------- */
     .sidebar{
       width:220px;
       background:var(--bg0);
@@ -93,6 +90,52 @@
       margin-bottom: 16px;
     }
 
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .stats-strip{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .mini-stat{
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(248,249,250,0.92));
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    }
+
+    .mini-stat .label{
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.45);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-stat .value{
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .mini-stat .value.subtle{
+      font-size: 1rem;
+      font-weight: 800;
+      color: rgba(0,0,0,0.8);
+    }
+
     .hello h1{
       margin: 0;
       font-size: 1.9rem;
@@ -135,11 +178,14 @@
       .nav a{justify-content:center;padding:12px}
       .main{margin-left:64px}
       .grid{ grid-template-columns: 1fr; }
+      .stats-strip{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 600px){
       .sidebar{display:none}
       .main{margin-left:0;padding: 18px 16px 50px;}
       .grid{ grid-template-columns: 1fr; }
+      .stats-strip{ grid-template-columns: 1fr; }
+      .topbar{ align-items: flex-start; }
     }
 
     /* ---------- Cards ---------- */
@@ -688,10 +734,9 @@
       <!-- NOTE: replace href with your real URLs -->
       <nav class="nav">
         <a href="{% url 'user_dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="/"><i class="fa-solid fa-home"></i> Home Page</a>
         <a href="#"><i class="fa-solid fa-robot"></i> Chat with AI Trainer</a>
         <a href="#"><i class="fa-solid fa-bowl-food"></i> AI Food Recommender</a>
-        <a href="{% url 'trainer' %}"><i class="fa-solid fa-user-tie"></i> Book a Trainer</a>
-        <a href="{% url 'client_chat' %}"><i class="fa-solid fa-comments"></i> Chat with Trainer {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
         <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
       </nav>
 
@@ -711,10 +756,30 @@
           <p>Here’s your membership and quick actions.</p>
         </div>
 
-        <div class="pill">
-          <i class="fa-solid fa-shield"></i> Secure Member Area
+        <div class="top-actions">
+          {% url 'user_mark_all_notifications_read' as user_mark_all_url %}
+          {% include 'notifications/notification.html' with bell_button_class='notif-btn' bell_icon_class='fa-solid fa-bell' badge_class='notif-dot' unread_count=unread_count notification_items=notifications|slice:':5' mark_all_url=user_mark_all_url panel_title='Notifications' panel_title_icon='fa-solid fa-bell card-icon-orange' list_class='notif-mini-list' item_class='notif-mini-item' icon_wrap_class='notif-mini-icon' content_class='notif-mini-content' title_class='notif-mini-title' text_class='notif-mini-text' time_class='notif-mini-time' empty_class='ud-empty-state' empty_text='No new notifications' foot_class='notif-panel-foot' view_all_url='#notifications' view_all_label='View all notifications' view_all_arrow='fa-solid fa-arrow-right' compact_mode=1 panel_class='notif-panel notif-panel-member' %}
         </div>
       </div>
+
+      <section class="stats-strip">
+        <div class="mini-stat">
+          <div class="label"><i class="fa-solid fa-id-card"></i> Plan</div>
+          <div class="value subtle">{% if membership %}{{ membership.membership_plan.name }}{% else %}No Active Plan{% endif %}</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label"><i class="fa-solid fa-hourglass-half"></i> Days Left</div>
+          <div class="value">{% if membership %}{{ membership.days_left }}{% else %}0{% endif %}</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label"><i class="fa-solid fa-calendar-check"></i> Bookings</div>
+          <div class="value">{{ bookings|length }}</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label"><i class="fa-solid fa-bell"></i> Unread Alerts</div>
+          <div class="value">{{ unread_count }}</div>
+        </div>
+      </section>
 
       <div class="grid">
         <!-- Membership Card -->
@@ -788,20 +853,41 @@
                 <i class="fa-solid fa-chevron-right chev"></i>
               </a>
 
-              <a class="action" href="{% url 'client_chat' %}">
+              <a class="action" href="{% url 'membership' %}">
                 <div class="left">
-                  <div class="icon"><i class="fa-solid fa-comments"></i></div>
+                  <div class="icon"><i class="fa-solid fa-id-card"></i></div>
                   <div>
-                    Chat with Trainer
-                    <small>Message your assigned trainer</small>
+                    Upgrade Membership
+                    <small>Explore plans and unlock more features</small>
                   </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  {% if chat_unread_count > 0 %}
-                  <span style="min-width:22px;height:22px;border-radius:50%;background:#ff7a18;color:#fff;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;">{{ chat_unread_count }}</span>
-                  {% endif %}
-                  <i class="fa-solid fa-chevron-right chev"></i>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+
+              <a class="action" href="#myBookings">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
+                  <div>
+                    My Bookings
+                    <small>Review your trainer booking status</small>
+                  </div>
                 </div>
+                <i class="fa-solid fa-chevron-right chev"></i>
+              </a>
+
+              <a class="action" href="#notifications">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-bell"></i></div>
+                  <div>
+                    Notifications
+                    <small>See latest booking and account updates</small>
+                  </div>
+                </div>
+                {% if unread_count > 0 %}
+                  <span style="min-width:22px;height:22px;border-radius:50%;background:#ff7a18;color:#fff;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;">{{ unread_count }}</span>
+                {% else %}
+                  <i class="fa-solid fa-chevron-right chev"></i>
+                {% endif %}
               </a>
 
               <a class="action" href="#">
@@ -823,7 +909,7 @@
       <div class="grid grid-gap-top">
 
         <!-- Notifications Card -->
-        <section class="card">
+        <section class="card" id="notifications">
           <div class="card-head">
             <h2>
               <i class="fa-solid fa-bell card-icon-orange"></i> Notifications
@@ -874,7 +960,7 @@
         </section>
 
         <!-- My Bookings Card -->
-        <aside class="card">
+        <aside class="card" id="myBookings">
           <div class="card-head">
             <h2><i class="fa-solid fa-calendar-check card-icon-orange"></i> My Bookings</h2>
           </div>
@@ -937,6 +1023,7 @@
         sidebar.classList.toggle("open");
       });
     }
+
   </script>
 </body>
 </html>

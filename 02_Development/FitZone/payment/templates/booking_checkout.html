@@ -482,6 +482,19 @@ body{
 .min-w-0 { min-width: 0; }
 .icon-muted { color: rgba(0,0,0,0.5); }
 
+.access-alert{
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(239,68,68,0.25);
+  background: rgba(239,68,68,0.10);
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
   </style>
 </head>
 
@@ -499,6 +512,13 @@ body{
         <h1>Booking Checkout</h1>
         <p>Review your trainer booking details and complete payment securely.</p>
       </header>
+
+      {% if show_payment_required_alert %}
+      <div class="access-alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>Payment required for access this feature. Please make payment.</span>
+      </div>
+      {% endif %}
 
       {% if booking %}
       <section class="checkout-grid">

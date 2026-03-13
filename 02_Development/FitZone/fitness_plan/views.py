@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from trainer.models import TrainerRegistration, TrainerBooking
 from notifications.utils import create_user_notification
@@ -32,6 +33,19 @@ def get_paid_booking(user, trainer_reg):
         payment_status='completed',
     ).first()
 
+
+def get_unpaid_confirmed_booking(user):
+    return TrainerBooking.objects.filter(
+        user=user,
+        status='confirmed',
+        payment_status='pending',
+    ).order_by('-updated_at').first()
+
+
+def redirect_to_booking_checkout_with_alert(booking_id):
+    checkout_url = reverse('booking_checkout', kwargs={'booking_id': booking_id})
+    return redirect(f"{checkout_url}?payment_required=1")
+
 @login_required
 # View/edit the user's fitness profile. Only accessible with a paid booking
 def fitness_profile(request):
@@ -43,7 +57,10 @@ def fitness_profile(request):
     ).first()
 
     if not paid_booking:
-        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to access fitness plans.")
+        unpaid_booking = get_unpaid_confirmed_booking(request.user)
+        if unpaid_booking:
+            return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
+        messages.error(request, "Payment required for access this feature. Please make payment.")
         return redirect('trainer')
 
     profile = ClientFitnessProfile.objects.filter(user=request.user).first()
@@ -78,7 +95,10 @@ def my_plans(request):
     ).first()
 
     if not paid_booking:
-        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to access fitness plans.")
+        unpaid_booking = get_unpaid_confirmed_booking(request.user)
+        if unpaid_booking:
+            return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
+        messages.error(request, "Payment required for access this feature. Please make payment.")
         return redirect('trainer')
 
     workout_plans = WorkoutPlan.objects.filter(client=request.user, is_active=True).prefetch_related('days__exercises')
@@ -101,7 +121,10 @@ def view_workout_plan(request, plan_id):
         user=request.user, status='confirmed', payment_status='completed',
     ).exists()
     if not paid_booking:
-        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to view workout plans.")
+        unpaid_booking = get_unpaid_confirmed_booking(request.user)
+        if unpaid_booking:
+            return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
+        messages.error(request, "Payment required for access this feature. Please make payment.")
         return redirect('trainer')
 
     plan = get_object_or_404(WorkoutPlan, id=plan_id, client=request.user)
@@ -121,7 +144,10 @@ def view_diet_plan(request, plan_id):
         user=request.user, status='confirmed', payment_status='completed',
     ).exists()
     if not paid_booking:
-        messages.warning(request, "Book Again to Access this Feature. You need an active paid trainer booking to view diet plans.")
+        unpaid_booking = get_unpaid_confirmed_booking(request.user)
+        if unpaid_booking:
+            return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
+        messages.error(request, "Payment required for access this feature. Please make payment.")
         return redirect('trainer')
 
     plan = get_object_or_404(DietPlan, id=plan_id, client=request.user)

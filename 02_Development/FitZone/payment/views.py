@@ -277,6 +277,7 @@ def booking_checkout(request, booking_id):
     context = {
         'booking': booking,
         'user': request.user,
+        'show_payment_required_alert': request.GET.get('payment_required') == '1',
     }
     return render(request, 'booking_checkout.html', context)
 

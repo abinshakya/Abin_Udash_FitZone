@@ -1,0 +1,100 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
+
+<div class="notif-dropdown-wrap">
+  <button class="{{ bell_button_class|default:'notif-bell' }}" id="{{ bell_button_id|default:'notifBellBtn' }}" type="button" title="Notifications">
+    {% if bell_icon_class %}
+      <i class="{{ bell_icon_class }}"></i>
+    {% endif %}
+    {% if bell_label %}
+      {% if bell_icon_class %} {% endif %}{{ bell_label }}
+    {% endif %}
+    {% if unread_count > 0 %}
+      <span class="{{ badge_class|default:'notif-badge' }}">{{ unread_count }}</span>
+    {% endif %}
+  </button>
+
+  <div class="{{ panel_class|default:'notif-panel' }}" id="{{ panel_id|default:'notifPanel' }}">
+    <div class="{{ panel_head_class|default:'notif-panel-head' }}">
+      <h4>{% if panel_title_icon %}<i class="{{ panel_title_icon }}"></i> {% endif %}{{ panel_title|default:'Notifications' }}</h4>
+      {% if mark_all_url and notification_items %}
+        <a href="{{ mark_all_url }}" class="{{ mark_all_class|default:'mark-all' }}">{{ mark_all_label|default:'Mark all read' }}</a>
+      {% endif %}
+    </div>
+
+    <div class="{{ list_class|default:'notif-list' }}">
+      {% if notification_items %}
+        {% for notif in notification_items %}
+          {% if compact_mode %}
+            <a href="{{ compact_item_url|default:'#notifications' }}" class="{{ item_class|default:'notif-mini-item' }} {% if not notif.is_read %}unread{% endif %}">
+              <div class="{{ icon_wrap_class|default:'notif-mini-icon' }} {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'confirmed' or notif.notif_type == 'approved' %}confirmed{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}rejected{% elif notif.notif_type == 'booking' %}booking{% elif notif.notif_type == 'cancellation' %}cancellation{% else %}general{% endif %}">
+                <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'approved' %}fa-trophy{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}fa-times-circle{% elif notif.notif_type == 'booking' %}fa-calendar-plus{% elif notif.notif_type == 'cancellation' %}fa-ban{% else %}fa-info-circle{% endif %}"></i>
+              </div>
+              <div class="{{ content_class|default:'notif-mini-content' }}">
+                <div class="{{ title_class|default:'notif-mini-title' }}">{{ notif.title }}</div>
+                <div class="{{ text_class|default:'notif-mini-text' }}">{{ notif.message|truncatewords:12 }}</div>
+                <div class="{{ time_class|default:'notif-mini-time' }}">{{ notif.created_at|timesince }} ago</div>
+              </div>
+            </a>
+          {% else %}
+            <div class="{{ item_class|default:'notif-item' }} {% if not notif.is_read %}unread{% endif %}">
+              <div class="{{ icon_wrap_class|default:'notif-icon' }} {% if notif.notif_type == 'booking_confirmed' or notif.notif_type == 'confirmed' or notif.notif_type == 'approved' %}confirmed{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}rejected{% elif notif.notif_type == 'booking' %}booking{% elif notif.notif_type == 'cancellation' %}cancellation{% else %}general{% endif %}">
+                <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'approved' %}fa-trophy{% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'rejected' %}fa-times-circle{% elif notif.notif_type == 'booking' %}fa-calendar-plus{% elif notif.notif_type == 'cancellation' %}fa-ban{% else %}fa-info-circle{% endif %}"></i>
+              </div>
+              <div class="{{ content_class|default:'notif-content' }}">
+                <p class="{{ title_class|default:'notif-text' }}"><strong>{{ notif.title }}</strong></p>
+                <p class="{{ text_class|default:'notif-text' }}">{{ notif.message|truncatewords:18 }}</p>
+                <div class="{{ time_class|default:'notif-time' }}"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</div>
+              </div>
+              {% if not notif.is_read %}
+                <span class="{{ unread_dot_class|default:'notif-unread-dot' }}"></span>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="{{ empty_class|default:'notif-empty' }}">
+          <i class="{{ empty_icon_class|default:'fa-solid fa-bell-slash' }}"></i>
+          <p>{{ empty_text|default:'No notifications yet' }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if view_all_url and notification_items %}
+      <div class="{{ foot_class|default:'notif-panel-foot' }}">
+        <a href="{{ view_all_url }}">{{ view_all_label|default:'View all notifications' }}{% if view_all_arrow %} <i class="{{ view_all_arrow }}"></i>{% endif %}</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var script = document.currentScript;
+    var wrap = script && script.previousElementSibling;
+    if (!wrap || !wrap.classList.contains('notif-dropdown-wrap')) return;
+    if (wrap.dataset.notifInit === '1') return;
+    wrap.dataset.notifInit = '1';
+
+    var btn = wrap.querySelector('button');
+    var panel = wrap.querySelector('.notif-panel');
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        panel.classList.remove('open');
+      }
+    });
+  })();
+</script>

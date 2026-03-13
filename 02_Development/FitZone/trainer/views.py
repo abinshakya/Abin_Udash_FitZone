@@ -807,6 +807,56 @@ def update_booking_status(request, booking_id):
 
 
 @login_required
+def trainer_reject_booking(request, booking_id):
+    booking = get_object_or_404(TrainerBooking, id=booking_id)
+
+    if booking.trainer.user != request.user:
+        messages.error(request, "Access denied.")
+        return redirect('trainer_dashboard')
+
+    if booking.status != 'pending':
+        messages.warning(request, "Only pending bookings can be rejected.")
+        return redirect('trainer_dashboard')
+
+    context = {
+        'booking': booking,
+        'action_title': 'Reject Booking',
+        'action_description': 'Please provide a reason for rejecting this booking. The client will be notified.',
+        'reason_field': 'rejection_reason',
+        'reason_placeholder': 'e.g. Fully booked, schedule conflict, not a good fit...',
+        'status_value': 'rejected',
+        'submit_label': 'Reject Booking',
+        'is_danger': True,
+    }
+    return render(request, 'trainer_booking_action.html', context)
+
+
+@login_required
+def trainer_cancel_booking(request, booking_id):
+    booking = get_object_or_404(TrainerBooking, id=booking_id)
+
+    if booking.trainer.user != request.user:
+        messages.error(request, "Access denied.")
+        return redirect('trainer_dashboard')
+
+    if booking.status != 'confirmed':
+        messages.warning(request, "Only confirmed bookings can be cancelled.")
+        return redirect('trainer_dashboard')
+
+    context = {
+        'booking': booking,
+        'action_title': 'Cancel Booking',
+        'action_description': 'Please provide a reason for cancelling this booking. The client will see this message in chat.',
+        'reason_field': 'cancellation_reason',
+        'reason_placeholder': 'e.g. Schedule conflict, payment issue, personal reasons...',
+        'status_value': 'cancelled',
+        'submit_label': 'Cancel Booking',
+        'is_danger': True,
+    }
+    return render(request, 'trainer_booking_action.html', context)
+
+
+@login_required
 def user_cancel_booking(request, booking_id):
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
     # Allow canceling pending bookings or confirmed bookings that haven't been paid

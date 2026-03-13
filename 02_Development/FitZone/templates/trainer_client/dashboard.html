@@ -830,20 +830,6 @@
         </div>
       </div>
 
-      <!-- Django Messages -->
-      {% if messages %}
-        {% for message in messages %}
-          <div class="payment-alert {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
-            <div class="payment-alert-icon {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
-              <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check{% else %}fa-info-circle{% endif %}"></i>
-            </div>
-            <div class="payment-alert-content">
-              <p class="payment-alert-title">{{ message }}</p>
-            </div>
-          </div>
-        {% endfor %}
-      {% endif %}
-
       <!-- Payment Required Section -->
       {% if confirmed_bookings %}
         <div class="payment-alert">
@@ -910,6 +896,20 @@
             {% endfor %}
           </div>
         </div>
+      {% endif %}
+
+      <!-- Django Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="payment-alert {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
+            <div class="payment-alert-icon {% if message.tags == 'error' %}is-error{% elif message.tags == 'success' %}is-success{% endif %}">
+              <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check{% else %}fa-info-circle{% endif %}"></i>
+            </div>
+            <div class="payment-alert-content">
+              <p class="payment-alert-title">{{ message }}</p>
+            </div>
+          </div>
+        {% endfor %}
       {% endif %}
 
       <!-- Active Trainers -->
