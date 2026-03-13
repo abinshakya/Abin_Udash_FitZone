@@ -47,56 +47,6 @@
     /* ---------- Layout ---------- */
     .dash{ min-height: 100vh; }
 
-    /* ---------- Sidebar ---------- */
-    .sidebar{
-      width:220px;
-      background:var(--bg0);
-      border-right:1px solid rgba(0,0,0,0.06);
-      display:flex;
-      flex-direction:column;
-      position:fixed;
-      top:0;bottom:0;left:0;
-      z-index:100;
-    }
-    .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px}
-    .brand-logo{
-      width:40px;height:40px;border-radius:12px;
-      background:linear-gradient(135deg,var(--orange),var(--orange2));
-      display:flex;align-items:center;justify-content:center;
-      font-size:18px;font-weight:900;color:#fff;
-    }
-    .brand-title{font-size:17px;font-weight:900;color:var(--text)}
-    .brand-sub{font-size:10px;color:rgba(0,0,0,0.45);font-weight:700;text-transform:uppercase;letter-spacing:1px}
-    .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
-    .nav a{
-      display:flex;align-items:center;gap:12px;
-      padding:11px 14px;border-radius:10px;
-      color:rgba(0,0,0,0.45);text-decoration:none;
-      font-size:13px;font-weight:600;transition:all .2s;
-    }
-    .nav a:hover{background:rgba(0,0,0,0.04);color:var(--text)}
-    .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
-    .nav a i{width:18px;text-align:center;font-size:14px}
-    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(0,0,0,0.06)}
-    .logout{display:flex;align-items:center;gap:10px;color:rgba(0,0,0,0.35);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
-    .logout:hover{color:var(--red)}
-
-    /* Sidebar unread badge (Chat) */
-    .nav-badge{
-      margin-left:auto;
-      min-width:20px;
-      height:20px;
-      border-radius:50%;
-      background:var(--orange);
-      color:#fff;
-      font-size:10px;
-      font-weight:800;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:0 5px;
-    }
-
     /* ---------- Main ---------- */
     .main{
       margin-left:220px;
@@ -626,13 +576,9 @@
 
     /* ---------- Responsive ---------- */
     @media (max-width: 900px) {
-      .sidebar{width:64px}
-      .brand>div,.nav a span,.sidebar-footer span{display:none}
-      .nav a{justify-content:center;padding:12px}
       .main{margin-left:64px}
     }
     @media (max-width: 600px) {
-      .sidebar{display:none}
       .main{margin-left:0}
 
       .content-grid { grid-template-columns: 1fr; }
@@ -657,37 +603,7 @@
 <body>
   <div class="dash">
     <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-logo">FZ</div>
-        <div>
-          <div class="brand-title">FitZone</div>
-          <div class="brand-sub">Trainer Dashboard</div>
-        </div>
-      </div>
-
-      <nav class="nav">
-        <a href="{% url 'trainer_dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
-
-        <a href="{% url 'trainer_chat' %}">
-          <i class="fa-solid fa-comments"></i> Chat
-          {% if chat_unread_count > 0 %}
-            <span class="nav-badge">{{ chat_unread_count }}</span>
-          {% endif %}
-        </a>
-
-        <a href="{% url 'trainer_client_list' %}"><i class="fa-solid fa-clipboard-list"></i> Client Plans</a>
-        <a href="{% url 'trainer_settings' %}" class="active"><i class="fa-solid fa-gear"></i> Settings</a>
-        <a href="/"><i class="fa-solid fa-home"></i> Home</a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <a href="{% url 'logout' %}" class="logout">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          Logout
-        </a>
-      </div>
-    </aside>
+    {% include 'slider.html' with active_sidebar='settings' %}
 
     <!-- Main Content -->
     <main class="main">
