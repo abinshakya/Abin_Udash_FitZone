@@ -1,0 +1,403 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trainer Chat | FitZone</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #ff7a18;
+            --primary-dark: #e65100;
+            --primary-light: rgba(255, 122, 24, 0.1);
+            --bg-body: #fdfdfd; 
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --text-dark: #1f2937;
+            --text-muted: #9ca3af;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-card: 0 4px 20px rgba(0,0,0,0.03);
+            --font-main: 'Poppins', sans-serif;
+            --sidebar-width: 220px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar (Identical to Dashboard) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.04);
+            z-index: 50;
+            padding: 0; 
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px 18px; 
+            margin-bottom: 0;
+        }
+
+        .brand-logo {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+            color: white;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .brand-text h2 { margin: 0; font-size: 17px; font-weight: 900; color: #1a1a1a; line-height: 1.2; }
+        .brand-text span { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0 10px;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: rgba(0,0,0,0.55);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .nav-link.active {
+            background: rgba(255,122,24,0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .nav-link.active i { color: var(--primary); }
+        .nav-link i { width: 18px; text-align: center; font-size: 14px; color: inherit; transition: color 0.2s; }
+        .nav-link:hover i { color: var(--primary); }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px;
+            color: rgba(0,0,0,0.35);
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: auto;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            transition: color 0.2s;
+        }
+
+        .logout-link:hover { color: #ef4444; }
+
+        /* --- Main Content (Chat Layout) --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f9fafb; /* Light gray background */
+        }
+
+        .chat-header {
+            padding: 1.5rem 3rem;
+            background: var(--white);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            z-index: 10;
+        }
+
+        .chat-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #111; letter-spacing: -0.5px; }
+        .chat-header p { margin: 4px 0 0 0; font-size: 0.85rem; color: #6b7280; font-weight: 400; }
+
+        .chat-container {
+            flex: 1;
+            padding: 2rem 4.5rem; /* Increased padding to accommodate avatar */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            position: relative;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg-ai {
+            background: var(--white);
+            color: #374151;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .msg-user {
+            background: linear-gradient(135deg, #ff7a18 0%, #fa8c16 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 8px 20px -6px rgba(255,122,24,0.4);
+        }
+
+        .ai-avatar {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: white;
+            color: var(--primary); 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; position: absolute; left: -48px; top: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .chat-input-area {
+            padding: 1.5rem 2.5rem;
+            background: var(--white);
+            border-top: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .input-wrapper {
+            background: #fdfdfd;
+            border-radius: 50px;
+            padding: 0.6rem 0.6rem 0.6rem 1.8rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+        }
+
+        .input-wrapper:focus-within {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255,122,24,0.1), 0 4px 12px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
+        }
+
+
+        .chat-input {
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #374151;
+            flex: 1;
+            outline: none;
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: transform 0.2s;
+            margin-left: 0.5rem;
+        }
+
+        .send-btn:hover { transform: scale(1.05); background: var(--primary-dark); }
+
+        /* Mobile */
+        .mobile-header-bar {
+            display: none;
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.active { transform: translateX(0); box-shadow: 0 0 50px rgba(0,0,0,0.1); }
+            .main-content { margin-left: 0; height: calc(100vh - 70px); } /* Adjust for mobile header */
+            .mobile-header-bar { display: flex; }
+            .chat-header { display: none; } /* Hide desktop header on mobile to save space */
+             body { overflow: auto; } /* Allow body scroll on mobile if needed */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header-bar">
+         <div class="brand-box" style="margin:0;">
+            <div class="brand-logo" style="width:32px;height:32px;font-size:0.9rem;">FZ</div>
+            <div class="brand-text"><h2>FitZone</h2></div>
+        </div>
+        <button class="mobile-toggle" style="background:none;border:none;font-size:1.2rem;" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand-box">
+            <div class="brand-logo">FZ</div>
+            <div class="brand-text">
+                <h2>FitZone</h2>
+                <span>Member Panel</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="{% url 'user_dashboard' %}" class="nav-link">
+                <i class="fa-solid fa-layer-group"></i> Dashboard
+            </a>
+            <a href="/" class="nav-link">
+                <i class="fa-solid fa-house"></i> Home Page
+            </a>
+            <a href="{% url 'ai_chat' %}" class="nav-link active">
+                <i class="fa-solid fa-robot"></i> Chat with AI Trainer
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-utensils"></i> Food Recommender
+            </a>
+             <a href="{% url 'membership' %}" class="nav-link">
+                <i class="fa-solid fa-id-card"></i> My Plans
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a>
+        </nav>
+
+        <a href="{% url 'logout' %}" class="logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="chat-header">
+            <div>
+                <h1>AI Trainer</h1>
+                <p>Ask anything about workouts, diet, or fitness plans.</p>
+            </div>
+            <!-- Optional: Clear Chat button -->
+            <button style="border:1px solid #e5e7eb; background:white; padding:0.5rem 1rem; border-radius:8px; cursor:pointer;" onclick="location.reload()">
+                <i class="fa-solid fa-rotate-right" style="color:#6b7280;"></i>
+            </button>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <!-- Intro Message -->
+            <div class="message-bubble msg-ai">
+                <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                Hello! I'm your AI fitness assistant. How can I help you reach your goals today?
+            </div>
+
+        
+        </div>
+
+        <div class="chat-input-area">
+            <form id="chatForm" class="input-wrapper" onsubmit="sendMessage(event)">
+                {% csrf_token %}
+                <input type="text" id="userMsg" class="chat-input" placeholder="Type your message..." autocomplete="off">
+                <button type="submit" class="send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if(menuToggle && sidebar){
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        const chatContainer = document.getElementById('chatContainer');
+        const chatForm = document.getElementById('chatForm');
+        const userMsgInput = document.getElementById('userMsg');
+
+        function appendMessage(text, sender) {
+            const div = document.createElement('div');
+            div.classList.add('message-bubble');
+            
+            if (sender === 'ai') {
+                div.classList.add('msg-ai');
+                div.innerHTML = `<div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>` + text;
+            } else {
+                div.classList.add('msg-user');
+                div.textContent = text;
+            }
+            
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function sendMessage(e) {
+            e.preventDefault();
+            const msg = userMsgInput.value.trim();
+            if (!msg) return;
+
+            appendMessage(msg, 'user');
+            userMsgInput.value = '';
+
+            setTimeout(() => {
+                appendMessage("I'm trained to help you with fitness.", 'ai');
+            }, 1000);
+            
+          
+        }
+    </script>
+</body>
+</html>

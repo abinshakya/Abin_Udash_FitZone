@@ -2,1028 +2,616 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Member Dashboard - FitZone</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
-
-  <style>
-    :root{
-      --bg0:#f8f9fa;
-      --bg1:#ffffff;
-
-      --cardTop: rgba(255,255,255,0.95);
-      --cardBot: rgba(248,249,250,0.95);
-
-      --text:#1a1a1a;
-      --muted: rgba(0,0,0,0.55);
-      --border: rgba(0,0,0,0.10);
-
-      --orange:#ff7a18;
-      --orange2:#ff9a3c;
-
-      --shadow: 0 22px 70px rgba(0,0,0,0.08);
-      --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
-    }
-
-    *{ box-sizing: border-box; }
-    body{
-      margin: 0;
-      font-family: "Poppins", system-ui, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
-        radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
-        linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
-      min-height: 100vh;
-    }
-    .dash{
-      min-height: 100vh;
-    }
-    .sidebar{
-      width:220px;
-      background:var(--bg0);
-      border-right:1px solid rgba(0,0,0,0.06);
-      display:flex;
-      flex-direction:column;
-      position:fixed;
-      top:0;bottom:0;left:0;
-      z-index:100;
-    }
-    .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px}
-    .brand-logo{
-      width:40px;height:40px;border-radius:12px;
-      background:linear-gradient(135deg,var(--orange),var(--orange2));
-      display:flex;align-items:center;justify-content:center;
-      font-size:18px;font-weight:900;color:#fff;
-    }
-    .brand-title{font-size:17px;font-weight:900;color:var(--text)}
-    .brand-sub{font-size:10px;color:rgba(0,0,0,0.45);font-weight:700;text-transform:uppercase;letter-spacing:1px}
-    .nav{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1}
-    .nav a{
-      display:flex;align-items:center;gap:12px;
-      padding:11px 14px;border-radius:10px;
-      color:rgba(0,0,0,0.45);text-decoration:none;
-      font-size:13px;font-weight:600;transition:all .2s;
-    }
-    .nav a:hover{background:rgba(0,0,0,0.03);color:var(--text)}
-    .nav a.active{background:rgba(255,122,24,0.1);color:var(--orange)}
-    .nav a i{width:18px;text-align:center;font-size:14px}
-    .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(0,0,0,0.06)}
-    .logout{display:flex;align-items:center;gap:10px;color:rgba(0,0,0,0.3);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s}
-    .logout:hover{color:#ef4444}
-
-    /* ---------- Main ---------- */
-    .main{
-      margin-left:220px;
-      padding: 26px 26px 60px;
-    }
-
-    .topbar{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .top-actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .stats-strip{
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .mini-stat{
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(248,249,250,0.92));
-      padding: 12px 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-    }
-
-    .mini-stat .label{
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .3px;
-      text-transform: uppercase;
-      color: rgba(0,0,0,0.45);
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .mini-stat .value{
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: #1a1a1a;
-      line-height: 1.2;
-    }
-
-    .mini-stat .value.subtle{
-      font-size: 1rem;
-      font-weight: 800;
-      color: rgba(0,0,0,0.8);
-    }
-
-    .hello h1{
-      margin: 0;
-      font-size: 1.9rem;
-      font-weight: 1000;
-      background: linear-gradient(135deg, #1a1a1a, var(--orange2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hello p{
-      margin: 6px 0 0;
-      color: rgba(0,0,0,0.5);
-      font-weight: 600;
-    }
-
-    .pill{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.08);
-      color: rgba(0,0,0,0.75);
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .pill i{ color: var(--orange2); }
-
-    .grid{
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
-      align-items: start;
-      margin-top: 18px;
-    }
-
-    @media (max-width: 900px){
-      .sidebar{width:64px}
-      .brand>div,.nav a span,.sidebar-footer span{display:none}
-      .nav a{justify-content:center;padding:12px}
-      .main{margin-left:64px}
-      .grid{ grid-template-columns: 1fr; }
-      .stats-strip{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 600px){
-      .sidebar{display:none}
-      .main{margin-left:0;padding: 18px 16px 50px;}
-      .grid{ grid-template-columns: 1fr; }
-      .stats-strip{ grid-template-columns: 1fr; }
-      .topbar{ align-items: flex-start; }
-    }
-
-    /* ---------- Cards ---------- */
-    .card{
-      position: relative;
-      border-radius: 22px;
-      border: 1px solid rgba(0,0,0,0.08);
-      background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
-      box-shadow: var(--shadowSoft);
-      overflow: hidden;
-    }
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius: 22px;
-      padding: 1px;
-      background: linear-gradient(135deg,
-        rgba(255,122,24,0.20),
-        rgba(0,0,0,0.06),
-        rgba(255,154,60,0.16)
-      );
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      pointer-events:none;
-      opacity: 0.7;
-    }
-
-    .card-head{
-      padding: 18px 18px 14px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      background: rgba(0,0,0,0.02);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .card-head h2{
-      margin: 0;
-      font-size: 1.1rem;
-      font-weight: 1000;
-      letter-spacing: 0.2px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: rgba(0,0,0,0.85);
-    }
-
-    .card-body{ padding: 18px; position: relative; z-index: 1; }
-
-    /* Membership summary */
-    .membership-title{
-      font-size: 1.4rem;
-      font-weight: 1000;
-      margin: 0 0 10px;
-      color: #1a1a1a;
-    }
-
-    .meta{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .chip{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,122,24,0.12);
-      border: 1px solid rgba(255,122,24,0.22);
-      color: #1a1a1a;
-      font-weight: 900;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-
-    .chip.gray{
-      background: rgba(0,0,0,0.03);
-      border-color: rgba(0,0,0,0.08);
-      color: rgba(0,0,0,0.75);
-    }
-
-    .progress-wrap{
-      margin-top: 10px;
-      display: grid;
-      gap: 8px;
-    }
-
-    .progress-top{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      color: rgba(0,0,0,0.55);
-      font-weight: 700;
-      font-size: 0.92rem;
-    }
-
-    .bar{
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.06);
-      border: 1px solid rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-
-    .bar > div{
-      height: 100%;
-      width: 55%; /* demo */
-      background: linear-gradient(135deg, var(--orange), var(--orange2));
-      border-radius: 999px;
-      box-shadow: 0 14px 30px rgba(255,122,24,0.25);
-    }
-
-    /* Quick actions */
-    .actions{
-      display: grid;
-      gap: 10px;
-    }
-
-    .action{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(0,0,0,0.08);
-      background: rgba(0,0,0,0.03);
-      text-decoration: none;
-      color: rgba(0,0,0,0.78);
-      font-weight: 900;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease;
-    }
-
-    .action:hover{
-      transform: translateY(-2px);
-      background: rgba(0,0,0,0.05);
-      border-color: rgba(255,122,24,0.26);
-      color: #1a1a1a;
-    }
-
-    .action .left{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .icon{
-      width: 40px;
-      height: 40px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,122,24,0.12);
-      border: 1px solid rgba(255,122,24,0.22);
-      color: var(--orange2);
-      flex: 0 0 auto;
-    }
-
-    .action small{
-      display: block;
-      color: rgba(0,0,0,0.5);
-      font-weight: 700;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .action .chev{
-      color: rgba(0,0,0,0.45);
-      flex: 0 0 auto;
-    }
-
-    /* Mobile sidebar toggle */
-    .mobile-top{
-      display: none;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      background: rgba(245,245,245,0.9);
-      backdrop-filter: blur(14px);
-      position: sticky;
-      top: 0;
-      z-index: 5;
-    }
-
-    .mobile-top button{
-      border: 1px solid rgba(0,0,0,0.12);
-      background: rgba(0,0,0,0.03);
-      color: #1a1a1a;
-      padding: 10px 12px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-weight: 900;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    @media (max-width: 600px){
-      .mobile-top{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* ---------- Card icons ---------- */
-    .card-icon-orange { color: var(--orange2); }
-
-    /* ---------- Unread badge ---------- */
-    .ud-unread-badge {
-      background: #ef4444;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 3px 9px;
-      border-radius: 20px;
-      margin-left: 6px;
-      animation: pulse 2s infinite;
-    }
-
-    /* ---------- Mark all read link ---------- */
-    .ud-mark-all-read {
-      text-decoration: none;
-      font-size: 0.78rem;
-      cursor: pointer;
-    }
-
-    /* ---------- Zero padding card body ---------- */
-    .card-body-flush { padding: 0; }
-
-    /* ---------- Scrollable list ---------- */
-    .ud-scroll-list {
-      max-height: 420px;
-      overflow-y: auto;
-    }
-
-    /* ---------- Notification Items ---------- */
-    .ud-notif-item {
-      padding: 16px 18px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      transition: background 0.2s;
-    }
-
-    .ud-notif-item.unread {
-      background: rgba(255,122,24,0.05);
-    }
-
-    .ud-notif-item.unread:hover {
-      background: rgba(255,122,24,0.08);
-    }
-
-    .ud-notif-icon {
-      flex-shrink: 0;
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-
-    .ud-notif-icon.confirmed {
-      background: rgba(34,197,94,0.12);
-      color: #22c55e;
-    }
-
-    .ud-notif-icon.rejected {
-      background: rgba(239,68,68,0.12);
-      color: #ef4444;
-    }
-
-    .ud-notif-icon.general {
-      background: rgba(59,130,246,0.12);
-      color: #3b82f6;
-    }
-
-    .ud-notif-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .ud-notif-title-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 3px;
-    }
-
-    .ud-notif-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a1a1a;
-    }
-
-    .ud-notif-unread-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--orange);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .ud-notif-msg {
-      margin: 0;
-      font-size: 13px;
-      color: rgba(0,0,0,0.45);
-      line-height: 1.45;
-    }
-
-    .ud-notif-meta {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-top: 6px;
-    }
-
-    .ud-notif-time {
-      font-size: 11px;
-      color: rgba(0,0,0,0.3);
-      font-weight: 600;
-    }
-
-    .ud-mark-read-link {
-      font-size: 11px;
-      color: var(--orange);
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    /* ---------- Empty States ---------- */
-    .ud-empty-state {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .ud-empty-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 20px;
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 14px;
-      font-size: 24px;
-      color: rgba(0,0,0,0.2);
-    }
-
-    .ud-empty-title {
-      margin: 0 0 6px;
-      font-size: 16px;
-      font-weight: 800;
-      color: rgba(0,0,0,0.55);
-    }
-
-    .ud-empty-text {
-      margin: 0;
-      font-size: 13px;
-      color: rgba(0,0,0,0.35);
-    }
-
-    .ud-empty-text-gap {
-      margin: 0 0 14px;
-      font-size: 13px;
-      color: rgba(0,0,0,0.35);
-    }
-
-    /* ---------- Booking Items ---------- */
-    .ud-booking-item {
-      padding: 14px 18px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .ud-booking-avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(255,154,60,0.1));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--orange);
-      font-weight: 800;
-      font-size: 16px;
-      flex-shrink: 0;
-      border: 1px solid rgba(255,122,24,0.2);
-    }
-
-    .ud-booking-info {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .ud-booking-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a1a1a;
-    }
-
-    .ud-booking-date {
-      font-size: 11px;
-      color: rgba(0,0,0,0.35);
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .ud-status-badge {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .ud-status-badge.status-pending {
-      background: rgba(251,191,36,0.12);
-      color: #fbbf24;
-      border: 1px solid rgba(251,191,36,0.25);
-    }
-
-    .ud-status-badge.status-confirmed {
-      background: rgba(34,197,94,0.12);
-      color: #22c55e;
-      border: 1px solid rgba(34,197,94,0.25);
-    }
-
-    .ud-status-badge.status-rejected {
-      background: rgba(239,68,68,0.12);
-      color: #ef4444;
-      border: 1px solid rgba(239,68,68,0.25);
-    }
-
-    .ud-status-badge.status-cancelled {
-      background: rgba(156,163,175,0.12);
-      color: #9ca3af;
-      border: 1px solid rgba(156,163,175,0.25);
-    }
-
-    .ud-cancel-form {
-      margin: 0;
-    }
-
-    .ud-cancel-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid rgba(239,68,68,0.2);
-      background: rgba(239,68,68,0.08);
-      color: #ef4444;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .ud-cancel-btn:hover {
-      background: rgba(239,68,68,0.2);
-    }
-
-    /* ---------- No Membership ---------- */
-    .ud-no-plan-text {
-      color: rgba(0,0,0,0.55);
-      margin: 10px 0;
-    }
-
-    .ud-browse-plans-btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, var(--orange), var(--orange2));
-      color: #fff;
-      text-decoration: none;
-      border-radius: 12px;
-      font-weight: 700;
-    }
-
-    .ud-browse-trainers-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: linear-gradient(135deg, var(--orange), var(--orange2));
-      color: #fff;
-      text-decoration: none;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    /* ---------- Inactive plan chip ---------- */
-    .chip-inactive {
-      background: rgba(220,53,69,0.12);
-      border-color: rgba(220,53,69,0.22);
-    }
-
-    .chip-inactive i {
-      color: #ef4444;
-    }
-
-    .grid-gap-top { margin-top: 18px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard | FitZone</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
+
+    <style>
+        :root {
+            --primary: #ff7a18;
+            --primary-dark: #e65100;
+            --primary-light: rgba(255, 122, 24, 0.1);
+            --bg-body: #fdfdfd; 
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --text-dark: #1f2937;
+            --text-muted: #9ca3af;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-card: 0 4px 20px rgba(0,0,0,0.03);
+            --font-main: 'Poppins', sans-serif;
+            --sidebar-width: 220px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Sidebar (Refined Styles) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.04);
+            z-index: 50;
+            padding: 0; /* Updated to match trainer_client */
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px 18px; /* Match trainer_client */
+            margin-bottom: 0;
+        }
+
+        .brand-logo {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c); /* Gradient match */
+            color: white;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .brand-text h2 { margin: 0; font-size: 17px; font-weight: 900; color: #1a1a1a; line-height: 1.2; }
+        .brand-text span { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 2px; /* Tighter gap */
+            padding: 0 10px; /* Side padding for nav area */
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px; /* Match trainer_client */
+            border-radius: 10px;
+            color: rgba(0,0,0,0.55);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px; /* Smaller font */
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .nav-link.active {
+            background: rgba(255,122,24,0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .nav-link.active i { color: var(--primary); }
+        .nav-link i { width: 18px; text-align: center; font-size: 14px; color: inherit; transition: color 0.2s; }
+        .nav-link:hover i { color: var(--primary); }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px; /* Footer styling */
+            color: rgba(0,0,0,0.35);
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: auto;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            transition: color 0.2s;
+        }
+
+        .logout-link:hover { color: #ef4444; }
+        .logout-link i { width: 20px; text-align: center; }
+
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem 2.5rem;
+            max-width: 1400px;
+        }
+
+        /* Top Bar */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .greeting h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 0.5rem 0; color: #111; }
+        .greeting p { margin: 0; color: #6b7280; font-size: 0.95rem; }
+
+        /* Stats Grid */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Membership Card Visual */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #111;
+        }
+
+        .membership-card-visual {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Texture overlay */
+        .membership-card-visual::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.5; pointer-events: none;
+        }
+
+        /* Orange Glow - Remove if you want pure dark */
+        .membership-card-visual::after {
+            content: ''; position: absolute;
+            top: -50px; right: -50px; width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(255, 122, 24, 0.15), transparent 70%);
+            filter: blur(40px); pointer-events: none;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .status-chip {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            padding: 0.4rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .status-chip.active { color: #86efac; border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.15); }
+        .status-chip.inactive { color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.15); }
+
+        .plan-name-large {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 1.5rem 0;
+            z-index: 2;
+            letter-spacing: -0.5px;
+        }
+
+        .card-info-grid {
+            display: flex;
+            gap: 2.5rem;
+            margin-top: auto;
+            z-index: 2;
+        }
+
+        .info-group label {
+            display: block; font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 1px; opacity: 0.6; margin-bottom: 4px;
+        }
+        .info-group span { font-size: 1rem; font-weight: 600; font-family: monospace; letter-spacing: 0.5px; }
+
+        .progress-bar-container { margin-top: 1.5rem; z-index: 2; }
+        .p-bar-bg { height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .p-bar-fill { height: 100%; background: var(--primary); box-shadow: 0 0 10px rgba(255,122,24,0.5); }
+        .p-bar-text { font-size: 0.75rem; margin-top: 6px; opacity: 0.7; text-align: right; font-weight: 500; }
+
+        /* Quick Actions */
+        .white-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.015);
+        }
+
+        .action-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .action-btn {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            text-decoration: none;
+            color: var(--text-dark);
+            border: 1px solid transparent;            
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: white; border-color: rgba(255,122,24,0.2);
+            box-shadow: 0 4px 12px rgba(255,122,24,0.08);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: rgba(255,122,24,0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 1rem;
+        }
+
+        .action-content h4 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .action-content p { margin: 2px 0 0; font-size: 0.75rem; color: #6b7280; }
+
+        /* Notification list within card */
+        .notif-item-row {
+            padding: 18px 0; border-bottom: 1px solid var(--gray-100);
+            display: flex; gap: 16px; align-items: flex-start;
+        }
+        .notif-item-row:last-child { border-bottom: none; }
+        
+        .notif-icon-box {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: #f3e8ff; color: #9333ea;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+
+        /* Specific colors for types if needed, but keeping purple as requested */
+        /* .notif-icon-box.warning { background: #fff7ed; color: #ea580c; } */
+
+        .notif-details { flex: 1; }
+        
+        .notif-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .notif-title { font-weight: 700; font-size: 0.95rem; color: #1f2937; }
+        
+        .notif-unread-dot {
+            width: 8px; height: 8px; background-color: var(--primary);
+            border-radius: 50%; display: inline-block; margin-top: 6px;
+        }
+        
+        .notif-msg { font-size: 0.85rem; color: #6b7280; margin: 0 0 6px 0; line-height: 1.5; }
+        .notif-time { font-size: 0.75rem; color: #9ca3af; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+
+        /* Mobile */
+        .mobile-header-bar {
+            display: none;
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: transform 0.3s;
+                top: 73px; /* Start below header */
+                height: calc(100vh - 73px);
+                z-index: 90;
+                box-shadow: none; /* Let sidebar shadow handle it */
+            }
+            .sidebar.active { 
+                transform: translateX(0); 
+                box-shadow: 4px 0 20px rgba(0,0,0,0.05); 
+            }
+            /* Hide brand in sidebar on mobile since it's in header */
+            .sidebar .brand-box { display: none; }
+            
+            .main-content { margin-left: 0; padding: 1.5rem; }
+            .mobile-header-bar { display: flex; }
+            .header-bar { display: none; }
+            .stats-row { gap: 1rem; }
+            .left-col, .right-col { width: 100%; }
+        }
+    </style>
 </head>
-
 <body>
-  <!-- Mobile Top -->
-  <div class="mobile-top">
-    <div class="pill"><i class="fa-solid fa-gauge"></i> Dashboard</div>
-    <button type="button" id="toggleSidebar">
-      <i class="fa-solid fa-bars"></i> Menu
-    </button>
-  </div>
 
-  <div class="dash">
+    <!-- Mobile Header -->
+    <div class="mobile-header-bar">
+         <div class="brand-box" style="margin:0;">
+            <div class="brand-logo" style="width:32px;height:32px;font-size:0.9rem;">FZ</div>
+            <div class="brand-text"><h2>FitZone</h2></div>
+        </div>
+        <button class="mobile-toggle" style="background:none;border:none;font-size:1.2rem;" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-logo">FZ</div>
-        <div>
-          <div class="brand-title">FitZone</div>
-          <div class="brand-sub">Member Panel</div>
+        <div class="brand-box">
+            <div class="brand-logo">FZ</div>
+            <div class="brand-text">
+                <h2>FitZone</h2>
+                <span>Member Panel</span>
+            </div>
         </div>
-      </div>
 
-      <!-- NOTE: replace href with your real URLs -->
-      <nav class="nav">
-        <a href="{% url 'user_dashboard' %}" class="active"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a href="/"><i class="fa-solid fa-home"></i> Home Page</a>
-        <a href="#"><i class="fa-solid fa-robot"></i> Chat with AI Trainer</a>
-        <a href="#"><i class="fa-solid fa-bowl-food"></i> AI Food Recommender</a>
-        <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
-      </nav>
+        <nav class="nav-menu">
+            <a href="{% url 'user_dashboard' %}" class="nav-link active">
+                <i class="fa-solid fa-layer-group"></i> Dashboard
+            </a>
+            <a href="/" class="nav-link">
+                <i class="fa-solid fa-house"></i> Home Page
+            </a>
+            <a href="{% url 'ai_chat' %}" class="nav-link">
+                <i class="fa-solid fa-robot"></i> Chat with AI Trainer
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-utensils"></i> Food Recommender
+            </a>
+             <a href="{% url 'membership' %}" class="nav-link">
+                <i class="fa-solid fa-id-card"></i> My Plans
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a>
+        </nav>
 
-      <div class="sidebar-footer">
-        <!-- replace with your logout url -->
-        <a class="logout" href="{% url 'logout' %}">
-          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        <a href="{% url 'logout' %}" class="logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
-      </div>
     </aside>
 
-    <!-- Main -->
-    <main class="main">
-      <div class="topbar">
-        <div class="hello">
-          <h1>Welcome, {{ request.user.username }}!</h1>
-          <p>Here’s your membership and quick actions.</p>
-        </div>
-
-        <div class="top-actions">
-          {% url 'user_mark_all_notifications_read' as user_mark_all_url %}
-          {% include 'notifications/notification.html' with bell_button_class='notif-btn' bell_icon_class='fa-solid fa-bell' badge_class='notif-dot' unread_count=unread_count notification_items=notifications|slice:':5' mark_all_url=user_mark_all_url panel_title='Notifications' panel_title_icon='fa-solid fa-bell card-icon-orange' list_class='notif-mini-list' item_class='notif-mini-item' icon_wrap_class='notif-mini-icon' content_class='notif-mini-content' title_class='notif-mini-title' text_class='notif-mini-text' time_class='notif-mini-time' empty_class='ud-empty-state' empty_text='No new notifications' foot_class='notif-panel-foot' view_all_url='#notifications' view_all_label='View all notifications' view_all_arrow='fa-solid fa-arrow-right' compact_mode=1 panel_class='notif-panel notif-panel-member' %}
-        </div>
-      </div>
-
-      <section class="stats-strip">
-        <div class="mini-stat">
-          <div class="label"><i class="fa-solid fa-id-card"></i> Plan</div>
-          <div class="value subtle">{% if membership %}{{ membership.membership_plan.name }}{% else %}No Active Plan{% endif %}</div>
-        </div>
-        <div class="mini-stat">
-          <div class="label"><i class="fa-solid fa-hourglass-half"></i> Days Left</div>
-          <div class="value">{% if membership %}{{ membership.days_left }}{% else %}0{% endif %}</div>
-        </div>
-        <div class="mini-stat">
-          <div class="label"><i class="fa-solid fa-calendar-check"></i> Bookings</div>
-          <div class="value">{{ bookings|length }}</div>
-        </div>
-        <div class="mini-stat">
-          <div class="label"><i class="fa-solid fa-bell"></i> Unread Alerts</div>
-          <div class="value">{{ unread_count }}</div>
-        </div>
-      </section>
-
-      <div class="grid">
-        <!-- Membership Card -->
-        <section class="card">
-          <div class="card-head">
-            <h2><i class="fa-solid fa-id-card card-icon-orange"></i> Membership Status</h2>
-            {% if membership and membership.is_active %}
-              <span class="chip gray"><i class="fa-regular fa-circle-check card-icon-orange"></i> Active</span>
-            {% else %}
-              <span class="chip gray chip-inactive"><i class="fa-solid fa-circle-xmark"></i> No Active Plan</span>
-            {% endif %}
-          </div>
-          <div class="card-body">
-            {% if membership %}
-            <!-- Dynamic membership values -->
-            <h3 class="membership-title">{{ membership.membership_plan.name }}</h3>
-
-            <div class="meta">
-              <span class="chip"><i class="fa-solid fa-calendar-days"></i> Duration: {{ membership.membership_plan.get_duration_display }}</span>
-              <span class="chip gray"><i class="fa-solid fa-clock"></i> Ends: {{ membership.end_date|date:"M d, Y" }}</span>
-              <span class="chip gray"><i class="fa-solid fa-money-bill-wave"></i> Paid: NPR {{ membership.membership_plan.price }}</span>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Desktop Header -->
+        <div class="header-bar">
+            <div class="greeting">
+                <h1>Hello, {{ request.user.first_name|default:request.user.username }}! 👋</h1>
+                <p>Manage your membership and stay on track.</p>
             </div>
-
-            <div class="progress-wrap">
-              <div class="progress-top">
-                <span>Membership Period</span>
-                <span>{{ membership.days_left }} days left</span>
-              </div>
-              <div class="bar"><div style="width: {{ membership.progress_percentage }}%"></div></div>
-              <div class="progress-top">
-                <span>Start: {{ membership.start_date|date:"M d, Y" }}</span>
-                <span>End: {{ membership.end_date|date:"M d, Y" }}</span>
-              </div>
+            
+            <div class="header-actions">
+                 <!-- Notifications Component -->
+                 {% url 'user_mark_all_notifications_read' as user_mark_all_url %}
+                 {% include 'notifications/notification.html' with bell_button_class='notif-btn' bell_icon_class='fa-regular fa-bell' badge_class='notif-dot' unread_count=unread_count notification_items=notifications|slice:':5' mark_all_url=user_mark_all_url panel_title='Notifications' panel_title_icon='fa-solid fa-bell' list_class='notif-mini-list' item_class='notif-mini-item' icon_wrap_class='notif-mini-icon' content_class='notif-mini-content' title_class='notif-mini-title' text_class='notif-mini-text' time_class='notif-mini-time' empty_class='ud-empty-state' empty_text='No new notifications' foot_class='notif-panel-foot' view_all_url='#notifications-list' view_all_label='View all' view_all_arrow='fa-solid fa-arrow-right' compact_mode=1 panel_class='notif-panel' %}
             </div>
-            {% else %}
-            <!-- No membership -->
-            <h3 class="membership-title">No Active Plan</h3>
-            <p class="ud-no-plan-text">You don't have an active membership yet.</p>
-            <a href="{% url 'membership' %}" class="ud-browse-plans-btn">Browse Plans</a>
-            {% endif %}
-          </div>
-        </section>
+        </div>
 
-        <!-- Actions Card -->
-        <aside class="card">
-          <div class="card-head">
-            <h2><i class="fa-solid fa-bolt card-icon-orange"></i> Quick Actions</h2>
-          </div>
-          <div class="card-body">
-            <div class="actions">
-              <!-- Replace href with your URLs -->
-              <a class="action" href="#">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-robot"></i></div>
-                  <div>
-                    Chat with AI Trainer
-                    <small>Ask workout plans & guidance</small>
-                  </div>
+        <!-- Stats Row (BOOKINGS REMOVED) -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-solid fa-crown" style="color:#eab308;"></i> Current Plan</div>
+                <div class="stat-value" style="font-size:1.1rem;">
+                    {% if membership %}{{ membership.membership_plan.name }}{% else %}No Plan{% endif %}
                 </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
-              </a>
-
-              <a class="action" href="#">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-bowl-food"></i></div>
-                  <div>
-                    AI Food Recommender
-                    <small>Get meal suggestions for goals</small>
-                  </div>
-                </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
-              </a>
-
-              <a class="action" href="{% url 'membership' %}">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-id-card"></i></div>
-                  <div>
-                    Upgrade Membership
-                    <small>Explore plans and unlock more features</small>
-                  </div>
-                </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
-              </a>
-
-              <a class="action" href="#myBookings">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-calendar-check"></i></div>
-                  <div>
-                    My Bookings
-                    <small>Review your trainer booking status</small>
-                  </div>
-                </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
-              </a>
-
-              <a class="action" href="#notifications">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-bell"></i></div>
-                  <div>
-                    Notifications
-                    <small>See latest booking and account updates</small>
-                  </div>
-                </div>
-                {% if unread_count > 0 %}
-                  <span style="min-width:22px;height:22px;border-radius:50%;background:#ff7a18;color:#fff;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;">{{ unread_count }}</span>
-                {% else %}
-                  <i class="fa-solid fa-chevron-right chev"></i>
-                {% endif %}
-              </a>
-
-              <a class="action" href="#">
-                <div class="left">
-                  <div class="icon"><i class="fa-solid fa-gear"></i></div>
-                  <div>
-                    Settings
-                    <small>Profile, password, preferences</small>
-                  </div>
-                </div>
-                <i class="fa-solid fa-chevron-right chev"></i>
-              </a>
             </div>
-          </div>
-        </aside>
-      </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-regular fa-clock" style="color:#3b82f6;"></i> Days Remaining</div>
+                <div class="stat-value">{% if membership %}{{ membership.days_left }}{% else %}0{% endif %}</div>
+            </div>
+             <div class="stat-card">
+                <div class="stat-label"><i class="fa-regular fa-bell" style="color:#ef4444;"></i> Notifications</div>
+                <div class="stat-value">{{ unread_count }}</div>
+            </div>
+        </div>
 
-      <!-- Notifications & Bookings Row -->
-      <div class="grid grid-gap-top">
+        <div class="dashboard-grid">
+            <!-- Left Col -->
+            <div class="left-col" style="display:flex; flex-direction:column; gap:2rem;">
+                
+                <!-- Digital Membership Card -->
+                <section>
+                    <h3 class="section-title">My Membership</h3>
+                    
+                    {% if membership and membership.is_active %}
+                    <div class="membership-card-visual">
+                        <div class="card-header-row">
+                            <div class="status-chip active"><i class="fa-solid fa-check"></i> Active</div>
+                        </div>
 
-        <!-- Notifications Card -->
-        <section class="card" id="notifications">
-          <div class="card-head">
-            <h2>
-              <i class="fa-solid fa-bell card-icon-orange"></i> Notifications
-              {% if unread_count > 0 %}
-                <span class="ud-unread-badge">{{ unread_count }}</span>
-              {% endif %}
-            </h2>
-            {% if notifications %}
-              <a href="{% url 'user_mark_all_notifications_read' %}" class="chip gray ud-mark-all-read">
-                <i class="fa-solid fa-check-double card-icon-orange"></i> Mark all read
-              </a>
-            {% endif %}
-          </div>
-          <div class="card-body card-body-flush">
-            {% if notifications %}
-              <div class="ud-scroll-list">
-                {% for notif in notifications %}
-                  <div class="ud-notif-item {% if not notif.is_read %}unread{% endif %}">
-                    <div class="ud-notif-icon {% if notif.notif_type == 'booking_confirmed' %}confirmed{% elif notif.notif_type == 'booking_rejected' %}rejected{% else %}general{% endif %}">
-                      <i class="fas {% if notif.notif_type == 'booking_confirmed' %}fa-check-circle{% elif notif.notif_type == 'booking_rejected' %}fa-times-circle{% else %}fa-info-circle{% endif %}"></i>
-                    </div>
-                    <div class="ud-notif-content">
-                      <div class="ud-notif-title-row">
-                        <span class="ud-notif-title">{{ notif.title }}</span>
-                        {% if not notif.is_read %}
-                          <span class="ud-notif-unread-dot"></span>
-                        {% endif %}
-                      </div>
-                      <p class="ud-notif-msg">{{ notif.message|truncatewords:30 }}</p>
-                      <div class="ud-notif-meta">
-                        <span class="ud-notif-time"><i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago</span>
-                        {% if not notif.is_read %}
-                          <a href="{% url 'user_mark_notification_read' notif.id %}" class="ud-mark-read-link">Mark read</a>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="ud-empty-state">
-                <div class="ud-empty-icon"><i class="fa-solid fa-bell-slash"></i></div>
-                <h3 class="ud-empty-title">No Notifications</h3>
-                <p class="ud-empty-text">You'll be notified when trainers respond to your bookings</p>
-              </div>
-            {% endif %}
-          </div>
-        </section>
+                        <div class="card-body-visual">
+                            <div class="plan-name-large">{{ membership.membership_plan.name }}</div>
+                            
+                            <div class="card-info-grid">
+                                <div class="info-group">
+                                    <label>Start</label>
+                                    <span>{{ membership.start_date|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="info-group">
+                                    <label>End</label>
+                                    <span>{{ membership.end_date|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
 
-        <!-- My Bookings Card -->
-        <aside class="card" id="myBookings">
-          <div class="card-head">
-            <h2><i class="fa-solid fa-calendar-check card-icon-orange"></i> My Bookings</h2>
-          </div>
-          <div class="card-body card-body-flush">
-            {% if bookings %}
-              <div class="ud-scroll-list">
-                {% for booking in bookings %}
-                  <div class="ud-booking-item">
-                    <!-- Trainer Avatar -->
-                    <div class="ud-booking-avatar">
-                      {{ booking.trainer.user.username.0|upper }}
+                            <div class="progress-bar-container">
+                                <div class="p-bar-bg">
+                                    <div class="p-bar-fill" style="width: {{ membership.progress_percentage }}%;"></div>
+                                </div>
+                                <div class="p-bar-text">{{ membership.days_left }} days left</div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Info -->
-                    <div class="ud-booking-info">
-                      <div class="ud-booking-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</div>
-                      <div class="ud-booking-date">
-                        <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
-                      </div>
+                    {% else %}
+                     <!-- Inactive State -->
+                    <div class="membership-card-visual" style="background: linear-gradient(135deg, #1f2937, #111827);">
+                        <div class="card-header-row">
+                            <div class="status-chip inactive">Inactive</div>
+                        </div>
+                        <div style="text-align:center; padding-top:2rem;">
+                            <h2 style="margin-bottom:0.5rem; color:white; font-size:1.3rem;">No Active Membership</h2>
+                            <p style="opacity:0.6; margin-bottom:1.5rem; color: #d1d5db; font-size:0.9rem;">Get access to trainers and diet plans.</p>
+                            <a href="{% url 'membership' %}" style="display:inline-block; background:var(--primary); color:white; padding:0.6rem 1.5rem; border-radius:50px; text-decoration:none; font-weight:600; font-size:0.9rem;">Browse Plans</a>
+                        </div>
                     </div>
-                    <!-- Status Badge -->
-                    <span class="ud-status-badge {% if booking.status == 'pending' %}status-pending{% elif booking.status == 'confirmed' %}status-confirmed{% elif booking.status == 'rejected' %}status-rejected{% else %}status-cancelled{% endif %}">
-                      {{ booking.get_status_display }}
-                    </span>
-                    <!-- Cancel button for pending -->
-                    {% if booking.status == 'pending' %}
-                      <form method="post" action="{% url 'user_cancel_booking' booking.id %}" class="ud-cancel-form">
-                        {% csrf_token %}
-                        <button type="submit" title="Cancel booking" class="ud-cancel-btn"
-                                onclick="return confirm('Cancel this booking?')">
-                          <i class="fas fa-times"></i>
-                        </button>
-                      </form>
                     {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
-            {% else %}
-              <div class="ud-empty-state">
-                <div class="ud-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
-                <h3 class="ud-empty-title">No Bookings</h3>
-                <p class="ud-empty-text-gap">Book a trainer to get started</p>
-                <a href="{% url 'trainer' %}" class="ud-browse-trainers-btn">
-                  <i class="fa-solid fa-dumbbell"></i> Browse Trainers
-                </a>
-              </div>
-            {% endif %}
-          </div>
-        </aside>
+                </section>
 
-      </div>
+                <!-- Activity Feed -->
+                <section>
+                    <h3 class="section-title">
+                        Recent Notifications
+                        {% if notifications %}
+                        <a href="{% url 'user_mark_all_notifications_read' %}" style="font-size:0.8rem; margin-left:auto; text-decoration:none; font-weight:500; color:var(--primary);">Mark all read</a>
+                        {% endif %}
+                    </h3>
+                    <div class="white-card" style="padding: 0 1.5rem;">
+                        {% if notifications %}
+                            {% for notif in notifications %}
+                            <div class="notif-item-row" {% if not notif.is_read %}style="background:transparent;"{% endif %}>
+                                <!-- Dynamic Icon Box -->
+                                <div class="notif-icon-box" style="
+                                    {% if notif.notif_type == 'booking_confirmed' %} background: #dcfce7; color: #16a34a;
+                                    {% elif notif.notif_type == 'booking_rejected' or notif.notif_type == 'plan_deleted' %} background: #fee2e2; color: #dc2626;
+                                    {% elif notif.notif_type == 'payment_required' %} background: #ffedd5; color: #ea580c;
+                                    {% elif notif.notif_type == 'workout_plan' or notif.notif_type == 'exercise_added' %} background: #dbeafe; color: #2563eb;
+                                    {% elif notif.notif_type == 'diet_plan' or notif.notif_type == 'meal_added' %} background: #d1fae5; color: #059669;
+                                    {% else %} background: #f3e8ff; color: #9333ea; {% endif %}
+                                ">
+                                    {% if notif.notif_type == 'booking_confirmed' %}<i class="fa-solid fa-calendar-check"></i>
+                                    {% elif notif.notif_type == 'booking_rejected' %}<i class="fa-solid fa-calendar-xmark"></i>
+                                    {% elif notif.notif_type == 'payment_required' %}<i class="fa-solid fa-credit-card"></i>
+                                    {% elif notif.notif_type == 'workout_plan' or notif.notif_type == 'exercise_added' %}<i class="fa-solid fa-dumbbell"></i>
+                                    {% elif notif.notif_type == 'diet_plan' or notif.notif_type == 'meal_added' %}<i class="fa-solid fa-utensils"></i>
+                                    {% elif notif.notif_type == 'plan_deleted' %}<i class="fa-solid fa-trash"></i>
+                                    {% else %}<i class="fa-solid fa-bell"></i>{% endif %}
+                                </div>
+                                <div class="notif-details">
+                                    <!-- Title Row + Red Dot -->
+                                    <div class="notif-top">
+                                        <div class="notif-title">{{ notif.title }} <span style="font-weight:400; font-size:0.7em; color:#9ca3af; margin-left:6px; display:inline-block;">•</span></div>
+                                        {% if not notif.is_read %}<span class="notif-unread-dot"></span>{% endif %}
+                                    </div>
+                                    <!-- Message -->
+                                    <p class="notif-msg">{{ notif.message }}</p>
+                                    <!-- Time -->
+                                    <div class="notif-time">
+                                        <i class="fa-regular fa-clock"></i> {{ notif.created_at|timesince }} ago
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                             <div style="padding:2rem; text-align:center;">
+                                <i class="fa-regular fa-bell-slash" style="font-size:1.5rem; color:#d1d5db;"></i>
+                                <p style="margin-top:0.5rem; color:#9ca3af; font-size:0.9rem;">No new notifications</p>
+                             </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Right Col -->
+            <div class="right-col">
+                <section>
+                    <h3 class="section-title">Quick Access</h3>
+                    <div class="white-card">
+                         <div class="action-list">
+                             <a href="{% url 'ai_chat' %}" class="action-btn">
+                                <div class="action-icon"><i class="fa-solid fa-robot"></i></div>
+                                <div class="action-content">
+                                    <h4>AI Trainer Chat</h4>
+                                    <p>Get workout advice</p>
+                                </div>
+                            </a>
+
+                            <a href="#" class="action-btn">
+                                <div class="action-icon"><i class="fa-solid fa-utensils"></i></div>
+                                <div class="action-content">
+                                    <h4>Diet Recommender</h4>
+                                    <p>Meal plans for you</p>
+                                </div>
+                            </a>
+
+                            <a href="{% url 'membership' %}" class="action-btn">
+                                <div class="action-icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                                <div class="action-content">
+                                    <h4>Upgrade Plan</h4>
+                                    <p>Get more features</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
     </main>
-  </div>
 
-  <script>
-    // Mobile sidebar toggle
-    const btn = document.getElementById("toggleSidebar");
-    const sidebar = document.getElementById("sidebar");
-    if (btn && sidebar) {
-      btn.addEventListener("click", () => {
-        sidebar.classList.toggle("open");
-      });
-    }
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
 
-  </script>
+        if(menuToggle && sidebar){
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+    </script>
 </body>
 </html>

@@ -179,3 +179,7 @@ def trainer_client_dashboard(request):
     }
     
     return render(request, 'trainer_client/dashboard.html', context)
+
+@login_required
+def ai_chat(request):
+    return render(request, 'member/ai_chat.html')
