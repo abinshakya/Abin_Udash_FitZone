@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
-    path('member/ai_chat/', views.ai_chat, name='ai_chat'),
+    path('ai_chat/', include('Ai_chatbot.urls')),
     path('my-trainer-dashboard/', views.trainer_client_dashboard, name='trainer_client_dashboard'),
     path('', include('login_logout_register.urls')),
     path('', include('membership.urls')),
