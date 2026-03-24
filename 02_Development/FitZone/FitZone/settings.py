@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'notifications',
     'chat',
     'fitness_plan',
+    'Ai_chatbot',
 ]
 
 MIDDLEWARE = [
@@ -95,6 +100,8 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -9,6 +9,9 @@
     <!-- Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         :root {
@@ -153,22 +156,23 @@
 
         .chat-container {
             flex: 1;
-            padding: 2rem 4.5rem; /* Increased padding to accommodate avatar */
+            padding: 2rem 5rem; /* Increased padding */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
+            scroll-behavior: smooth;
         }
 
         .message-bubble {
-            max-width: 65%;
+            max-width: 85%; /* Increased from 65% for better readability */
             padding: 1rem 1.5rem;
-            border-radius: 20px;
+            border-radius: 18px;
             position: relative;
             line-height: 1.6;
             font-size: 0.95rem;
             animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -179,7 +183,22 @@
             align-self: flex-start;
             border-bottom-left-radius: 4px;
             border: 1px solid rgba(0,0,0,0.04);
+            width: fit-content;
+            max-width: 85%;
         }
+
+        .markdown-content p { margin: 0 0 1rem 0; line-height: 1.6; }
+        .markdown-content p:last-child { margin-bottom: 0; }
+        .markdown-content ul, .markdown-content ol { margin: 0.5rem 0 1rem 1.5rem; }
+        .markdown-content li { margin-bottom: 0.4rem; line-height: 1.5; }
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { 
+            margin: 1.5rem 0 0.8rem 0; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: #111;
+        }
+        .markdown-content h1:first-child, .markdown-content h2:first-child { margin-top: 0; }
+        .markdown-content strong { color: #111; font-weight: 700; }
 
         .msg-user {
             background: linear-gradient(135deg, #ff7a18 0%, #fa8c16 100%);
@@ -190,13 +209,13 @@
         }
 
         .ai-avatar {
-            width: 36px; height: 36px; border-radius: 10px;
+            width: 32px; height: 32px; border-radius: 8px;
             background: white;
             color: var(--primary); 
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; position: absolute; left: -48px; top: 0;
+            font-size: 1rem; position: absolute; left: -42px; top: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.04);
+            border: 1px solid rgba(255,122,24,0.1);
         }
 
         .chat-input-area {
@@ -301,7 +320,7 @@
             <a href="/" class="nav-link">
                 <i class="fa-solid fa-house"></i> Home Page
             </a>
-            <a href="{% url 'ai_chat' %}" class="nav-link active">
+            <a href="{% url 'Ai_chatbot:ai_chat' %}" class="nav-link active">
                 <i class="fa-solid fa-robot"></i> Chat with AI Trainer
             </a>
             <a href="#" class="nav-link">
@@ -334,19 +353,24 @@
         </div>
 
         <div class="chat-container" id="chatContainer">
-            <!-- Intro Message -->
-            <div class="message-bubble msg-ai">
-                <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
-                Hello! I'm your AI fitness assistant. How can I help you reach your goals today?
-            </div>
-
-        
+            {% for message in chat_history %}
+                {% if message.role == 'ai' %}
+                <div class="message-bubble msg-ai markdown-body">
+                    <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="markdown-content">{{ message.content }}</div>
+                </div>
+                {% else %}
+                <div class="message-bubble msg-user">
+                    {{ message.content }}
+                </div>
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="chat-input-area">
-            <form id="chatForm" class="input-wrapper" onsubmit="sendMessage(event)">
+            <form id="chatForm" class="input-wrapper">
                 {% csrf_token %}
-                <input type="text" id="userMsg" class="chat-input" placeholder="Type your message..." autocomplete="off">
+                <input type="text" name="message" id="userMsg" class="chat-input" placeholder="Type your message..." autocomplete="off">
                 <button type="submit" class="send-btn">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
@@ -355,9 +379,9 @@
     </main>
 
     <script>
+        // Sidebar toggle for mobile
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
-
         if(menuToggle && sidebar){
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('active');
@@ -373,8 +397,12 @@
             div.classList.add('message-bubble');
             
             if (sender === 'ai') {
-                div.classList.add('msg-ai');
-                div.innerHTML = `<div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>` + text;
+                div.classList.add('msg-ai', 'markdown-body');
+                const contentDiv = document.createElement('div');
+                contentDiv.classList.add('markdown-content');
+                contentDiv.innerHTML = marked.parse(text);
+                div.innerHTML = `<div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>`;
+                div.appendChild(contentDiv);
             } else {
                 div.classList.add('msg-user');
                 div.textContent = text;
@@ -384,19 +412,55 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function sendMessage(e) {
-            e.preventDefault();
-            const msg = userMsgInput.value.trim();
-            if (!msg) return;
+        // Initial markdown parsing for history
+        document.querySelectorAll('.markdown-content').forEach(el => {
+            el.innerHTML = marked.parse(el.textContent);
+        });
 
-            appendMessage(msg, 'user');
-            userMsgInput.value = '';
+        // Auto-scroll to bottom of chat on load
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-            setTimeout(() => {
-                appendMessage("I'm trained to help you with fitness.", 'ai');
-            }, 1000);
-            
-          
+        if (chatForm) {
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const msg = userMsgInput.value.trim();
+                if (!msg) return;
+
+                appendMessage(msg, 'user');
+                userMsgInput.value = '';
+
+                // Add loading indicator
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('message-bubble', 'msg-ai');
+                loadingDiv.innerHTML = `<div class="ai-avatar"><i class="fa-solid fa-robot"></i></div><i class="fa-solid fa-ellipsis fa-fade"></i> AI is thinking...`;
+                chatContainer.appendChild(loadingDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                fetch('{% url "Ai_chatbot:get_ai_response" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ message: msg })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    chatContainer.removeChild(loadingDiv);
+                    if (data.response) {
+                        appendMessage(data.response, 'ai');
+                    } else if (data.error) {
+                        appendMessage("Error: " + data.error, 'ai');
+                    }
+                })
+                .catch(error => {
+                    chatContainer.removeChild(loadingDiv);
+                    console.error('Error:', error);
+                    appendMessage("Sorry, I encountered an error. Please try again later.", 'ai');
+                });
+            });
         }
     </script>
 </body>
