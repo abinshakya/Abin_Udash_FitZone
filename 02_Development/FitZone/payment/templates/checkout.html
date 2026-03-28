@@ -3,453 +3,385 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">        
   <title>FitZone | Checkout</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>:root{
-  --bg0:#f8f9fa;
-  --bg1:#ffffff;
-
-  --cardTop: rgba(255,255,255,0.95);
-  --cardBot: rgba(248,249,250,0.95);
-
-  --text:#1a1a1a;
-  --muted: rgba(0,0,0,0.55);
-  --border: rgba(0,0,0,0.10);
-
-  --orange:#ff7a18;
-  --orange2:#ff9a3c;
-
-  --shadow: 0 22px 70px rgba(0,0,0,0.08);
-  --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
+  <style>
+:root {
+  --bg-body: #f9fafb;
+  --bg-card: #ffffff;
+  
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  
+  --border-color: #e5e7eb;
+  
+  --primary: #ea580c;
+  --primary-hover: #c2410c;
 }
 
-*{ box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-body{
+body {
   margin: 0;
-  font-family: "Poppins", system-ui, sans-serif;
-  color: var(--text);
-  background:
-    radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
-    radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
-    linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-body);
   min-height: 100vh;
 }
 
-.page{ padding: 36px 0 90px; }
+.page { padding: 48px 0 90px; }
 
-.checkout-container{
-  max-width: 1120px;
+.checkout-container {
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 0 22px;
+  padding: 0 24px;
 }
 
 /* HEADER */
-.page-head{
+.page-head {
   text-align: center;
-  margin: 8px 0 34px;
+  margin-bottom: 40px;
 }
 
-.page-head h1{
-  margin: 0 0 10px;
-  font-size: clamp(2.05rem, 3vw, 2.7rem);
-  font-weight: 900;
-  letter-spacing: 0.3px;
-  background: linear-gradient(135deg, #1a1a1a, var(--orange2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 12px 40px rgba(255,122,24,0.10);
+.page-head h1 {
+  margin: 0 0 8px;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
 }
 
-.page-head p{
+.page-head p {
   margin: 0;
-  color: rgba(0,0,0,0.55);
-  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-size: 1.125rem;
 }
 
 /* GRID */
-.checkout-grid{
+.checkout-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 22px;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
   align-items: start;
 }
 
-@media (max-width: 900px){
-  .checkout-grid{ grid-template-columns: 1fr; }
+@media (max-width: 800px) {
+  .checkout-grid { grid-template-columns: 1fr; }
 }
 
 /* CARD */
-.card{
-  position: relative;
-  background: linear-gradient(180deg, var(--cardTop), var(--cardBot));
-  border: 1px solid rgba(0,0,0,0.10);
-  border-radius: 22px;
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadowSoft);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* subtle glow border */
-.card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius: 22px;
-  padding: 1px;
-  background: linear-gradient(135deg,
-    rgba(255,122,24,0.22),
-    rgba(0,0,0,0.06),
-    rgba(255,154,60,0.18)
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events:none;
-  opacity: 0.75;
-}
-
-.card-header{
-  padding: 18px 22px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: rgba(0,0,0,0.02);
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: #f9fafb;
 }
 
 .card-header h2,
-.card-header h3{
+.card-header h3 {
   margin: 0;
-  font-size: 1.12rem;
-  font-weight: 900;
-  letter-spacing: 0.2px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(0,0,0,0.85);
 }
 
-.card-body{ padding: 22px; }
+.card-header h2 i,
+.card-header h3 i {
+  color: var(--primary);
+}
+
+.card-body { padding: 24px; }
 
 /* PLAN DETAILS */
-.plan-top{
-  display: grid;
-  grid-template-columns: 150px 1fr;
-  gap: 18px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 520px){
-  .plan-top{ grid-template-columns: 1fr; }
-}
-
-.plan-img{
-  width: 100%;
-  height: 112px;
-  border-radius: 16px;
-  object-fit: cover;
-  border: 1px solid rgba(0,0,0,0.10);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.08);
-}
-
-.plan-title{
-  margin: 0 0 8px;
-  font-size: 1.55rem;
-  font-weight: 900;
-  color: #1a1a1a;
-}
-
-.plan-meta{
+.plan-top {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
   align-items: center;
+  margin-bottom: 24px;
 }
 
-.pill{
+.plan-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f3f4f6;
+  border: 1px solid var(--border-color);
+}
+
+.plan-title {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(255,122,24,0.14);
-  border: 1px solid rgba(255,122,24,0.28);
-  color: #1a1a1a;
-  font-size: 0.9rem;
-  font-weight: 900;
-  white-space: nowrap;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.price{
-  font-size: 2.15rem;
-  font-weight: 900;
-  color: var(--orange);
-  letter-spacing: 0.3px;
-  text-shadow: 0 10px 30px rgba(255,122,24,0.12);
+.features-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
-.features-title{
-  margin: 18px 0 12px;
-  font-size: 1.05rem;
-  font-weight: 900;
-  color: rgba(0,0,0,0.80);
-}
-
-.plan-features{
+.plan-features {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.plan-features li{
+.plan-features li {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: rgba(0,0,0,0.75);
-  line-height: 1.35;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.plan-features i{
-  color: var(--orange);
-  margin-top: 3px;
+.plan-features i {
+  color: var(--primary);
+  margin-top: 2px;
+  font-size: 1rem;
 }
 
 /* SUMMARY */
-.summary-row{
+.summary-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
   padding: 12px 0;
-  color: rgba(0,0,0,0.75);
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.summary-row span:first-child{
-  color: rgba(0,0,0,0.55);
+.summary-row strong {
+  color: var(--text-main);
   font-weight: 600;
 }
 
-.divider{
+.divider {
   height: 1px;
-  background: rgba(0,0,0,0.08);
-  margin: 12px 0;
+  background: var(--border-color);
+  margin: 16px 0;
 }
 
-.total{
+.total {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
-  padding: 6px 0 2px;
+  padding: 8px 0;
 }
 
-.total .label{
-  font-weight: 900;
-  color: rgba(0,0,0,0.80);
+.total .label {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1.125rem;
 }
 
-.total .value{
-  font-size: 1.85rem;
-  font-weight: 950;
-  color: var(--orange);
+.total .value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 /* CUSTOMER INFO */
-.customer{
+.customer {
   display: grid;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 24px;
 }
 
-.info{
+.info {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.08);
-  color: rgba(0,0,0,0.75);
-  font-weight: 700;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-.info i{ color: var(--orange); }
-
-.info .text{
-  min-width: 0;
+.info i { color: var(--text-muted); width: 16px; text-align: center; }
+.info .text {
+  color: var(--text-main);
+  font-weight: 500;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* PAYMENT METHOD */
-.pm-title{
-  margin: 18px 0 10px;
-  font-size: 1.05rem;
-  font-weight: 950;
-  color: rgba(0,0,0,0.80);
+.pm-title {
+  margin: 24px 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
+.pm-title i { color: var(--primary); }
 
-.pm-grid{
-  display: grid;
-  gap: 12px;
-  margin-top: 6px;
-}
-
-.pm-option{
-  position: relative;
+.pm-option {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px;
-  border-radius: 16px;
-  background: rgba(0,0,0,0.025);
-  border: 1px solid rgba(0,0,0,0.10);
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: transform .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease;
-  user-select: none;
+  transition: all 0.2s;
+  position: relative;
 }
 
-.pm-option:hover{
-  transform: translateY(-2px);
-  background: rgba(0,0,0,0.04);
-  border-color: rgba(255,122,24,0.30);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.06);
+.pm-option:hover {
+  border-color: #d1d5db;
 }
 
-.pm-left{
+.pm-left {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 0;
 }
 
-.pm-radio{
+.pm-radio {
   width: 18px;
   height: 18px;
-  border-radius: 999px;
-  border: 2px solid rgba(0,0,0,0.25);
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pm-radio::after{
+.pm-radio::after {
   content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: transparent;
-  transform: scale(0.6);
-  transition: background .15s ease, transform .15s ease;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  transform: scale(0);
+  transition: transform 0.2s;
 }
 
-.pm-name{
-  font-weight: 950;
-  color: rgba(0,0,0,0.85);
+.pm-name {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.95rem;
 }
 
-.pm-badge{
-  margin-left: 10px;
-  font-size: 0.78rem;
-  font-weight: 950;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255,122,24,0.14);
-  border: 1px solid rgba(255,122,24,0.22);
-  color: #1a1a1a;
+.pm-badge {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #fff7ed;
+  color: var(--primary);
+  font-weight: 600;
 }
 
-.pm-note{
+.pm-note {
   font-size: 0.85rem;
-  color: rgba(0,0,0,0.50);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
-.pm-option input{
+.pm-option input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-/* stronger selected state */
-.pm-option:has(input:checked){
-  border-color: rgba(255,122,24,0.55);
-  background: rgba(255,122,24,0.08);
-  box-shadow: 0 18px 40px rgba(255,122,24,0.10);
+.pm-option:has(input:checked) {
+  border-color: var(--primary);
+  background: #fff7ed;
 }
 
-.pm-option:has(input:checked) .pm-radio{
-  border-color: rgba(255,122,24,0.92);
+.pm-option:has(input:checked) .pm-radio {
+  border-color: var(--primary);
 }
 
-.pm-option:has(input:checked) .pm-radio::after{
-  background: linear-gradient(135deg, var(--orange), var(--orange2));
+.pm-option:has(input:checked) .pm-radio::after {
   transform: scale(1);
 }
 
 /* BUTTON */
-.btn-pay{
+.btn-pay {
   width: 100%;
-  padding: 16px 18px;
-  border-radius: 18px;
-  font-size: 1.05rem;
-  font-weight: 950;
-  letter-spacing: 0.2px;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, var(--orange), var(--orange2));
-  border: 1px solid rgba(255,122,24,0.35);
+  background: var(--primary);
+  border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
-  margin-top: 18px;
+  gap: 8px;
+  margin-top: 24px;
+  transition: background 0.2s;
 }
 
-.btn-pay:hover{
-  transform: translateY(-3px);
-  box-shadow: 0 22px 55px rgba(255,122,24,0.35);
-  filter: brightness(1.08);
+.btn-pay:hover {
+  background: var(--primary-hover);
 }
 
-.note{
-  margin-top: 12px;
-  color: rgba(0,0,0,0.50);
-  font-size: 0.92rem;
-  line-height: 1.4;
-}
-
-.empty{
+.note {
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
   text-align: center;
-  color: var(--muted);
-  padding: 30px 0;
 }
 
-/* ✅ :has() fallback */
-@supports not(selector(:has(*))){
-  .pm-option input:checked ~ .pm-fallback { display: none; }
+.empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 0;
 }
 
-  .icon-accent { color: var(--orange); }
-  .min-w-0 { min-width: 0; }
-  .icon-muted { color: rgba(0,0,0,0.5); }
+@media (max-width: 520px) {
+  .plan-top { flex-direction: column; align-items: flex-start; }
+}
 
   </style>
 </head>
@@ -471,10 +403,9 @@ body{
         <div class="card">
           <div class="card-header">
             <h2>
-              <i class="fa-solid fa-dumbbell icon-accent"></i>
+              <i class="fa-solid fa-dumbbell"></i>
               Plan Details
             </h2>
-            <span class="pill"><i class="fa-solid fa-shield-halved"></i> Secure Checkout</span>
           </div>
 
           <div class="card-body">
@@ -487,19 +418,17 @@ body{
 
               <div>
                 <h3 class="plan-title">{{ plan.name }}</h3>
-                <div class="plan-meta">
-                  <div class="price">Rs{{ plan.price }}</div>
-                  <div class="pill"><i class="fa-regular fa-clock"></i> {{ plan.get_duration_display }}</div>
-                </div>
+                <div class="price">Rs {{ plan.price }}</div>
+                <div class="pill"><i class="fa-regular fa-clock"></i> {{ plan.get_duration_display }}</div>
               </div>
             </div>
 
-            <h4 class="features-title">What you’ll get</h4>
+            <h4 class="features-title">What you'll get</h4>
             <ul class="plan-features">
-              <li><i class="fa-solid fa-check"></i> {{ plan.feature_1 }}</li>
-              <li><i class="fa-solid fa-check"></i> {{ plan.feature_2 }}</li>
+              <li><i class="fa-solid fa-check"></i> {{ plan.feature_1 }}</li>   
+              <li><i class="fa-solid fa-check"></i> {{ plan.feature_2 }}</li>   
               {% if plan.feature_3 %}
-                <li><i class="fa-solid fa-check"></i> {{ plan.feature_3 }}</li>
+                <li><i class="fa-solid fa-check"></i> {{ plan.feature_3 }}</li> 
               {% endif %}
             </ul>
           </div>
@@ -509,7 +438,7 @@ body{
         <div class="card">
           <div class="card-header">
             <h3>
-              <i class="fa-solid fa-receipt icon-accent"></i>
+              <i class="fa-solid fa-receipt"></i>
               Order Summary
             </h3>
           </div>
@@ -537,8 +466,6 @@ body{
               <div class="value"> Rs {{ plan.price }}</div>
             </div>
 
-            <div class="divider"></div>
-
             <div class="customer">
               <div class="info">
                 <i class="fa-solid fa-user"></i>
@@ -552,32 +479,29 @@ body{
 
             <!--Payment Method -->
             <div class="pm-title">
-              <i class="fa-solid fa-credit-card icon-accent"></i>
-              Select Payment Method
+              <i class="fa-solid fa-credit-card"></i>
+              Payment Method
             </div>
 
-            <form action="{% url 'initiate_payment' plan.id %}" method="get">
-              <div class="pm-grid">
-                <label class="pm-option">
-                  <input type="radio" name="payment_method" value="khalti" checked>
-                  <div class="pm-left">
-                    <div class="pm-radio"></div>
-                    <div class="min-w-0">
-                      <div class="pm-name">Khalti <span class="pm-badge">Popular</span></div>
-                      <div class="pm-note">Pay using Khalti wallet</div>
-                    </div>
+            <form action="{% url 'initiate_payment' plan.id %}" method="get">   
+              <label class="pm-option">
+                <input type="radio" name="payment_method" value="khalti" checked>
+                <div class="pm-left">
+                  <div class="pm-radio"></div>
+                  <div>
+                    <div class="pm-name">Khalti <span class="pm-badge">Popular</span></div>
+                    <div class="pm-note">Pay securely using Khalti wallet</div>        
                   </div>
-                  <i class="fa-solid fa-wallet icon-muted"></i>
-                </label>
-              </div>
+                </div>
+              </label>
 
               <button type="submit" class="btn-pay">
-                Pay NPR {{ plan.price }} Now <i class="fa-solid fa-arrow-right"></i>
+                Pay Rs {{ plan.price }} <i class="fa-solid fa-lock"></i>
               </button>
             </form>
 
             <p class="note">
-              By clicking “Pay Now”, you agree to our terms and confirm your subscription purchase.
+              By clicking "Pay", you agree to our terms and confirm your subscription purchase.
             </p>
           </div>
         </div>
