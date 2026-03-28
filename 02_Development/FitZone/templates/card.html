@@ -16,32 +16,61 @@
 </div>
 
 <div class="card-container">
-    <div class="card">
-        <img src="https://th.bing.com/th/id/OIP.nK0kn9OWTR3eDUvCeNOiiQHaEO?w=287&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="AI Trainer">
-        <div class="card-content">
-            <h3>AI Trainer</h3>
-            <p>AI Trainer .</p>
-            <button>Start Training</button>
+    {% if services %}
+        {% for service in services %}
+        <div class="card">
+            <img src="{{ service.image.url }}" alt="{{ service.title }}">
+            <div class="card-content">
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+                <div class="btn-container">
+                    <a href="{{ service.button_url }}">
+                        <button>{{ service.button_text }} —&gt;</button>
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1594882645126-14020914d58d?auto=format&fit=crop&q=80&w=800" alt="AI Trainer">
+            <div class="card-content">
+                <h3>AI Nutritionist</h3>
+                <p>Personalized meal plans and nutrition tracking powered by our advanced AI model.</p>
+                <div class="btn-container">
+                    <a href="/food/">
+                        <button>Get Started —&gt;</button>
+                    </a>
+                </div>
+            </div>
+        </div>
 
-    <div class="card">
-        <img src="https://th.bing.com/th/id/OIP.A_ntWOzZrXC0YJXVaJV7AQHaE5?w=290&h=192&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Group Classes">
-        <div class="card-content">
-            <h3>Book Trainer</h3>
-            <p>Good Book trainer.</p>
-            <button>Start Training</button>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800" alt="Book Trainer">
+            <div class="card-content">
+                <h3>Personal Trainers</h3>
+                <p>Work 1-on-1 with certified professional trainers to reach your fitness goals faster.</p>
+                <div class="btn-container">
+                    <a href="/trainers/">
+                        <button>Browse Trainers —&gt;</button>
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="card">
-        <img src="https://th.bing.com/th/id/OIP.M4pI-HEhC4lcxam_8febuQHaDT?w=342&h=156&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="Nutrition Planning">
-        <div class="card-content">
-            <h3>Become a member</h3>
-            <p>good asdfasd.</p>
-            <button>Join Now</button>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800" alt="Membership">
+            <div class="card-content">
+                <h3>Membership Plans</h3>
+                <p>Unlock premium features and unlimited access to all our fitness resources.</p>
+                <div class="btn-container">
+                    <a href="{% url 'membership' %}">
+                        <button>Join Now —&gt;</button>
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
+    {% endif %}
 </div>
 
 </body>

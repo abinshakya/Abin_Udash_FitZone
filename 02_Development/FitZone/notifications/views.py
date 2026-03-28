@@ -36,9 +36,14 @@ def mark_user_notification_read(request, notif_id):
     notif = get_object_or_404(UserNotification, id=notif_id)
     if notif.user != request.user:
         messages.error(request, "Access denied.")
-        return redirect('trainer_client_dashboard')
-    notif.is_read = True
-    notif.save()
+    else:
+        notif.is_read = True
+        notif.save()
+    
+    # Check referring URL to decide where to redirect
+    referer = request.META.get('HTTP_REFERER')
+    if referer and 'user-dashboard' in referer:
+        return redirect('user_dashboard')
     return redirect('trainer_client_dashboard')
 
 
@@ -47,4 +52,9 @@ def mark_all_user_notifications_read(request):
     """Mark all user notifications as read."""
     UserNotification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     messages.success(request, "All notifications marked as read.")
+    
+    # Check referring URL to decide where to redirect
+    referer = request.META.get('HTTP_REFERER')
+    if referer and 'user-dashboard' in referer:
+        return redirect('user_dashboard')
     return redirect('trainer_client_dashboard')

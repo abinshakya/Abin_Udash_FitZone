@@ -82,7 +82,13 @@ def cancel_overdue_bookings(user):
             pass
 
 def home(request):
-    return render(request,'index.html')
+    from .models import HomeBanner, PremiumService
+    banners = HomeBanner.objects.filter(is_active=True)
+    services = PremiumService.objects.filter(is_active=True)
+    return render(request, 'index.html', {
+        'banners': banners,
+        'services': services
+    })
 
 @login_required
 def user_dashboard(request):

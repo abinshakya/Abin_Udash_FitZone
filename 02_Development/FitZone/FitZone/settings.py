@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'fitness_plan',
     'Ai_chatbot',
     'food_recommendation_system',
+    'FitZone',
 ]
 
 MIDDLEWARE = [
