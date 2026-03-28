@@ -33,7 +33,7 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('', include('chat.urls')),
     path('', include('fitness_plan.urls')),
-
+    path('food-recommendation/', include('food_recommendation_system.urls')),
 ]
 
 if settings.DEBUG:

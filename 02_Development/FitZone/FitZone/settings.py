@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'chat',
     'fitness_plan',
     'Ai_chatbot',
+    'food_recommendation_system',
 ]
 
 MIDDLEWARE = [

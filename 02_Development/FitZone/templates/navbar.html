@@ -64,6 +64,9 @@
         </li>
         {% endif %}
         <li class="nav-item">
+          <a class="nav-link {% if 'food-recommendation' in request.path %}active{% endif %}" href="{% url 'food_recommendation_system:home' %}">AI Nutrition</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="/about">About</a>
         </li>
       </ul>

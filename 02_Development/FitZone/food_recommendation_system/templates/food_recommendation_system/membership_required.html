@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-5 text-center shadow">
+        <h2 class="text-danger">Membership Required</h2>
+        <p class="lead">The Food Recommendation System is a premium feature available only to members.</p>
+        <p>Please upgrade your membership to access personalized meal plans, BMI calculations, and nutritional insights.</p>
+        <div class="mt-4">
+            <a href="{% url 'membership_plans' %}" class="btn btn-primary btn-lg">View Membership Plans</a>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
