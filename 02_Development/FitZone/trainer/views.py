@@ -9,6 +9,7 @@ from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import Q
 import os
 
 from .forms import (
@@ -20,10 +21,54 @@ from chat.models import ChatRoom, Message
 
 
 def trainer(request):
-    # Get all verified trainers with their profile pictures
+    # Base queryset: all verified trainers
     verified_trainers = TrainerRegistration.objects.filter(
         is_verified=True
     ).select_related('user').prefetch_related('documents').order_by('-submitted_at')
+
+    # Search + filters
+    query = request.GET.get('q', '').strip()
+    specialization = request.GET.get('specialization', '').strip()
+    min_experience = request.GET.get('min_experience', '').strip()
+    sort = request.GET.get('sort', 'newest').strip() or 'newest'
+
+    trainers_qs = verified_trainers
+
+    if query:
+        trainers_qs = trainers_qs.filter(
+            Q(user__first_name__icontains=query)
+            | Q(user__last_name__icontains=query)
+            | Q(user__username__icontains=query)
+            | Q(specialization__icontains=query)
+            | Q(bio__icontains=query)
+        )
+
+    if specialization:
+        trainers_qs = trainers_qs.filter(specialization__icontains=specialization)
+
+    if min_experience.isdigit():
+        trainers_qs = trainers_qs.filter(experience__gte=int(min_experience))
+
+    if sort == 'experience_desc':
+        trainers_qs = trainers_qs.order_by('-experience', '-submitted_at')
+    elif sort == 'price_asc':
+        trainers_qs = trainers_qs.order_by('monthly_price', '-submitted_at')
+    elif sort == 'price_desc':
+        trainers_qs = trainers_qs.order_by('-monthly_price', '-submitted_at')
+    else:
+        sort = 'newest'
+        trainers_qs = trainers_qs.order_by('-submitted_at')
+
+    # Build specialization filter options from verified trainer data
+    specialization_options = sorted(
+        {
+            item.strip()
+            for trainer_obj in verified_trainers
+            for item in (trainer_obj.specialization or '').split(',')
+            if item.strip()
+        },
+        key=lambda x: x.lower(),
+    )
 
     # Booking context
     user_is_email_verified = False
@@ -40,10 +85,19 @@ def trainer(request):
         )
 
     context = {
-        'trainers': verified_trainers,
+        'trainers': trainers_qs,
         'today': timezone.now().date().isoformat(),
         'user_is_email_verified': user_is_email_verified,
         'pending_booking_trainer_ids': pending_booking_trainer_ids,
+        'specialization_options': specialization_options,
+        'filters': {
+            'q': query,
+            'specialization': specialization,
+            'min_experience': min_experience,
+            'sort': sort,
+        },
+        'result_count': trainers_qs.count(),
+        'has_active_filters': bool(query or specialization or min_experience),
     }
     return render(request, 'trainer.html', context)
 

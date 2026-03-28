@@ -3,16 +3,81 @@
 
 <div class="container py-5 trainer-page trainer-page-wrap">
 
-  <!-- Section Title -->
-  <div class="trainer-section-title">
-    <h2 class="mt-4">Meet Your <span>Trainers</span></h2>
-    <p class="text-secondary">
-      Our certified professionals are ready to guide you on your fitness journey.
-    </p>
+  <!-- Hero Header -->
+  <div class="trainer-hero">
+    <div class="trainer-hero-copy">
+      <p class="trainer-kicker">Certified Coaching Network</p>
+      <h2>Meet Your <span>Trainers</span></h2>
+      <p>
+        Explore verified professionals, compare expertise, and find the right coach for your goals.
+      </p>
+    </div>
+    <div class="trainer-hero-stats" aria-label="Trainer stats">
+      <div class="hero-stat-card">
+        <span class="hero-stat-label">Available Now</span>
+        <span class="hero-stat-value">{{ result_count }}</span>
+      </div>
+    </div>
   </div>
 
+  <!-- Search + Filter Bar -->
+  <form method="get" class="trainer-filter-bar" role="search" aria-label="Search and filter trainers">
+    <div class="filter-grid">
+      <div class="filter-search-wrap">
+        <i class="fa-solid fa-magnifying-glass filter-search-icon"></i>
+        <input
+          type="text"
+          name="q"
+          value="{{ filters.q }}"
+          class="filter-control filter-search-input"
+          placeholder="Search by name, specialization, or bio"
+          autocomplete="off"
+          inputmode="search"
+          aria-label="Search trainers"
+        >
+      </div>
+
+      <select name="specialization" class="filter-control" aria-label="Filter by specialization">
+        <option value="">All Specializations</option>
+        {% for spec in specialization_options %}
+          <option value="{{ spec }}" {% if filters.specialization == spec %}selected{% endif %}>{{ spec }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="min_experience" class="filter-control" aria-label="Filter by minimum experience">
+        <option value="">Any Experience</option>
+        <option value="1" {% if filters.min_experience == '1' %}selected{% endif %}>1+ years</option>
+        <option value="2" {% if filters.min_experience == '2' %}selected{% endif %}>2+ years</option>
+        <option value="3" {% if filters.min_experience == '3' %}selected{% endif %}>3+ years</option>
+        <option value="5" {% if filters.min_experience == '5' %}selected{% endif %}>5+ years</option>
+        <option value="10" {% if filters.min_experience == '10' %}selected{% endif %}>10+ years</option>
+      </select>
+
+      <select name="sort" class="filter-control" aria-label="Sort trainers">
+        <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Newest</option>
+        <option value="experience_desc" {% if filters.sort == 'experience_desc' %}selected{% endif %}>Most Experienced</option>
+        <option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+        <option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+      </select>
+
+      <div class="filter-actions">
+        <button type="submit" class="filter-btn filter-btn-primary" aria-label="Apply search and filters">
+          <i class="fa-solid fa-sliders"></i> Search
+        </button>
+        <a href="{% url 'trainer' %}" class="filter-btn filter-btn-ghost">Reset</a>
+      </div>
+    </div>
+
+    <div class="filter-meta-row">
+      <span class="filter-result-count">{{ result_count }} trainer{{ result_count|pluralize }} found</span>
+      {% if has_active_filters %}
+        <span class="filter-active-note">Filters applied</span>
+      {% endif %}
+    </div>
+  </form>
+
   <!-- Trainer Cards -->
-  <div class="row g-4 mt-3">
+  <div class="row g-4 mt-2">
     {% if trainers %}
       {% for trainer in trainers %}
       <div class="col-12 col-md-6 col-lg-4">
@@ -180,8 +245,14 @@
       <div class="col-12">
         <div class="empty-state-v2 text-center py-5">
           <i class="fa-solid fa-user-slash empty-icon"></i>
-          <h3>No Verified Trainers Available</h3>
-          <p>Check back later for available trainers.</p>
+          <h3>No Trainers Found</h3>
+          <p>
+            {% if has_active_filters %}
+              Try changing your search or filters.
+            {% else %}
+              Check back later for available trainers.
+            {% endif %}
+          </p>
         </div>
       </div>
     {% endif %}
