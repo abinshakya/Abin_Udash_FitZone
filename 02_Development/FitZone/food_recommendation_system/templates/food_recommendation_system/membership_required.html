@@ -1,14 +1,39 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="card p-5 text-center shadow">
-        <h2 class="text-danger">Membership Required</h2>
-        <p class="lead">The Food Recommendation System is a premium feature available only to members.</p>
-        <p>Please upgrade your membership to access personalized meal plans, BMI calculations, and nutritional insights.</p>
-        <div class="mt-4">
-            <a href="{% url 'membership_plans' %}" class="btn btn-primary btn-lg">View Membership Plans</a>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">Back to Home</a>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden" style="max-width: 550px;">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 rounded-circle p-4 mb-3">
+                    <i class="fas fa-lock text-warning fa-3x"></i>
+                </div>
+            </div>
+            
+            <h2 class="fw-bold mb-3" style="color: #1a1a1a;">Membership Required</h2>
+            
+            <p class="text-muted mb-4 fs-5" style="line-height: 1.6;">
+                The <strong>Food Recommendation System</strong> is a premium feature. 
+                Please upgrade your membership to access personalized meal plans and nutritional insights.
+            </p>
+
+            <div class="d-grid gap-3">
+                <a href="{% url 'membership' %}" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm border-0" style="background: linear-gradient(135deg, #ff781f 0%, #e66a1a 100%);">
+                    <i class="fas fa-crown me-2"></i> View Membership Plans
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg rounded-pill fw-semibold py-3">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Home
+                </a>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    body {
+        background: radial-gradient(circle at top left, rgba(255, 120, 31, 0.05) 0%, transparent 40%),
+                    radial-gradient(circle at bottom right, rgba(230, 106, 26, 0.05) 0%, transparent 40%);
+    }
+</style>
 {% endblock %}
