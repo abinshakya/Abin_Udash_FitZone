@@ -20,58 +20,83 @@
     </div>
   </div>
 
-  <!-- Search + Filter Bar -->
-  <form method="get" class="trainer-filter-bar" role="search" aria-label="Search and filter trainers">
-    <div class="filter-grid">
-      <div class="filter-search-wrap">
-        <i class="fa-solid fa-magnifying-glass filter-search-icon"></i>
-        <input
-          type="text"
-          name="q"
-          value="{{ filters.q }}"
-          class="filter-control filter-search-input"
-          placeholder="Search by name, specialization, or bio"
-          autocomplete="off"
-          inputmode="search"
-          aria-label="Search trainers"
-        >
+  <!-- Search + Filter Bar Trigger for Mobile -->
+  <div class="d-lg-none mb-3">
+    <button class="btn w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterDrawer" aria-controls="filterDrawer" style="background-color: #ff781f; color: white; border: none; font-weight: bold; padding: 12px; border-radius: 12px; box-shadow: 0 4px 10px rgba(255, 120, 31, 0.3);">
+      <i class="fa-solid fa-sliders me-2"></i> Filters & Search
+    </button>
+  </div>
+
+  <!-- Search + Filter Form -->
+  <form method="get" role="search" aria-label="Search and filter trainers">
+    <div class="offcanvas-lg offcanvas-bottom trainer-filter-bar" tabindex="-1" id="filterDrawer" aria-labelledby="filterDrawerLabel" style="height: auto; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+      
+      <div class="offcanvas-header d-lg-none border-bottom mb-2 pb-3 px-4 pt-4">
+        <h5 class="offcanvas-title" id="filterDrawerLabel" style="font-weight: 800; color: #1f2937;"><i class="fa-solid fa-filter me-2"></i> Refine Search</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterDrawer" aria-label="Close"></button>
       </div>
 
-      <select name="specialization" class="filter-control" aria-label="Filter by specialization">
-        <option value="">All Specializations</option>
-        {% for spec in specialization_options %}
-          <option value="{{ spec }}" {% if filters.specialization == spec %}selected{% endif %}>{{ spec }}</option>
-        {% endfor %}
-      </select>
+      <div class="offcanvas-body p-lg-0 px-4 pb-4 pt-1 flex-column overflow-y-auto">
+        <div class="filter-grid w-100">
+          <div class="filter-search-wrap">
+            <i class="fa-solid fa-magnifying-glass filter-search-icon"></i>
+            <input
+              type="text"
+              name="q"
+              value="{{ filters.q }}"
+              class="filter-control filter-search-input"
+              placeholder="Search by name, specialization, or bio"
+              autocomplete="off"
+              inputmode="search"
+              aria-label="Search trainers"
+            >
+          </div>
 
-      <select name="min_experience" class="filter-control" aria-label="Filter by minimum experience">
-        <option value="">Any Experience</option>
-        <option value="1" {% if filters.min_experience == '1' %}selected{% endif %}>1+ years</option>
-        <option value="2" {% if filters.min_experience == '2' %}selected{% endif %}>2+ years</option>
-        <option value="3" {% if filters.min_experience == '3' %}selected{% endif %}>3+ years</option>
-        <option value="5" {% if filters.min_experience == '5' %}selected{% endif %}>5+ years</option>
-        <option value="10" {% if filters.min_experience == '10' %}selected{% endif %}>10+ years</option>
-      </select>
+          <select name="specialization" class="filter-control" aria-label="Filter by specialization">
+            <option value="">All Specializations</option>
+            {% for spec in specialization_options %}
+              <option value="{{ spec }}" {% if filters.specialization == spec %}selected{% endif %}>{{ spec }}</option>
+            {% endfor %}
+          </select>
 
-      <select name="sort" class="filter-control" aria-label="Sort trainers">
-        <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Newest</option>
-        <option value="experience_desc" {% if filters.sort == 'experience_desc' %}selected{% endif %}>Most Experienced</option>
-        <option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-        <option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-      </select>
+          <select name="min_experience" class="filter-control" aria-label="Filter by minimum experience">
+            <option value="">Any Experience</option>
+            <option value="1" {% if filters.min_experience == '1' %}selected{% endif %}>1+ years</option>
+            <option value="2" {% if filters.min_experience == '2' %}selected{% endif %}>2+ years</option>
+            <option value="3" {% if filters.min_experience == '3' %}selected{% endif %}>3+ years</option>
+            <option value="5" {% if filters.min_experience == '5' %}selected{% endif %}>5+ years</option>
+            <option value="10" {% if filters.min_experience == '10' %}selected{% endif %}>10+ years</option>
+          </select>
 
-      <div class="filter-actions">
-        <button type="submit" class="filter-btn filter-btn-primary" aria-label="Apply search and filters">
-          <i class="fa-solid fa-sliders"></i> Search
-        </button>
-        <a href="{% url 'trainer' %}" class="filter-btn filter-btn-ghost">Reset</a>
+          <select name="sort" class="filter-control" aria-label="Sort trainers">
+            <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="experience_desc" {% if filters.sort == 'experience_desc' %}selected{% endif %}>Most Experienced</option>
+            <option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          </select>
+
+          <div class="filter-actions mt-lg-0 mt-2">
+            <button type="submit" class="filter-btn filter-btn-primary" aria-label="Apply search and filters">
+              <i class="fa-solid fa-magnifying-glass"></i> Search
+            </button>
+            <a href="{% url 'trainer' %}" class="filter-btn filter-btn-ghost">Reset</a>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="filter-meta-row">
+    <div class="filter-meta-row mt-2 d-none d-lg-flex">
       <span class="filter-result-count">{{ result_count }} trainer{{ result_count|pluralize }} found</span>
       {% if has_active_filters %}
         <span class="filter-active-note">Filters applied</span>
+      {% endif %}
+    </div>
+
+    <!-- Mobile count text underneath the button if needed, or simply leave the count header present -->
+    <div class="filter-meta-row mt-1 d-flex d-lg-none justify-content-between align-items-center">
+      <span class="filter-result-count" style="font-weight: 700; color: #1f2937;">{{ result_count }} trainer{{ result_count|pluralize }} found</span>
+      {% if has_active_filters %}
+        <span class="filter-active-note" style="font-size: 0.8rem; color: #ff781f; background: rgba(255, 120, 31, 0.1); padding: 4px 8px; border-radius: 6px;">Filters applied</span>
       {% endif %}
     </div>
   </form>
@@ -80,7 +105,7 @@
   <div class="row g-4 mt-2">
     {% if trainers %}
       {% for trainer in trainers %}
-      <div class="col-12 col-md-6 col-lg-4">
+      <div class="col-6 col-md-6 col-lg-4">
         <article class="trainer-card-v2">
 
           <!-- Image -->
@@ -135,108 +160,13 @@
                 View Profile
               </a>
 
-              <button class="btn-book-v2" type="button" data-bs-toggle="modal" data-bs-target="#bookingModal{{ trainer.id }}">
+              <a class="btn-book-v2" href="{% url 'trainer_profile_detail' trainer.id %}?book=true">
                 Book Now
-              </button>
+              </a>
             </div>
           </div>
 
         </article>
-
-        <!-- Booking Modal -->
-        <div class="modal fade" id="bookingModal{{ trainer.id }}" tabindex="-1" aria-labelledby="bookingModalLabel{{ trainer.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content booking-modal-content">
-                    <form method="post" action="{% url 'book_trainer' trainer.id %}">
-                        {% csrf_token %}
-                        <!-- Hero Header -->
-                        <div class="booking-modal-hero">
-                            <div class="booking-hero-accent"></div>
-                            <button type="button" class="btn-close booking-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
-                            <div class="booking-avatar">
-                                {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
-                            </div>
-                            <h5 class="booking-modal-title">
-                                Book Training Session
-                            </h5>
-                            <p class="booking-modal-subtitle">
-                                with <span class="booking-trainer-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</span>
-                            </p>
-                        </div>
-
-                        <div class="modal-body booking-body">
-                            <!-- Pricing & Time Row -->
-                            <div class="booking-info-grid">
-                                <div class="booking-info-card orange">
-                                    <div class="booking-info-icon orange"><i class="fas fa-tags"></i></div>
-                                    <div class="booking-info-label">Price</div>
-                                    <div class="booking-info-value">
-                                        {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}<span class="booking-price-suffix">/mo</span>{% else %}TBD{% endif %}
-                                    </div>
-                                </div>
-                                <div class="booking-info-card green">
-                                    <div class="booking-info-icon green"><i class="fas fa-clock"></i></div>
-                                    <div class="booking-info-label">Availability</div>
-                                    <div class="booking-avail-value">
-                                        {{ trainer.available_time|default:"Flexible" }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Date Picker -->
-                            <div class="booking-field-group">
-                                <label class="booking-field-label">
-                                    <span class="booking-label-icon purple"><i class="fas fa-calendar-alt"></i></span>
-                                    Preferred Start Date <span class="booking-required">*</span>
-                                </label>
-                                <input type="date" name="booking_date" required min="{{ today }}" class="booking-input">
-                            </div>
-
-                            <!-- Message -->
-                            <div class="booking-field-group">
-                                <label class="booking-field-label">
-                                    <span class="booking-label-icon pink"><i class="fas fa-pen-fancy"></i></span>
-                                    Message <span class="booking-optional">(optional)</span>
-                                </label>
-                                <textarea name="message" rows="3" placeholder="Tell the trainer about your fitness goals, preferred workout style..." class="booking-textarea"></textarea>
-                            </div>
-
-                            <!-- Warnings -->
-                            {% if trainer.id in pending_booking_trainer_ids %}
-                            <div class="booking-warning warn">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>You already have a pending booking with this trainer.</span>
-                            </div>
-                            {% endif %}
-                            {% if user.is_authenticated and not user_is_email_verified %}
-                            <div class="booking-warning danger">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Please verify your email before booking.</span>
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="booking-footer">
-                            <button type="button" class="btn booking-cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                            {% if user.is_authenticated and user_is_email_verified and trainer.id not in pending_booking_trainer_ids %}
-                                <button type="submit" class="btn booking-submit-btn">
-                                    <i class="fas fa-bolt me-1"></i> Confirm Booking
-                                </button>
-                            {% elif not user.is_authenticated %}
-                                <a href="{% url 'login' %}" class="btn booking-login-btn">
-                                    <i class="fas fa-sign-in-alt me-1"></i> Login to Book
-                                </a>
-                            {% else %}
-                                <button type="button" class="btn booking-disabled-btn" disabled>
-                                    <i class="fas fa-lock me-1"></i> Cannot Book
-                                </button>
-                            {% endif %}
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
       </div>
 

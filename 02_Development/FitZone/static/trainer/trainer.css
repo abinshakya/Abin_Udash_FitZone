@@ -236,11 +236,13 @@
 .trainer-card-v2 {
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
-  background: var(--card);
-  border: 1px solid var(--stroke);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.075);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border-radius: 18px;
+  background: radial-gradient(circle at 12% 20%, rgba(255,122,24,0.04), transparent 32%),
+    radial-gradient(circle at 88% 16%, rgba(34,197,94,0.05), transparent 36%),
+    #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -281,8 +283,8 @@
 /* Media (image area) */
 .trainer-media {
   position: relative;
-  height: 310px;
-  background: #f0f2f5;
+  height: 300px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
   overflow: hidden;
 }
 
@@ -421,7 +423,7 @@
 
 /* Content */
 .trainer-content-v2 {
-  padding: 16px 16px 16px;
+  padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -453,47 +455,56 @@
 .btn-outline-v2 {
   flex: 1;
   text-align: center;
-  padding: 11px 12px;
-  border-radius: 13px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(0,0,0,0.02);
-  color: #555;
-  font-weight: 850;
-  font-size: 0.88rem;
+  background: transparent;
+  color: #374151;
+  font-weight: 800;
+  font-size: 0.9rem;
   text-decoration: none;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-outline-v2:hover {
-  transform: translateY(-1px);
-  background: rgba(0,0,0,0.04);
-  border-color: rgba(255,122,24,0.35);
-  color: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  border-color: rgba(255,122,24,0.4);
+  color: #000;
 }
 
 .btn-book-v2 {
   flex: 1;
-  padding: 11px 12px;
-  border-radius: 13px;
+  padding: 12px 14px;
+  text-align: center;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   color: #fff;
-  font-weight: 900;
-  font-size: 0.88rem;
+  font-weight: 800;
+  font-size: 0.95rem;
   letter-spacing: 0.2px;
-  background: linear-gradient(135deg, var(--orange), var(--orange2));
-  box-shadow: 0 10px 25px rgba(255,122,24,0.24);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+  box-shadow: 0 8px 22px rgba(255,122,24,0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-book-v2:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 16px 35px rgba(255,122,24,0.33);
+  color: #fff;
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 12px 28px rgba(255,122,24,0.35);
 }
 
 .btn-book-v2:active {
-  transform: translateY(0px);
+  transform: translateY(0);
 }
 
 /* Empty state */
@@ -523,7 +534,7 @@
   margin-bottom: 14px;
 }
 
-/* ─── Booking Modal ─── */
+/* --- Booking Modal --- */
 .booking-modal-content {
   background: #ffffff !important;
   border: 1px solid rgba(255,122,24,0.2);
@@ -934,9 +945,26 @@
   }
 
   .trainer-filter-bar {
-    padding: 14px;
-    border-radius: 16px;
-    position: static;
+    padding: 0;
+    border-radius: 0;
+    background: #fff;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .trainer-filter-bar.offcanvas-bottom {
+    position: fixed !important;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+    z-index: 1055 !important;
+    background: #fff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    isolation: isolate;
+    transform: translate3d(0, 100%, 1000px); /* Hardware acceleration and z-index push */
+  }
+  
+  .trainer-filter-bar.offcanvas-bottom.show {
+    transform: translate3d(0, 0, 1000px) !important;
   }
 
   .filter-grid {
@@ -956,6 +984,12 @@
   }
 
   .trainer-media { height: 270px; }
+
+  .trainer-card-v2 {
+    border-radius: 16px;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.07);
+    z-index: 0 !important;
+  }
 
   .trainer-badges {
     top: 10px;
@@ -989,28 +1023,6 @@
     gap: 8px;
     padding: 7px 9px;
   }
-}
-
-@media (max-width: 576px) {
-  .trainer-page-wrap {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .trainer-media { height: 232px; }
-
-  .trainer-content-v2 {
-    padding: 13px 12px 13px;
-    gap: 12px;
-  }
-
-  .trainer-bio-v2 {
-    font-size: 0.84rem;
-    line-height: 1.45;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    min-height: 2.9em;
-  }
 
   .trainer-actions {
     flex-direction: row;
@@ -1019,13 +1031,65 @@
 
   .btn-outline-v2,
   .btn-book-v2 {
-    width: 100%;
-    font-size: 0.84rem;
-    padding: 10px 10px;
+    width: 50%;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
   }
+}
 
+@media (max-width: 576px) {
+  .trainer-media {
+    height: 140px;
+  }
+  .trainer-name-v2 {
+    font-size: 0.85rem;
+    margin: 0 0 4px 0;
+  }
+  .trainer-meta {
+    padding: 3px 6px;
+  }
+  .meta-item {
+    font-size: 0.65rem;
+  }
+  .badge-pill {
+    padding: 2px 6px;
+    font-size: 0.6rem;
+  }
+  .trainer-badges {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+  }
+  .trainer-overlay {
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+  }
+  .trainer-content-v2 {
+    padding: 8px;
+    gap: 8px;
+  }
+  .trainer-bio-v2 {
+    font-size: 0.7rem;
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+    min-height: 2.6em;
+  }
+  .trainer-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .btn-outline-v2, 
+  .btn-book-v2 {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 6px 4px;
+    border-radius: 6px;
+    text-align: center;
+  }
   .empty-state-v2 {
-    border-radius: 16px;
-    padding: 36px 18px !important;
+    border-radius: 12px;
+    padding: 24px 12px !important;
   }
 }
