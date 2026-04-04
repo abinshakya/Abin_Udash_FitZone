@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review {{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }} | FitZone{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white" style="border-radius: 10px 10px 0 0;">
+                    <h4 class="mb-0"><i class="fas fa-star"></i> Rate your Trainer</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead">How was your experience with <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>?</p>
+                    
+                    <form method="post">
+                        {% csrf_field %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Rating</label>
+                            {{ form.rating }}
+                            {% if form.rating.errors %}
+                                <div class="text-danger small mt-1">{{ form.rating.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Review Comment</label>
+                            {{ form.comment }}
+                            {% if form.comment.errors %}
+                                <div class="text-danger small mt-1">{{ form.comment.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Share your thoughts about your trainer's guidance, behavior, and results.</small>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn text-white w-100" style="background:#ea580c; border:none;">Submit Review</button>
+                            <a href="{% url 'trainer_client_dashboard' %}" class="btn btn-secondary w-100">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

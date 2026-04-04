@@ -34,9 +34,9 @@
     }
 
     .page-wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
+      margin-left: 220px;
+      max-width: 1400px;
+      padding: 40px 26px 80px;
     }
 
     .page-header {
@@ -300,6 +300,8 @@
   </style>
 </head>
 <body>
+    {% include 'trainer_client/slidebartrainer.html' with active_sidebar='plans' %}
+
   <div class="page-wrap">
     <a href="{% url 'trainer_client_dashboard' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
 

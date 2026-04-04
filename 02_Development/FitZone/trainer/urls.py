@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -12,6 +11,7 @@ urlpatterns = [
     path('trainer/<int:trainer_id>/booking/', views.trainer_booking_modal, name='trainer_booking_modal'),
     path('trainer/<int:trainer_id>/book/', views.book_trainer, name='book_trainer'),
     path('trainer/dashboard/', views.trainer_dashboard, name='trainer_dashboard'),
+    path('trainer/client-bookings/', views.trainer_client_bookings, name='trainer_client_bookings'),
     path('trainer/settings/', views.trainer_settings, name='trainer_settings'),
     path('trainer/edit-profile/', views.edit_trainer_profile, name='edit_trainer_profile'),
     path('trainer/upload-photo/', views.upload_trainer_photo, name='upload_trainer_photo'),
@@ -23,5 +23,6 @@ urlpatterns = [
     path('user/booking/<int:booking_id>/cancel/', views.user_cancel_booking, name='user_cancel_booking'),
     path('trainerregestration/', TrainerRegistrationWizard.as_view(FORMS), name='trainerregestration'),
     path('trainer/registration-status/', views.trainer_registration_status, name='trainer_registration_status'),
-  
+    path('user/booking/<int:booking_id>/complete/', views.user_complete_booking, name='user_complete_booking'),
+    path('user/booking/<int:booking_id>/review/', views.user_review_trainer, name='user_review_trainer'),
 ]

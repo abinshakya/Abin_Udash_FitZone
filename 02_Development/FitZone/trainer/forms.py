@@ -322,3 +322,14 @@ class TrainerProfileEditForm(forms.Form):
         if len(spec_list) < 1:
             raise ValidationError("Please select at least one area of expertise.")
         return spec_list
+
+from .models import TrainerReview
+
+class TrainerReviewForm(forms.ModelForm):
+    class Meta:
+        model = TrainerReview
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your review here...'}),
+        }

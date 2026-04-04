@@ -991,13 +991,7 @@ def user_cancel_booking(request, booking_id):
 @login_required
 def user_complete_booking(request, booking_id):
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
-    if booking.status == 'confirmed':
-        booking.status = 'completed'
-        booking.save()
-        messages.success(request, 'Your booking has been marked as completed.')
-    else:
-        messages.error(request, 'Only confirmed bookings can be completed.')
-    
+    messages.info(request, 'Bookings now complete automatically based on validity. No manual action is required.')
     return redirect('trainer_client_dashboard')
 
 @login_required
@@ -1008,8 +1002,15 @@ def user_review_trainer(request, booking_id):
     from .forms import TrainerReviewForm
 
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
-    if booking.status != 'completed':
-        messages.error(request, 'You can only review after the booking has completed.')
+
+    # Allow rating only after the paid booking's validity has ended.
+    today = timezone.now().date()
+    if not (
+        booking.payment_status == 'completed'
+        and booking.valid_until is not None
+        and booking.valid_until < today
+    ):
+        messages.error(request, 'You can rate this trainer after your booking validity has ended.')
         return redirect('trainer_client_dashboard')
 
     review = TrainerReview.objects.filter(user=request.user, trainer=booking.trainer).first()

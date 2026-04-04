@@ -520,6 +520,21 @@ body{
       </div>
       {% endif %}
 
+      {% if show_extend_alert %}
+      <div class="access-alert" style="margin-top:10px;background:rgba(59,130,246,0.06);border-color:rgba(59,130,246,0.35);">
+        <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i>
+        <span>
+          You already have an active booking with
+          <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>
+          {% if current_valid_until %}
+            valid until {{ current_valid_until|date:"M d, Y" }}.
+          {% endif %}
+          Paying for this booking will extend your validity with this trainer
+          to <strong>{{ extended_valid_until|date:"M d, Y" }}</strong>.
+        </span>
+      </div>
+      {% endif %}
+
       {% if booking %}
       <section class="checkout-grid">
 

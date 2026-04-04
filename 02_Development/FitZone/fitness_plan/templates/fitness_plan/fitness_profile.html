@@ -34,9 +34,9 @@
     }
 
     .page-wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
+      margin-left: max(220px, calc(220px + (100vw - 220px - 1000px) / 2));
+      max-width: 1000px;
+      padding: 40px 40px 80px;
     }
 
     .page-header {
@@ -191,9 +191,14 @@
     .back-link:hover {
       color: var(--orange);
     }
+  /* ---------- Main ---------- */
   </style>
 </head>
 <body>
+    {% include 'trainer_client/slidebartrainer.html' with active_sidebar='profile' %}
+<!-- Sidebar -->
+
+
   <div class="page-wrap">
     <a href="{% url 'my_plans' %}" class="back-link"><i class="fas fa-arrow-left"></i> Back to My Plans</a>
 

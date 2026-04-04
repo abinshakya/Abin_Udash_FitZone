@@ -649,8 +649,7 @@
                     </div>
 
                     <div class="stat-box">
-                        <div class="stat-value">5.0</div>
-                        <div class="stat-label">Rating</div>
+                    <div class="stat-value">{{ avg_rating|default:"0.0" }}</div>
                     </div>
 
                     <div class="stat-box">
@@ -838,6 +837,40 @@
                 </div>
             </div>
         </div>
+
+        <!-- Reviews Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="bio-section">
+                    <h2 class="section-title"><i class="fas fa-star"></i> Client Reviews ({{ reviews|length }})</h2>
+                    {% if reviews %}
+                        <div class="row g-3">
+                        {% for review in reviews %}
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm border-0" style="background:#f8f9fa; border-radius:10px;">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 text-primary">{{ review.user.username }}</h6>
+                                            <span class="badge" style="background:#f59e0b; color:#fff;">
+                                                {{ review.rating }} <i class="fas fa-star" style="font-size:0.8rem;"></i>
+                                            </span>
+                                        </div>
+                                        <p class="text-muted small mb-0 fst-italic">{{ review.created_at|date:"M d, Y" }}</p>
+                                        {% if review.comment %}
+                                            <p class="mt-2 mb-0" style="font-size:0.95rem;">{{ review.comment }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No reviews yet. Be the first to review after a session!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Booking Modal -->
@@ -935,7 +968,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS (loaded from navbar.html) -->
     <script>
         // Auto-open booking modal if redirected with ?book=true
         document.addEventListener('DOMContentLoaded', function() {

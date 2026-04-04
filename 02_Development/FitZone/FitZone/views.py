@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Q
 
 def cancel_overdue_bookings(user):
     from notifications.models import UserNotification, TrainerNotification
@@ -165,13 +166,14 @@ def trainer_client_dashboard(request):
         payment_status='pending'
     ).select_related('trainer__user').order_by('payment_due_date')
     
-    # Get active trainers (confirmed and paid)
+    # Get active trainers (confirmed, paid, and still within validity)
+    today = timezone.now().date()
     active_trainers = TrainerBooking.objects.filter(
         user=request.user,
         status='confirmed',
         payment_status='completed'
-    ).select_related('trainer__user').order_by('-updated_at')
-    
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('trainer__user').order_by('-updated_at')
+
     # Get notifications
     notifications = UserNotification.objects.filter(user=request.user).order_by('-created_at')[:20]
     unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
@@ -182,6 +184,7 @@ def trainer_client_dashboard(request):
         'active_trainers': active_trainers,
         'notifications': notifications,
         'unread_count': unread_count,
+        'today': today,
     }
     
     return render(request, 'trainer_client/dashboard.html', context)

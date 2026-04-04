@@ -33,7 +33,7 @@ def trainer_chat(request):
     if not registration:
         return redirect('trainer_dashboard')
 
-    # Get or create chat rooms for all confirmed clients
+    # Get or create chat rooms for all confirmed clients (any payment status)
     active_bookings = TrainerBooking.objects.filter(
         trainer=registration,
         status='confirmed',
@@ -56,12 +56,14 @@ def trainer_chat(request):
         )
     ).order_by('-last_message_time')
 
-    # Determine which clients have active bookings
+    # Determine which clients currently have an active, paid, and valid booking
+    today = timezone.now().date()
     active_client_ids = set(
         TrainerBooking.objects.filter(
             trainer=registration,
             status='confirmed',
-        ).values_list('user_id', flat=True)
+            payment_status='completed',
+        ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).values_list('user_id', flat=True)
     )
 
     # Active room
@@ -100,7 +102,8 @@ def trainer_chat(request):
 @login_required
 def client_chat(request):
     """Chat page for clients — shows all trainer conversations (including past)."""
-    # Get active trainer bookings for this user
+    # Get active trainer bookings for this user (any payment status) so that
+    # chat rooms exist even if the booking later expires.
     active_bookings = TrainerBooking.objects.filter(
         user=request.user,
         status='confirmed',
@@ -113,12 +116,14 @@ def client_chat(request):
             client=request.user
         )
 
-    # Determine which trainers have active bookings
+    # Determine which trainers currently have an active, paid, and valid booking
+    today = timezone.now().date()
     active_trainer_ids = set(
         TrainerBooking.objects.filter(
             user=request.user,
             status='confirmed',
-        ).values_list('trainer_id', flat=True)
+            payment_status='completed',
+        ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).values_list('trainer_id', flat=True)
     )
 
     # Fetch ALL chat rooms (including past/cancelled) to preserve chat history
@@ -174,12 +179,14 @@ def send_message(request, room_id):
     if request.user != room.client and request.user != room.trainer.user:
         return JsonResponse({'error': 'Access denied'}, status=403)
 
-    # Block messaging if no active booking exists
+    # Block messaging if no active, paid, and valid booking exists
+    today = timezone.now().date()
     has_active = TrainerBooking.objects.filter(
         trainer=room.trainer,
         user=room.client,
         status='confirmed',
-    ).exists()
+        payment_status='completed',
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).exists()
     if not has_active:
         return JsonResponse({'error': 'Booking is no longer active. Book again to access this feature.'}, status=403)
 

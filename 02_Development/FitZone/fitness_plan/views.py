@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
+from django.db.models import Q
 
 from trainer.models import TrainerRegistration, TrainerBooking
 from notifications.utils import create_user_notification
@@ -14,24 +16,34 @@ from .forms import (
     ExerciseForm, DietPlanForm, MealForm
 )
 
-# Return True if the user has a confirmed+paid booking with this trainer
+def _active_paid_bookings(user, trainer_reg=None):
+    """Helper: confirmed, paid bookings that are still within validity.
+
+    If valid_until is null (older bookings), we treat them as active to avoid
+    locking out existing users.
+    """
+    today = timezone.now().date()
+    filters = {
+        'user': user,
+        'status': 'confirmed',
+        'payment_status': 'completed',
+    }
+    if trainer_reg is not None:
+        filters['trainer'] = trainer_reg
+
+    return TrainerBooking.objects.filter(**filters).filter(
+        Q(valid_until__isnull=True) | Q(valid_until__gte=today)
+    )
+
+
+# Return True if the user has a confirmed+paid+valid booking with this trainer
 def has_paid_booking(user, trainer_reg):
-    return TrainerBooking.objects.filter(
-        user=user,
-        trainer=trainer_reg,
-        status='confirmed',
-        payment_status='completed',
-    ).exists()
+    return _active_paid_bookings(user, trainer_reg).exists()
 
 
-# Return the confirmed+paid booking between user and trainer
+# Return the confirmed+paid+valid booking between user and trainer
 def get_paid_booking(user, trainer_reg):
-    return TrainerBooking.objects.filter(
-        user=user,
-        trainer=trainer_reg,
-        status='confirmed',
-        payment_status='completed',
-    ).first()
+    return _active_paid_bookings(user, trainer_reg).first()
 
 
 def get_unpaid_confirmed_booking(user):
@@ -50,11 +62,7 @@ def redirect_to_booking_checkout_with_alert(booking_id):
 # View/edit the user's fitness profile. Only accessible with a paid booking
 def fitness_profile(request):
     # Check for at least one paid booking
-    paid_booking = TrainerBooking.objects.filter(
-        user=request.user,
-        status='confirmed',
-        payment_status='completed',
-    ).first()
+    paid_booking = _active_paid_bookings(request.user).first()
 
     if not paid_booking:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
@@ -88,11 +96,7 @@ def fitness_profile(request):
 @login_required
 # Client views their workout and diet plans
 def my_plans(request):
-    paid_booking = TrainerBooking.objects.filter(
-        user=request.user,
-        status='confirmed',
-        payment_status='completed',
-    ).first()
+    paid_booking = _active_paid_bookings(request.user).first()
 
     if not paid_booking:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
@@ -117,9 +121,7 @@ def my_plans(request):
 @login_required
 # Client views a specific workout plan
 def view_workout_plan(request, plan_id):
-    paid_booking = TrainerBooking.objects.filter(
-        user=request.user, status='confirmed', payment_status='completed',
-    ).exists()
+    paid_booking = _active_paid_bookings(request.user).exists()
     if not paid_booking:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
@@ -140,9 +142,7 @@ def view_workout_plan(request, plan_id):
 @login_required
 # Client views a specific diet plan
 def view_diet_plan(request, plan_id):
-    paid_booking = TrainerBooking.objects.filter(
-        user=request.user, status='confirmed', payment_status='completed',
-    ).exists()
+    paid_booking = _active_paid_bookings(request.user).exists()
     if not paid_booking:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
@@ -177,12 +177,13 @@ def trainer_client_list(request):
         messages.error(request, "Trainer registration not found.")
         return redirect('/')
 
-    # Get all paid bookings
+    # Get all paid + still valid bookings
+    today = timezone.now().date()
     paid_bookings = TrainerBooking.objects.filter(
         trainer=registration,
         status='confirmed',
         payment_status='completed',
-    ).select_related('user').order_by('-updated_at')
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('user').order_by('-updated_at')
 
     clients_data = []
     for booking in paid_bookings:

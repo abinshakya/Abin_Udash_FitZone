@@ -207,6 +207,27 @@ def verify_payment(request, pidx):
                     # Handle booking payment completion
                     booking = payment.booking
                     booking.payment_status = 'completed'
+                    today = timezone.now().date()
+                    from trainer.models import TrainerBooking as TB
+                    existing_qs = TB.objects.filter(
+                        user=booking.user,
+                        trainer=booking.trainer,
+                        status='confirmed',
+                        payment_status='completed',
+                    ).exclude(id=booking.id).order_by('-valid_until', '-booking_date')
+
+                    base_date = today
+                    if existing_qs.exists():
+                        latest = existing_qs.first()
+                        if latest.valid_until and latest.valid_until >= today:
+                            base_date = latest.valid_until
+
+                    if base_date < today:
+                        base_date = today
+
+                    # One-month chunk (30 days) – can be adjusted later if needed
+                    booking.valid_until = base_date + timedelta(days=30)
+
                     booking.save()
                     messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")
                     return render(request, 'payment_success.html', {'payment': payment})
@@ -274,10 +295,37 @@ def booking_checkout(request, booking_id):
         messages.error(request, "Profile not found. Please complete your registration.")
         return redirect('register')
     
+    from django.db.models import Q
+
+    today = timezone.now().date()
+    existing_qs = TrainerBooking.objects.filter(
+        user=request.user,
+        trainer=booking.trainer,
+        status='confirmed',
+        payment_status='completed',
+    ).exclude(id=booking.id)
+
+    latest = existing_qs.order_by('-valid_until', '-booking_date').first()
+
+    show_extend_alert = False
+    current_valid_until = None
+    extended_valid_until = None
+
+    if latest and (latest.valid_until is None or latest.valid_until >= today):
+        show_extend_alert = True
+        current_valid_until = latest.valid_until
+        base_date = latest.valid_until or today
+        if base_date < today:
+            base_date = today
+        extended_valid_until = base_date + timedelta(days=30)#Validity date
+
     context = {
         'booking': booking,
         'user': request.user,
         'show_payment_required_alert': request.GET.get('payment_required') == '1',
+        'show_extend_alert': show_extend_alert,
+        'current_valid_until': current_valid_until,
+        'extended_valid_until': extended_valid_until,
     }
     return render(request, 'booking_checkout.html', context)
 

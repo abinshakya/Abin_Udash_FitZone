@@ -22,17 +22,34 @@
 
   <!-- Search + Filter Bar Trigger for Mobile -->
   <div class="d-lg-none mb-3">
-    <button class="btn w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterDrawer" aria-controls="filterDrawer" style="background-color: #ff781f; color: white; border: none; font-weight: bold; padding: 12px; border-radius: 12px; box-shadow: 0 4px 10px rgba(255, 120, 31, 0.3);">
+    <button class="btn w-100" 
+            type="button" 
+            data-bs-toggle="offcanvas" 
+            data-bs-target="#filterDrawer" 
+            aria-controls="filterDrawer" 
+            style="background-color: #ff781f; 
+            color: white; 
+            border: none; 
+            font-weight: bold; 
+            padding: 12px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(255, 120, 31, 0.3);">
       <i class="fa-solid fa-sliders me-2"></i> Filters & Search
     </button>
   </div>
 
   <!-- Search + Filter Form -->
   <form method="get" role="search" aria-label="Search and filter trainers">
-    <div class="offcanvas-lg offcanvas-bottom trainer-filter-bar" tabindex="-1" id="filterDrawer" aria-labelledby="filterDrawerLabel" style="height: auto; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+    <div class="offcanvas-lg offcanvas-bottom trainer-filter-bar" 
+         tabindex="-1" 
+         id="filterDrawer" 
+         aria-labelledby="filterDrawerLabel" 
+         style="height: auto; max-height: 85vh; border-top-left-radius: 20px; border-top-right-radius: 20px;">
       
       <div class="offcanvas-header d-lg-none border-bottom mb-2 pb-3 px-4 pt-4">
-        <h5 class="offcanvas-title" id="filterDrawerLabel" style="font-weight: 800; color: #1f2937;"><i class="fa-solid fa-filter me-2"></i> Refine Search</h5>
+        <h5 class="offcanvas-title" id="filterDrawerLabel" style="font-weight: 800; color: #1f2937;">
+          <i class="fa-solid fa-filter me-2"></i> Refine Search
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterDrawer" aria-label="Close"></button>
       </div>
 
@@ -40,22 +57,22 @@
         <div class="filter-grid w-100">
           <div class="filter-search-wrap">
             <i class="fa-solid fa-magnifying-glass filter-search-icon"></i>
-            <input
-              type="text"
-              name="q"
-              value="{{ filters.q }}"
-              class="filter-control filter-search-input"
-              placeholder="Search by name, specialization, or bio"
-              autocomplete="off"
-              inputmode="search"
-              aria-label="Search trainers"
-            >
+            <input type="text"
+                   name="q"
+                   value="{{ filters.q }}"
+                   class="filter-control filter-search-input"
+                   placeholder="Search by name, specialization, or bio"
+                   autocomplete="off"
+                   inputmode="search"
+                   aria-label="Search trainers">
           </div>
 
           <select name="specialization" class="filter-control" aria-label="Filter by specialization">
             <option value="">All Specializations</option>
             {% for spec in specialization_options %}
-              <option value="{{ spec }}" {% if filters.specialization == spec %}selected{% endif %}>{{ spec }}</option>
+              <option value="{{ spec }}" {% if filters.specialization == spec %}selected{% endif %}>
+                {{ spec }}
+              </option>
             {% endfor %}
           </select>
 
@@ -94,9 +111,13 @@
 
     <!-- Mobile count text underneath the button if needed, or simply leave the count header present -->
     <div class="filter-meta-row mt-1 d-flex d-lg-none justify-content-between align-items-center">
-      <span class="filter-result-count" style="font-weight: 700; color: #1f2937;">{{ result_count }} trainer{{ result_count|pluralize }} found</span>
+      <span class="filter-result-count" style="font-weight: 700; color: #1f2937;">
+        {{ result_count }} trainer{{ result_count|pluralize }} found
+      </span>
       {% if has_active_filters %}
-        <span class="filter-active-note" style="font-size: 0.8rem; color: #ff781f; background: rgba(255, 120, 31, 0.1); padding: 4px 8px; border-radius: 6px;">Filters applied</span>
+        <span class="filter-active-note" style="font-size: 0.8rem; color: #ff781f; background: rgba(255, 120, 31, 0.1); padding: 4px 8px; border-radius: 6px;">
+          Filters applied
+        </span>
       {% endif %}
     </div>
   </form>
@@ -105,71 +126,65 @@
   <div class="row g-4 mt-2">
     {% if trainers %}
       {% for trainer in trainers %}
-      <div class="col-6 col-md-6 col-lg-4">
-        <article class="trainer-card-v2">
+        <div class="col-6 col-md-6 col-lg-4">
+          <article class="trainer-card-v2">
 
-          <!-- Image -->
-          <div class="trainer-media">
-            {% if trainer.get_profile_picture %}
-              <img
-                src="{{ trainer.get_profile_picture.file.url }}"
-                alt="{{ trainer.user.get_full_name|default:trainer.user.username }}"
-                class="trainer-img-v2"
-                onerror="this.src='https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=600&background=ff7a18&color=fff'"
-              >
-            {% else %}
-              <img
-                src="https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=600&background=ff7a18&color=fff"
-                alt="{{ trainer.user.get_full_name|default:trainer.user.username }}"
-                class="trainer-img-v2"
-              >
-            {% endif %}
+            <!-- Image -->
+            <div class="trainer-media">
+              {% if trainer.get_profile_picture %}
+                <img src="{{ trainer.get_profile_picture.file.url }}"
+                     alt="{{ trainer.user.get_full_name|default:trainer.user.username }}"
+                     class="trainer-img-v2"
+                     onerror="this.src='https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=600&background=ff7a18&color=fff'">
+              {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=600&background=ff7a18&color=fff"
+                     alt="{{ trainer.user.get_full_name|default:trainer.user.username }}"
+                     class="trainer-img-v2">
+              {% endif %}
 
-            <!-- Top badges -->
-            <div class="trainer-badges">
-              <span class="badge-pill badge-verified">
-                <span class="dot"></span> Verified
-              </span>
-              <span class="badge-pill badge-role">
-                {{ trainer.specialization|default:"Trainer" }}
-              </span>
-            </div>
+              <!-- Top badges -->
+              <div class="trainer-badges">
+                <span class="badge-pill badge-verified">
+                  <span class="dot"></span> Verified
+                </span>
+                <span class="badge-pill badge-role">
+                  {{ trainer.specialization|default:"Trainer" }}
+                </span>
+              </div>
 
-            <!-- Bottom overlay info -->
-            <div class="trainer-overlay">
-              <h3 class="trainer-name-v2">
-                {{ trainer.user.get_full_name|default:trainer.user.username }}
-              </h3>
+              <!-- Bottom overlay info -->
+              <div class="trainer-overlay">
+                <h3 class="trainer-name-v2">
+                  {{ trainer.user.get_full_name|default:trainer.user.username }}
+                </h3>
 
-              <div class="trainer-meta">
-                <span class="meta-item">⭐ 5.0</span>
-                <span class="meta-sep">•</span>
-                <span class="meta-item">{{ trainer.experience|default:"0" }} yrs exp</span>
+                <div class="trainer-meta">
+                  <span class="meta-item">⭐ {{ trainer.get_avg_rating }}</span>
+                  <span class="meta-sep">•</span>
+                  <span class="meta-item">{{ trainer.experience|default:"0" }} yrs exp</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Content -->
-          <div class="trainer-content-v2">
-            <p class="trainer-bio-v2">
-              {{ trainer.bio|default:"Certified fitness professional dedicated to helping you achieve your health and wellness goals through personalized training programs." }}
-            </p>
+            <!-- Content -->
+            <div class="trainer-content-v2">
+              <p class="trainer-bio-v2">
+                {{ trainer.bio|default:"Certified fitness professional dedicated to helping you achieve your health and wellness goals through personalized training programs." }}
+              </p>
 
-            <div class="trainer-actions">
-              <a class="btn-outline-v2" href="{% url 'trainer_profile_detail' trainer.id %}">
-                View Profile
-              </a>
+              <div class="trainer-actions">
+                <a class="btn-outline-v2" href="{% url 'trainer_profile_detail' trainer.id %}">
+                  View Profile
+                </a>
 
-              <a class="btn-book-v2" href="{% url 'trainer_profile_detail' trainer.id %}?book=true">
-                Book Now
-              </a>
+                <a class="btn-book-v2" href="{% url 'trainer_profile_detail' trainer.id %}?book=true">
+                  Book Now
+                </a>
+              </div>
             </div>
-          </div>
 
-        </article>
-
-      </div>
-
+          </article>
+        </div>
       {% endfor %}
     {% else %}
       <div class="col-12">

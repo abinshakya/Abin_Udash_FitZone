@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class TrainerRegistration(models.Model):
@@ -21,6 +22,12 @@ class TrainerRegistration(models.Model):
     def get_profile_picture(self):
         """Get the profile picture document if it exists"""
         return self.documents.filter(doc_type='profile_pic').first()
+        
+    def get_avg_rating(self):
+        reviews = self.reviews.all()
+        if reviews:
+            return round(sum(r.rating for r in reviews) / len(reviews), 1)
+        return 0.0
 
     def __str__(self):
         return f"{self.user.username} - Trainer Registration"
@@ -71,6 +78,7 @@ class TrainerBooking(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
         ('rejected', 'Rejected'),
         ('cancelled', 'Cancelled'),
     ]
@@ -93,6 +101,11 @@ class TrainerBooking(models.Model):
     payment_due_date = models.DateTimeField(blank=True, null=True, help_text="Payment must be made by this date")
     amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Booking amount")
     
+    # Access validity (per paid booking)
+    # When payment is completed, this is typically set to 1 month from either
+    # today or from the end of any existing active booking with the same trainer.
+    valid_until = models.DateField(blank=True, null=True, help_text="Training access valid until this date (inclusive)")
+    
     # Cancellation
     cancellation_reason = models.TextField(blank=True, null=True, help_text="Reason for cancellation")
     cancelled_by = models.CharField(max_length=10, blank=True, null=True, choices=[('trainer', 'Trainer'), ('user', 'User'), ('system', 'System')])
@@ -105,3 +118,30 @@ class TrainerBooking(models.Model):
 
     def __str__(self):
         return f"{self.user.username} -> {self.trainer.user.username} ({self.status})"
+
+    @property
+    def days_left(self):
+        """Number of days remaining in this booking's validity.
+
+        Returns an integer >= 0 if ``valid_until`` is set, otherwise ``None``.
+        """
+        if not self.valid_until:
+            return None
+
+        today = timezone.now().date()
+        return max((self.valid_until - today).days, 0)
+
+class TrainerReview(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='trainer_reviews')
+    trainer = models.ForeignKey(TrainerRegistration, on_delete=models.CASCADE, related_name='reviews')
+    booking = models.OneToOneField(TrainerBooking, on_delete=models.SET_NULL, null=True, blank=True, related_name='review')
+    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], help_text="Rating out of 5")
+    comment = models.TextField(blank=True, null=True, help_text="Review comment")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('user', 'trainer')
+
+    def __str__(self):
+        return f"{self.user.username}'s review for {self.trainer.user.username} ({self.rating}/5)"

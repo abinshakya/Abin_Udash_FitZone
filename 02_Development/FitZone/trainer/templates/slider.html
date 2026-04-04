@@ -13,6 +13,7 @@
     <a href="{% url 'trainer_dashboard' %}"{% if active_sidebar == 'dashboard' %} class="active"{% endif %}><i class="fa-solid fa-house"></i> Dashboard</a>
     <a href="{% url 'trainer_chat' %}"{% if active_sidebar == 'chat' %} class="active"{% endif %}><i class="fa-solid fa-comments"></i> Chat {% if chat_unread_count > 0 %}<span style="margin-left:auto;min-width:20px;height:20px;border-radius:50%;background:#ff7a18;color:#fff;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;">{{ chat_unread_count }}</span>{% endif %}</a>
     <a href="{% url 'trainer_client_list' %}"{% if active_sidebar == 'client_plans' %} class="active"{% endif %}><i class="fa-solid fa-clipboard-list"></i> Client Plans</a>
+    <a href="{% url 'trainer_client_bookings' %}"{% if active_sidebar == 'client_bookings' %} class="active"{% endif %}><i class="fa-solid fa-calendar-check"></i> Client Bookings</a>
     <a href="{% url 'request_payment' %}"{% if active_sidebar == 'request_payment' %} class="active"{% endif %}><i class="fa-solid fa-money-bill-transfer"></i> Request Payment</a>
     <a href="{% url 'trainer_settings' %}"{% if active_sidebar == 'settings' %} class="active"{% endif %}><i class="fa-solid fa-gear"></i> Settings</a>
     <a href="/"><i class="fa-solid fa-home"></i> Home</a>
