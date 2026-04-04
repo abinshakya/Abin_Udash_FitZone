@@ -1,0 +1,898 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Bookings - FitZone</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
+
+  <style>
+    :root{
+      --bg0:#f8f9fa;
+      --bg1:#ffffff;
+
+      --cardTop: rgba(255,255,255,0.95);
+      --cardBot: rgba(248,249,250,0.95);
+
+      --text:#1a1a1a;
+      --muted: rgba(0,0,0,0.55);
+      --border: rgba(0,0,0,0.10);
+
+      --orange:#ff7a18;
+      --orange2:#ff9a3c;
+
+      --shadow: 0 22px 70px rgba(0,0,0,0.08);
+      --shadowSoft: 0 16px 45px rgba(0,0,0,0.06);
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      font-family: "Poppins", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 520px at 18% 0%, rgba(255,122,24,0.22), transparent 60%),
+        radial-gradient(900px 450px at 85% 10%, rgba(255,154,60,0.12), transparent 60%),
+        linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%);
+      min-height: 100vh;
+    }
+
+    .dash{
+      min-height: 100vh;
+    }
+
+    .main{
+      margin-left:220px;
+      padding: 26px 26px 60px;
+      max-width: 1400px;
+    }
+
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .hello h1{
+      margin: 0;
+      font-size: 1.9rem;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #1a1a1a, var(--orange2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hello p{
+      margin: 6px 0 0;
+      color: rgba(0,0,0,0.65);
+      font-weight: 600;
+    }
+
+    .verification-badge{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .verification-badge.verified{
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .verification-badge.pending{
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+
+    .stats-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card{
+      background: linear-gradient(155deg, var(--cardTop), var(--cardBot));
+      border: 1px solid rgba(0,0,0,0.11);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadowSoft);
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(255,122,24,0.3);
+    }
+
+    .stat-icon{
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon.orange{
+      background: rgba(255,122,24,0.15);
+      color: var(--orange);
+    }
+
+    .stat-icon.green{
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+    }
+
+    .stat-icon.blue{
+      background: rgba(59,130,246,0.15);
+      color: #3b82f6;
+    }
+
+    .stat-icon.purple{
+      background: rgba(139,92,246,0.15);
+      color: #8b5cf6;
+    }
+
+    .stat-value{
+      font-size: 32px;
+      font-weight: 900;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+
+    .stat-label{
+      font-size: 14px;
+      color: rgba(0,0,0,0.5);
+      font-weight: 600;
+    }
+
+    .card{
+      background: linear-gradient(155deg, var(--cardTop) 0%, var(--cardBot) 100%);
+      border: 1px solid rgba(0,0,0,0.11);
+      border-radius: 22px;
+      box-shadow: var(--shadowSoft);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-head{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .card-head h2{
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 950;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon-orange{
+      color: var(--orange);
+    }
+
+    .card-body{
+      padding: 24px;
+    }
+
+    .card-body-flush{
+      padding: 0;
+    }
+
+    .booking-list{
+      display: grid;
+      gap: 0;
+    }
+
+    .booking-item{
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .booking-item:last-child{
+      border-bottom: none;
+    }
+
+    .booking-avatar{
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(255,154,60,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-weight: 800;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,122,24,0.2);
+    }
+
+    .booking-info{
+      flex: 1;
+    }
+
+    .booking-name{
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .booking-date{
+      font-size: 12px;
+      color: rgba(0,0,0,0.4);
+      font-weight: 600;
+    }
+
+    .booking-email{
+      font-size: 11px;
+      color: rgba(0,0,0,0.35);
+      margin-top: 2px;
+    }
+
+    .status-badge{
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-pending{
+      background: rgba(251,191,36,0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251,191,36,0.25);
+    }
+
+    .status-confirmed{
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .status-rejected{
+      background: rgba(239,68,68,0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+
+    .status-cancelled{
+      background: rgba(156,163,175,0.12);
+      color: #9ca3af;
+      border: 1px solid rgba(156,163,175,0.25);
+    }
+
+    .booking-actions{
+      display: flex;
+      gap: 8px;
+    }
+
+    .booking-actions form{
+      margin: 0;
+    }
+
+    .action-btn{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .action-btn.accept{
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+    }
+
+    .action-btn.accept:hover{
+      background: rgba(34,197,94,0.25);
+    }
+
+    .action-btn.reject{
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+    }
+
+    .action-btn.reject:hover{
+      background: rgba(239,68,68,0.25);
+    }
+
+    .action-btn.cancel{
+      background: rgba(156,163,175,0.15);
+      color: #9ca3af;
+    }
+
+    .action-btn.cancel:hover{
+      background: rgba(156,163,175,0.25);
+    }
+
+    /* Cancel Modal */
+    .cancel-modal-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+      z-index:9999;align-items:center;justify-content:center;
+    }
+    .cancel-modal-overlay.open{display:flex}
+    .cancel-modal{
+      background:#fff;border-radius:16px;padding:28px 32px;width:100%;max-width:440px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    }
+    .cancel-modal h3{
+      font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:6px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .cancel-modal h3 i{color:#ef4444;font-size:20px}
+    .cancel-modal p{font-size:13px;color:rgba(0,0,0,0.55);margin-bottom:16px}
+    .cancel-modal textarea{
+      width:100%;min-height:90px;padding:12px 14px;border:1px solid rgba(0,0,0,0.12);
+      border-radius:10px;font-family:inherit;font-size:13px;resize:vertical;
+      outline:none;transition:border-color .2s;
+    }
+    .cancel-modal textarea:focus{border-color:rgba(239,68,68,0.5)}
+    .cancel-modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+    .cancel-modal-btn{
+      padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;
+      cursor:pointer;border:none;transition:all .2s;font-family:inherit;
+    }
+    .cancel-modal-btn.secondary{background:#f3f4f6;color:#6b7280}
+    .cancel-modal-btn.secondary:hover{background:#e5e7eb}
+    .cancel-modal-btn.danger{background:#ef4444;color:#fff}
+    .cancel-modal-btn.danger:hover{background:#dc2626}
+
+    .empty-state{
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .empty-icon{
+      font-size: 64px;
+      color: rgba(0,0,0,0.2);
+      margin-bottom: 16px;
+    }
+
+    .empty-title{
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 900;
+      color: rgba(0,0,0,0.7);
+    }
+
+    .empty-text{
+      margin: 0;
+      color: rgba(0,0,0,0.4);
+      font-size: 14px;
+    }
+
+    .booking-message{
+      padding: 4px 24px 14px 74px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .booking-message p{
+      margin: 0;
+      font-size: 12px;
+      color: rgba(0,0,0,0.45);
+      font-style: italic;
+    }
+
+    .booking-message .fa-quote-left{
+      font-size: 10px;
+      margin-right: 5px;
+      color: var(--orange);
+    }
+
+    .alert-box{
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 22px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .alert-box.alert-info{
+      background: rgba(59,130,246,0.06);
+      border-color: rgba(59,130,246,0.2);
+    }
+
+    .alert-box.alert-info .alert-icon-box{
+      color: #3b82f6;
+    }
+
+    .alert-box.alert-success{
+      background: rgba(34,197,94,0.06);
+      border-color: rgba(34,197,94,0.2);
+    }
+
+    .alert-box.alert-success .alert-icon-box{
+      color: #22c55e;
+    }
+
+    .alert-icon-box{
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .alert-content h4{
+      margin: 0 0 4px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1a1a1a;
+    }
+
+    .alert-content p{
+      margin: 0;
+      font-size: 13px;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.5;
+    }
+
+    .alert-close-btn{
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: rgba(0,0,0,0.3);
+      cursor: pointer;
+      font-size: 18px;
+      transition: color 0.2s;
+    }
+
+    .alert-close-btn:hover{
+      color: rgba(0,0,0,0.6);
+    }
+
+    .toast-container{
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+    }
+
+    .toast-msg{
+      margin-bottom: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      color: #1a1a1a;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: toastIn 0.3s ease-out;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .toast-msg.toast-success{
+      background: rgba(34,197,94,0.15);
+      border-left: 4px solid #22c55e;
+    }
+
+    .toast-msg.toast-error{
+      background: rgba(239,68,68,0.15);
+      border-left: 4px solid #ef4444;
+    }
+
+    .toast-msg.toast-warning{
+      background: rgba(251,191,36,0.15);
+      border-left: 4px solid #fbbf24;
+    }
+
+    .toast-msg.toast-info{
+      background: rgba(59,130,246,0.15);
+      border-left: 4px solid #3b82f6;
+    }
+
+    .toast-icon{ font-size: 18px; }
+    .toast-success .toast-icon{ color: #22c55e; }
+    .toast-error .toast-icon{ color: #ef4444; }
+    .toast-warning .toast-icon{ color: #fbbf24; }
+    .toast-info .toast-icon{ color: #3b82f6; }
+
+    .toast-close{
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: rgba(0,0,0,0.5);
+      font-size: 16px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .toast-close:hover{ color: #1a1a1a; }
+
+    @keyframes toastIn{
+      from{ transform: translateX(100%); opacity: 0; }
+      to{ transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastOut{
+      from{ transform: translateX(0); opacity: 1; }
+      to{ transform: translateX(100%); opacity: 0; }
+    }
+
+    @media (max-width: 900px) {
+      .main{margin-left:64px}
+    }
+    @media (max-width: 600px) {
+      .main{margin-left:0}
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .notif-panel {
+        width: 300px;
+        right: -40px;
+      }
+    }
+  
+    .action-btn.view-details{
+      background: rgba(59,130,246,0.15);
+      color: #3b82f6;
+    }
+    .action-btn.view-details:hover{
+      background: rgba(59,130,246,0.25);
+    }
+    
+    /* Client Modal */
+    .client-modal-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+      z-index:9999;align-items:center;justify-content:center;
+    }
+    .client-modal-overlay.open{display:flex}
+    .client-modal{
+      background:#fff;border-radius:16px;padding:28px 32px;width:100%;max-width:440px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    }
+    .client-modal-header{
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+    }
+    .client-modal-title{
+      font-size:18px;font-weight:800;color:#1a1a1a;margin:0;
+      display:flex;align-items:center;gap:10px;
+    }
+    .client-modal-close{
+      background:none;border:none;font-size:20px;color:#6b7280;cursor:pointer;
+    }
+    .client-modal-body{
+      font-size:14px;color:#1a1a1a;
+    }
+    .client-modal-item{
+      display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.05);
+    }
+    .client-modal-item:last-child{border:none;}
+    .client-modal-label{font-weight:600;color:rgba(0,0,0,0.6);}
+    .client-modal-av{
+      width:60px;height:60px;background:#ff7a18;color:#fff;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;margin:0 auto 16px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="dash">
+    <!-- Sidebar -->
+    {% include 'slider.html' with active_sidebar='client_bookings' %}
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="topbar">
+        <div class="hello">
+          <h1>Welcome, {{ request.user.get_full_name|default:request.user.username }}! 👋</h1>
+          <p>Manage your clients and grow your fitness business</p>
+          {% if registration %}
+            {% if registration.is_verified %}
+              <span class="verification-badge verified">
+                <i class="fas fa-check-circle"></i> Verified Trainer
+              </span>
+            {% else %}
+              <span class="verification-badge pending">
+                <i class="fas fa-clock"></i> Pending Verification
+              </span>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- Notification Bell -->
+        {% url 'mark_all_notifications_read' as trainer_mark_all_url %}
+        {% url 'trainer_dashboard' as trainer_view_all_url %}
+        {% include 'notifications/notification.html' with bell_button_class='notif-bell-btn' bell_icon_class='fas fa-bell bell-icon' bell_label='Notifications' unread_count=user_unread_notif_count notification_items=navbar_notifications mark_all_url=trainer_mark_all_url view_all_url=trainer_view_all_url view_all_label='View all' view_all_arrow='fas fa-arrow-right' icon_wrap_class='notif-icon-wrap' %}
+      </div>
+
+      <!-- Toast Messages -->
+      {% if messages %}
+        <div id="toastContainer" class="toast-container">
+          {% for message in messages %}
+            <div class="toast-msg {% if message.tags == 'success' %}toast-success{% elif message.tags == 'error' %}toast-error{% elif message.tags == 'warning' %}toast-warning{% else %}toast-info{% endif %}">
+              <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} toast-icon"></i>
+              <span>{{ message }}</span>
+              <button onclick="this.parentElement.remove()" class="toast-close"><i class="fas fa-times"></i></button>
+            </div>
+          {% endfor %}
+        </div>
+        <script>
+          setTimeout(function(){
+            var alerts = document.querySelectorAll('.toast-msg');
+            alerts.forEach(function(a){
+              a.style.animation = 'toastOut 0.3s ease-out';
+              setTimeout(function(){ a.remove(); }, 300);
+            });
+          }, 5000);
+        </script>
+      {% endif %}
+
+      {% if registration %}
+        <!-- Verification Alerts -->
+        {% if not registration.is_verified %}
+          <div class="alert-box alert-info">
+            <div class="alert-icon-box"><i class="fas fa-info-circle"></i></div>
+            <div class="alert-content">
+              <h4>Verification Pending</h4>
+              <p>Your trainer application is under review. You'll be notified once your profile is verified.</p>
+              {% if registration.remarks %}
+                <p style="margin-top:6px;"><strong>Admin Remarks:</strong> {{ registration.remarks }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="alert-box alert-success" id="verifiedAlert" style="display:none;">
+            <div class="alert-icon-box"><i class="fas fa-check-circle"></i></div>
+            <div class="alert-content">
+              <h4>Profile Verified!</h4>
+              <p>Congratulations! Your trainer profile has been verified and is now visible to potential clients.</p>
+            </div>
+            <button onclick="this.parentElement.remove()" class="alert-close-btn"><i class="fas fa-times"></i></button>
+          </div>
+          <script>
+            (function(){
+              var el = document.getElementById('verifiedAlert');
+              if(!el) return;
+              if(!sessionStorage.getItem('seenVerified')){
+                el.style.display = 'flex';
+                sessionStorage.setItem('seenVerified','1');
+                setTimeout(function(){
+                  el.style.transition='all .3s';
+                  el.style.opacity='0';
+                  el.style.transform='translateY(-20px)';
+                  setTimeout(function(){ el.remove(); },300);
+                },5000);
+              }
+            })();
+          </script>
+        {% endif %}
+        <!-- Bookings Card -->
+        <div class="card" id="pending-requests">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-user-clock card-icon-orange"></i> New Client Requests</h2>
+          </div>
+          <div class="card-body card-body-flush">
+            {% if pending_requests %}
+              <div class="booking-list">
+                {% for booking in pending_requests %}
+                  <div class="booking-item">
+                    <div class="booking-avatar">
+                      {{ booking.user.username.0|upper }}
+                    </div>
+                    <div class="booking-info">
+                      <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                      <div class="booking-email">{{ booking.user.email }}</div>
+                      <div class="booking-date">
+                        <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
+                      </div>
+                    </div>
+                    <span class="status-badge status-{{ booking.status }}">
+                      {{ booking.get_status_display }}
+                    </span>
+                    <div class="booking-actions">
+                        <button type="button" class="action-btn view-details" title="View Client Details" onclick="showClientModal({{ booking.id }})">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      {% if booking.status == 'pending' %}
+                        <form method="post" action="{% url 'update_booking_status' booking.id %}" style="display: inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="status" value="confirmed">
+                          <button type="submit" class="action-btn accept" title="Accept booking">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </form>
+                        <a class="action-btn reject" title="Reject booking" href="{% url 'trainer_reject_booking' booking.id %}">
+                          <i class="fas fa-times"></i>
+                        </a>
+                      {% elif booking.status == 'confirmed' %}
+                        <a class="action-btn cancel" title="Cancel booking" href="{% url 'trainer_cancel_booking' booking.id %}">
+                          <i class="fas fa-ban"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% if booking.cancellation_reason and booking.status == 'cancelled' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-ban" style="color:#ef4444"></i> <strong>Cancelled{% if booking.cancelled_by %} by {{ booking.cancelled_by }}{% endif %}:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.cancellation_reason and booking.status == 'rejected' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-times-circle" style="color:#ef4444"></i> <strong>Rejected:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.message %}
+                    <div class="booking-message">
+                      <p><i class="fas fa-quote-left"></i> {{ booking.message|truncatewords:30 }}</p>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                <h3 class="empty-title">No Pending Requests</h3>
+                <p class="empty-text">Pending client requests will appear here</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+<br>
+<!-- Bookings Card -->
+        <div class="card" id="active-clients">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-users card-icon-orange"></i> Active Clients</h2>
+          </div>
+          <div class="card-body card-body-flush">
+            {% if active_clients %}
+              <div class="booking-list">
+                {% for booking in active_clients %}
+                  <div class="booking-item">
+                    <div class="booking-avatar">
+                      {{ booking.user.username.0|upper }}
+                    </div>
+                    <div class="booking-info">
+                      <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                      <div class="booking-email">{{ booking.user.email }}</div>
+                      <div class="booking-date">
+                        <i class="fa-regular fa-calendar"></i> {{ booking.booking_date|date:"M d, Y" }}
+                      </div>
+                    </div>
+                    <span class="status-badge status-{{ booking.status }}">
+                      {{ booking.get_status_display }}
+                    </span>
+                    <div class="booking-actions">
+                        <button type="button" class="action-btn view-details" title="View Client Details" onclick="showClientModal({{ booking.id }})">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      {% if booking.status == 'pending' %}
+                        <form method="post" action="{% url 'update_booking_status' booking.id %}" style="display: inline;">
+                          {% csrf_token %}
+                          <input type="hidden" name="status" value="confirmed">
+                          <button type="submit" class="action-btn accept" title="Accept booking">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </form>
+                        <a class="action-btn reject" title="Reject booking" href="{% url 'trainer_reject_booking' booking.id %}">
+                          <i class="fas fa-times"></i>
+                        </a>
+                      {% elif booking.status == 'confirmed' %}
+                        <a class="action-btn cancel" title="Cancel booking" href="{% url 'trainer_cancel_booking' booking.id %}">
+                          <i class="fas fa-ban"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% if booking.cancellation_reason and booking.status == 'cancelled' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-ban" style="color:#ef4444"></i> <strong>Cancelled{% if booking.cancelled_by %} by {{ booking.cancelled_by }}{% endif %}:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.cancellation_reason and booking.status == 'rejected' %}
+                    <div class="booking-message" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;">
+                      <p><i class="fas fa-times-circle" style="color:#ef4444"></i> <strong>Rejected:</strong> {{ booking.cancellation_reason }}</p>
+                    </div>
+                  {% elif booking.message %}
+                    <div class="booking-message">
+                      <p><i class="fas fa-quote-left"></i> {{ booking.message|truncatewords:30 }}</p>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                <h3 class="empty-title">No Active Clients</h3>
+                <p class="empty-text">Your active clients will appear here</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      {% else %}
+        <div class="card">
+          <div class="card-body" style="text-align: center; padding: 60px 20px;">
+            <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+            <h3 class="empty-title">Registration Incomplete</h3>
+            <p class="empty-text">Please complete your trainer registration to access the dashboard</p>
+            <a href="{% url 'trainerregestration' %}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: linear-gradient(135deg, var(--orange), var(--orange2)); color: #fff; text-decoration: none; border-radius: 12px; font-weight: 800;">
+              Complete Registration
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+    
+      {% for booking in all_bookings %}
+      <div id="clientModal-{{ booking.id }}" class="client-modal-overlay" onclick="closeClientModalToggle({{ booking.id }})">
+        <div class="client-modal" onclick="event.stopPropagation()">
+          <div class="client-modal-header">
+            <h3 class="client-modal-title"><i class="fas fa-user-circle"></i> Client Details</h3>
+            <button class="client-modal-close" onclick="closeClientModalToggle({{ booking.id }})"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="client-modal-body">
+            <div class="client-modal-av">{{ booking.user.username.0|upper }}</div>
+            <div class="client-modal-item">
+                <span class="client-modal-label">Name</span>
+                <span>{{ booking.user.get_full_name|default:booking.user.username }}</span>
+            </div>
+            <div class="client-modal-item">
+                <span class="client-modal-label">Email</span>
+                <span>{{ booking.user.email }}</span>
+            </div>
+            <div class="client-modal-item">
+                <span class="client-modal-label">Phone</span>
+                <span>{{ booking.user.userprofile.phone|default:"N/A" }}</span>
+            </div>
+            <div class="client-modal-item">
+                <span class="client-modal-label">Age</span>
+                <span>{{ booking.user.userprofile.age|default:"N/A" }}</span>
+            </div>
+            <div class="client-modal-item">
+                <span class="client-modal-label">Gender</span>
+                <span>{{ booking.user.userprofile.gender|title|default:"N/A" }}</span>
+            </div>
+            {% if booking.message %}
+            <div class="client-modal-item" style="flex-direction: column;">
+                <span class="client-modal-label" style="margin-bottom: 8px;">Message from Client</span>
+                <span style="font-style: italic; background:#f9fafb; padding:10px; border-radius:8px;">"{{ booking.message }}"</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+    </main>
+  </div>
+
+  <script>
+  </script>
+
+</body>
+</html>

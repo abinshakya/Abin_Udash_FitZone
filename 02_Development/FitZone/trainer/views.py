@@ -1,4 +1,3 @@
-# views.py
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -11,7 +10,9 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Q
 import os
-
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import TrainerBooking
 from .forms import (
     Step1BasicInfoForm, Step2CertificationForm, Step3DocumentsForm, TrainerProfileEditForm
 )
@@ -145,7 +146,7 @@ def trainer_profile_detail(request, trainer_id):
         'photos': photos,
         'has_pending_booking': has_pending_booking,
         'user_is_email_verified': user_is_email_verified,
-        'today': timezone.now().date().isoformat(),
+        'today': timezone.now().date().isoformat(), 'reviews': trainer.reviews.all(), 'avg_rating': round(sum(r.rating for r in trainer.reviews.all()) / max(trainer.reviews.count(), 1), 1) if trainer.reviews.exists() else 0.0,
     }
     
     return render(request, 'trainer_profile_detail.html', context)
@@ -214,9 +215,47 @@ def trainer_dashboard(request):
         'unread_count': unread_count,
         'bookings': bookings,
         'active_clients': active_clients,
+        'all_bookings': registration.bookings.select_related('user').all(),
     }
     
     return render(request, 'trainer_dashboard.html', context)
+
+
+@login_required
+def trainer_client_bookings(request):
+    try:
+        profile = request.user.userprofile
+        if profile.role != 'trainer':
+            messages.warning(request, "Access denied. Trainers only!")
+            return redirect('/')
+    except:
+        messages.warning(request, "Access denied. Trainers only!")
+        return redirect('/')
+
+    registration = TrainerRegistration.objects.filter(user=request.user).first()
+    
+    pending_requests = []
+    active_clients = []
+    notifications = []
+    unread_count = 0
+
+    if registration:
+        notifications = registration.notifications.all()[:20]
+        unread_count = registration.notifications.filter(is_read=False).count()
+        pending_requests = registration.bookings.select_related('user').filter(status='pending').order_by('-created_at')
+        active_clients = registration.bookings.select_related('user').filter(status='confirmed').order_by('-created_at')
+
+    context = {
+        'registration': registration,
+        'notifications': notifications,
+        'unread_count': unread_count,
+        'pending_requests': pending_requests,
+        'active_clients': active_clients,
+        'all_bookings': registration.bookings.select_related('user').all(),
+        'active_sidebar': 'client_bookings',
+    }
+
+    return render(request, 'trainer_client_bookings.html', context)
 
 
 @login_required
@@ -762,7 +801,7 @@ def update_booking_status(request, booking_id):
 
     if booking.trainer.user != request.user:
         messages.error(request, "Access denied.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_client_bookings')
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -857,7 +896,7 @@ def update_booking_status(request, booking_id):
         else:
             messages.error(request, "Invalid action.")
 
-    return redirect('trainer_dashboard')
+    return redirect('trainer_client_bookings')
 
 
 @login_required
@@ -866,11 +905,11 @@ def trainer_reject_booking(request, booking_id):
 
     if booking.trainer.user != request.user:
         messages.error(request, "Access denied.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_client_bookings')
 
     if booking.status != 'pending':
         messages.warning(request, "Only pending bookings can be rejected.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_client_bookings')
 
     context = {
         'booking': booking,
@@ -891,11 +930,11 @@ def trainer_cancel_booking(request, booking_id):
 
     if booking.trainer.user != request.user:
         messages.error(request, "Access denied.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_client_bookings')
 
     if booking.status != 'confirmed':
         messages.warning(request, "Only confirmed bookings can be cancelled.")
-        return redirect('trainer_dashboard')
+        return redirect('trainer_client_bookings')
 
     context = {
         'booking': booking,
@@ -948,3 +987,44 @@ def user_cancel_booking(request, booking_id):
     else:
         messages.error(request, "Only pending or unpaid confirmed bookings can be cancelled.")
     return redirect('trainer_client_dashboard')
+
+@login_required
+def user_complete_booking(request, booking_id):
+    booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
+    if booking.status == 'confirmed':
+        booking.status = 'completed'
+        booking.save()
+        messages.success(request, 'Your booking has been marked as completed.')
+    else:
+        messages.error(request, 'Only confirmed bookings can be completed.')
+    
+    return redirect('trainer_client_dashboard')
+
+@login_required
+def user_review_trainer(request, booking_id):
+    from django.shortcuts import render, get_object_or_404, redirect
+    from django.contrib import messages
+    from .models import TrainerBooking, TrainerReview
+    from .forms import TrainerReviewForm
+
+    booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
+    if booking.status != 'completed':
+        messages.error(request, 'You can only review after the booking has completed.')
+        return redirect('trainer_client_dashboard')
+
+    review = TrainerReview.objects.filter(user=request.user, trainer=booking.trainer).first()
+
+    if request.method == 'POST':
+        form = TrainerReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            new_review = form.save(commit=False)
+            new_review.user = request.user
+            new_review.trainer = booking.trainer
+            new_review.booking = booking
+            new_review.save()
+            messages.success(request, 'Thank you for reviewing the trainer!')
+            return redirect('trainer_client_dashboard')
+    else:
+        form = TrainerReviewForm(instance=review)
+
+    return render(request, 'user_review_trainer.html', {'form': form, 'booking': booking})
