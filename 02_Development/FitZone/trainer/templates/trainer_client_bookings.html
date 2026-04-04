@@ -645,6 +645,14 @@
           {% endfor %}
         </div>
         <script>
+
+    function showClientModal(id) {
+      document.getElementById('clientModal-' + id).classList.add('open');
+    }
+    function closeClientModalToggle(id) {
+      document.getElementById('clientModal-' + id).classList.remove('open');
+    }
+
           setTimeout(function(){
             var alerts = document.querySelectorAll('.toast-msg');
             alerts.forEach(function(a){
@@ -678,6 +686,14 @@
             <button onclick="this.parentElement.remove()" class="alert-close-btn"><i class="fas fa-times"></i></button>
           </div>
           <script>
+
+    function showClientModal(id) {
+      document.getElementById('clientModal-' + id).classList.add('open');
+    }
+    function closeClientModalToggle(id) {
+      document.getElementById('clientModal-' + id).classList.remove('open');
+    }
+
             (function(){
               var el = document.getElementById('verifiedAlert');
               if(!el) return;
@@ -892,6 +908,14 @@
   </div>
 
   <script>
+
+    function showClientModal(id) {
+      document.getElementById('clientModal-' + id).classList.add('open');
+    }
+    function closeClientModalToggle(id) {
+      document.getElementById('clientModal-' + id).classList.remove('open');
+    }
+
   </script>
 
 </body>
