@@ -917,9 +917,9 @@
                         <div class="booking-field-group">
                             <label class="booking-field-label">
                                 <span class="booking-label-icon purple"><i class="fas fa-calendar-alt"></i></span>
-                                Preferred Start Date <span class="booking-required">*</span>
+                                Start Date <span class="booking-required">*</span>
                             </label>
-                            <input type="date" name="booking_date" required min="{{ today }}" class="booking-input">
+                            <input type="date" name="booking_date" required value="{{ today }}" class="booking-input" readonly>
                         </div>
 
                         <!-- Message -->

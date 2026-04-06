@@ -729,19 +729,16 @@ def book_trainer(request, trainer_id):
         return redirect('trainer_profile_detail', trainer_id=trainer_id)
 
     if request.method == 'POST':
-        booking_date = request.POST.get('booking_date')
+        # Always use today's date as the booking date, regardless of client input
+        booking_date = timezone.now().date()
         user_message = request.POST.get('message', '')
-
-        if not booking_date:
-            messages.error(request, "Please select a preferred start date.")
-            return redirect('trainer_profile_detail', trainer_id=trainer_id)
 
         # Check for existing pending booking
         if TrainerBooking.objects.filter(user=request.user, trainer=trainer_reg, status='pending').exists():
             messages.warning(request, "You already have a pending booking with this trainer.")
             return redirect('trainer_profile_detail', trainer_id=trainer_id)
 
-        # Create booking
+        # Create booking with today's date
         booking = TrainerBooking.objects.create(
             user=request.user,
             trainer=trainer_reg,
@@ -752,12 +749,14 @@ def book_trainer(request, trainer_id):
         # Create notification for the trainer
         user_full_name = request.user.get_full_name() or request.user.username
         trainer_name = trainer_reg.user.get_full_name() or trainer_reg.user.username
+        booking_date_str = booking_date.strftime("%b %d, %Y")
+
         TrainerNotification.objects.create(
             trainer=trainer_reg,
             booking=booking,
             notif_type='booking',
             title=f'New Booking from {user_full_name}',
-            message=f'{user_full_name} wants to start training on {booking_date}.'
+            message=f'{user_full_name} wants to start training on {booking_date_str}.'
                     + (f' Message: "{user_message}"' if user_message else ''),
         )
 
@@ -767,7 +766,7 @@ def book_trainer(request, trainer_id):
             booking=booking,
             notif_type='general',
             title='Booking Request Sent',
-            message=f'Your booking request to {trainer_name} for {booking_date} has been sent. You\'ll be notified once the trainer responds.',
+            message=f'Your booking request to {trainer_name} for {booking_date_str} has been sent. You\'ll be notified once the trainer responds.',
         )
 
         # Send email to the trainer
@@ -777,7 +776,7 @@ def book_trainer(request, trainer_id):
                 message=(
                     f'Hi {trainer_name},\n\n'
                     f'{user_full_name} has requested to book a training session with you.\n\n'
-                    f'Preferred Start Date: {booking_date}\n'
+                    f'Preferred Start Date: {booking_date_str}\n'
                     + (f'Message: "{user_message}"\n' if user_message else '')
                     + f'\nPlease log in to your FitZone dashboard to accept or decline this booking.\n\n'
                     f'Best regards,\nFitZone Team'
