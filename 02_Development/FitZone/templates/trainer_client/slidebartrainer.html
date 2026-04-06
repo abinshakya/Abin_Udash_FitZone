@@ -9,6 +9,7 @@
   position:fixed;
   top:0;bottom:0;left:0;
   z-index:100;
+  transition: transform 0.3s ease;
 }
 .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px}
 .brand-logo{
@@ -49,6 +50,65 @@
   padding:0 5px;
 }
 
+/* Hamburger button - hidden by default */
+.sidebar-toggle{
+  display:none;
+  position:fixed;
+  top:14px;
+  right:14px;
+  z-index:150;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,0.08);
+  background:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  cursor:pointer;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:var(--text);
+  transition:all 0.2s;
+}
+
+.sidebar-toggle:hover{
+  background:rgba(255,122,24,0.06);
+  color:var(--orange);
+}
+
+/* Sidebar close button - only on mobile */
+.sidebar-close{
+  display:none;
+  position:absolute;
+  top:16px;
+  right:14px;
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  border:none;
+  background:rgba(0,0,0,0.05);
+  cursor:pointer;
+  font-size:14px;
+  color:rgba(0,0,0,0.4);
+  align-items:center;
+  justify-content:center;
+  transition:all 0.2s;
+}
+
+.sidebar-close:hover{
+  background:rgba(239,68,68,0.1);
+  color:#ef4444;
+}
+
+/* Dark overlay behind sidebar on mobile */
+.sidebar-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:99;
+}
+
 @media (max-width: 900px) {
   .sidebar{width:64px}
   .brand>div,.nav a span,.sidebar-footer span{display:none}
@@ -57,13 +117,59 @@
 }
 
 @media (max-width: 600px) {
-  .sidebar{display:none}
+  .sidebar{
+    transform: translateX(-100%);
+    width: 260px;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+    background: #fff;
+  }
+
+  .sidebar.open{
+    transform: translateX(0);
+  }
+
+  /* Show full labels when sidebar is open on mobile */
+  .sidebar.open .brand>div,
+  .sidebar.open .nav a span,
+  .sidebar.open .sidebar-footer span{
+    display: block;
+  }
+
+  .sidebar.open .nav a{
+    justify-content: flex-start;
+    padding: 11px 14px;
+  }
+
+  .sidebar-toggle{
+    display:flex;
+  }
+
+  .sidebar-close{
+    display:flex;
+  }
+
+  .sidebar-overlay.open{
+    display:block;
+  }
+
   .main, .page-wrap {margin-left:0 !important}
 }
 </style>
 
+<!-- Hamburger Toggle Button (mobile only) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu">
+  <i class="fa-solid fa-bars"></i>
+</button>
+
+<!-- Dark Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <!-- Sidebar -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+    <i class="fa-solid fa-times"></i>
+  </button>
+
   <div class="brand">
     <div class="brand-logo">FZ</div>
     <div>
@@ -94,3 +200,26 @@
     </a>
   </div>
 </aside>
+
+<script>
+(function(){
+  var toggle = document.getElementById('sidebarToggle');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+  var close = document.getElementById('sidebarClose');
+
+  function openSidebar(){
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+  }
+
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  toggle.addEventListener('click', openSidebar);
+  overlay.addEventListener('click', closeSidebar);
+  close.addEventListener('click', closeSidebar);
+})();
+</script>

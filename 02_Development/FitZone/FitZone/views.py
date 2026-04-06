@@ -172,7 +172,7 @@ def trainer_client_dashboard(request):
         user=request.user,
         status='confirmed',
         payment_status='completed'
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('trainer__user').order_by('-updated_at')
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('trainer__user').prefetch_related('trainer__documents').order_by('-updated_at')
 
     # Get notifications
     notifications = UserNotification.objects.filter(user=request.user).order_by('-created_at')[:20]

@@ -280,56 +280,48 @@
     }
 
     .trainer-card{
-      background: linear-gradient(155deg, rgba(255,255,255,0.92), rgba(248,249,250,0.92));
+      background: #fff;
       border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
       transition: all 0.2s;
     }
 
     .trainer-card:hover{
       transform: translateY(-3px);
-      border-color: rgba(255,122,24,0.3);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
-    .trainer-header{
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .trainer-avatar-lg{
-      width: 60px;
-      height: 60px;
+    .trainer-profile-pic{
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--orange), var(--orange2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 900;
-      font-size: 24px;
+      object-fit: cover;
+      margin: 0 auto 14px;
+      display: block;
+      border: 3px solid rgba(255,122,24,0.2);
     }
 
-    .trainer-header-info h3{
+    .trainer-name{
       margin: 0 0 4px;
-      font-size: 18px;
-      font-weight: 900;
+      font-size: 17px;
+      font-weight: 800;
       color: #1a1a1a;
     }
 
     .trainer-spec{
       font-size: 12px;
-      color: rgba(0,0,0,0.5);
+      color: rgba(0,0,0,0.45);
       font-weight: 600;
+      margin-bottom: 14px;
     }
 
     .trainer-details{
       display: grid;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      text-align: left;
     }
 
     .trainer-detail-row{
@@ -343,19 +335,21 @@
     .trainer-detail-row i{
       color: var(--orange);
       width: 16px;
+      text-align: center;
     }
 
     .trainer-validity-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:2px 10px;
-      border-radius:999px;
-      background:rgba(34,197,94,0.08);
-      border:1px solid rgba(34,197,94,0.3);
-      font-size:11px;
-      font-weight:700;
-      color:#15803d;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803d;
+      margin-left: auto;
     }
 
     .trainer-actions{
@@ -373,10 +367,10 @@
       text-align: center;
       transition: all 0.2s;
       border: 1px solid;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .trainer-btn-primary{
@@ -396,7 +390,9 @@
       border-color: rgba(0,0,0,0.1);
     }
 
-    .trainer-btn-secondary:hover{ background: rgba(0,0,0,0.06); }
+    .trainer-btn-secondary:hover{
+      background: rgba(0,0,0,0.07);
+    }
 
     /* ---------- Booking List ---------- */
     .booking-list{ display: grid; gap: 0; }
@@ -732,32 +728,168 @@
 
     /* ---------- Responsive ---------- */
     @media (max-width: 900px) {
-      
       .brand>div,.nav a span,.sidebar-footer span{display:none}
       .nav a{justify-content:center;padding:12px}
       .main{margin-left:64px}
+
+      .two-col-grid{
+        grid-template-columns: 1fr;
+      }
+
+      .hello h1{ font-size: 1.5rem; }
     }
 
     @media (max-width: 600px) {
-      
-      .main{margin-left:0}
+      .main{
+        margin-left: 0;
+        padding: 16px 14px 90px;
+      }
 
+      /* Topbar */
       .topbar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
       }
 
-      .trainer-grid { grid-template-columns: 1fr; }
+      .hello h1{ font-size: 1.3rem; }
+      .hello p{ font-size: 13px; }
 
-      .payment-item {
+      /* Cards */
+      .card{ border-radius: 14px; margin-bottom: 14px; }
+      .card-head{ padding: 14px 16px; }
+      .card-head h2{ font-size: 1rem; }
+      .card-body{ padding: 16px; }
+
+      /* Trainer grid */
+      .trainer-grid{ grid-template-columns: 1fr; gap: 14px; }
+      .trainer-card{ padding: 20px 16px; }
+
+      /* Payment alert */
+      .payment-alert{ padding: 14px 16px; gap: 12px; flex-direction: row; }
+      .payment-alert-icon{ width: 40px; height: 40px; font-size: 18px; }
+      .payment-alert-title{ font-size: 15px; }
+      .payment-alert-text{ font-size: 13px; }
+
+      /* Payment items */
+      .payment-item{
         flex-direction: column;
         align-items: flex-start;
+        padding: 16px;
+        gap: 12px;
       }
 
-      .payment-right {
+      .payment-right{
         width: 100%;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
       }
+
+      .payment-amount{ font-size: 22px; }
+
+      .pay-btn{
+        padding: 10px 18px;
+        font-size: 13px;
+      }
+
+      /* Two column grid */
+      .two-col-grid{
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      /* Bookings */
+      .booking-item{
+        padding: 14px 16px;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .booking-avatar{
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+      }
+
+      .booking-name{ font-size: 14px; }
+
+      .status-badge{
+        padding: 4px 10px;
+        font-size: 10px;
+      }
+
+      .cancel-btn{
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+      }
+
+      /* Notifications */
+      .notif-item{ padding: 12px 16px; gap: 10px; }
+      .notif-icon{ width: 34px; height: 34px; font-size: 15px; }
+      .notif-title{ font-size: 13px; }
+      .notif-msg{ font-size: 12px; }
+      .notif-list{ max-height: 300px; }
+
+      /* Cancel modal */
+      .cancel-modal{
+        margin: 16px;
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      /* Chips */
+      .chip{ font-size: 11px; padding: 4px 10px; }
+
+      /* Empty state */
+      .empty-state{ padding: 30px 16px; }
+      .empty-icon{ font-size: 48px; }
+      .empty-title{ font-size: 17px; }
+
+      /* Mobile bottom nav */
+      .mobile-bottom-nav{
+        display: flex;
+      }
+    }
+
+    /* Mobile Bottom Nav */
+    .mobile-bottom-nav{
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      z-index: 200;
+      padding: 6px 0;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+
+    .mobile-nav-item{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      color: rgba(0,0,0,0.4);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .mobile-nav-item.active{
+      color: var(--orange);
+    }
+
+    .mobile-nav-item i{
+      font-size: 18px;
     }
   </style>
 </head>
@@ -870,16 +1002,23 @@
             <div class="trainer-grid">
               {% for booking in active_trainers %}
                 <div class="trainer-card">
-                  <div class="trainer-header">
-                    <div class="trainer-avatar-lg">
-                      {{ booking.trainer.user.username.0|upper }}
-                    </div>
-                    <div class="trainer-header-info">
-                      <h3>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
-                      <div class="trainer-spec">{{ booking.trainer.specialization }}</div>
-                    </div>
-                  </div>
+                  <!-- Profile Picture -->
+                  {% if booking.trainer.get_profile_picture %}
+                    <img src="{{ booking.trainer.get_profile_picture.file.url }}"
+                         alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}"
+                         class="trainer-profile-pic"
+                         onerror="this.src='https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=ff7a18&color=fff&bold=true'">
+                  {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=ff7a18&color=fff&bold=true"
+                         alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}"
+                         class="trainer-profile-pic">
+                  {% endif %}
 
+                  <!-- Name & Specialization -->
+                  <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+                  <div class="trainer-spec">{{ booking.trainer.specialization }}</div>
+
+                  <!-- Details -->
                   <div class="trainer-details">
                     <div class="trainer-detail-row">
                       <i class="fas fa-calendar-check"></i>
@@ -907,7 +1046,8 @@
                     </div>
                   </div>
 
-                  <div class="trainer-actions" style="gap:5px;">
+                  <!-- Actions -->
+                  <div class="trainer-actions">
                     <a href="{% url 'start_chat_with_trainer' booking.trainer.id %}" class="trainer-btn trainer-btn-primary">
                       <i class="fas fa-comments"></i> Message
                     </a>
@@ -1052,6 +1192,30 @@
         </div>
       </div>
     </main>
+
+    <!-- Mobile Bottom Nav (visible on small screens) -->
+    <nav class="mobile-bottom-nav">
+      <a href="{% url 'trainer_client_dashboard' %}" class="mobile-nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="{% url 'client_chat' %}" class="mobile-nav-item">
+        <i class="fa-solid fa-comments"></i>
+        <span>Chat</span>
+      </a>
+      <a href="{% url 'my_plans' %}" class="mobile-nav-item">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Plans</span>
+      </a>
+      <a href="{% url 'fitness_profile' %}" class="mobile-nav-item">
+        <i class="fa-solid fa-heartbeat"></i>
+        <span>Profile</span>
+      </a>
+      <a href="/" class="mobile-nav-item">
+        <i class="fa-solid fa-home"></i>
+        <span>Home</span>
+      </a>
+    </nav>
   </div>
 
   <!-- Cancel Booking Modal -->
