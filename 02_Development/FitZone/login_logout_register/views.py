@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -290,3 +290,38 @@ def verify_otp_view(request):
     except UserProfile.DoesNotExist:
         messages.error(request, "Profile not found!")
         return redirect('/')
+
+@login_required
+def change_password(request):
+    context = {'profile': UserProfile.objects.filter(user=request.user).first()}
+    
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        errors = {}
+
+        # Validations
+        if not request.user.check_password(old_password):
+            errors['old_password'] = "The current password you entered does not match."
+            
+        if len(new_password) < 8:
+            errors['new_password'] = "Password must be at least 8 characters long."
+
+        if new_password != confirm_password:
+            errors['confirm_password'] = "New passwords do not match."
+
+        # If errors exist, render template with specific error messages
+        if errors:
+            context['errors'] = errors
+            return render(request, 'change_password.html', context)
+
+        # Success - Change Password
+        request.user.set_password(new_password)
+        request.user.save()
+        update_session_auth_hash(request, request.user)  # Keep the user logged in
+        context['password_changed'] = True
+        return render(request, 'change_password.html', context)
+        
+    return render(request, 'change_password.html', context)
