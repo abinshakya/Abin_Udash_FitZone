@@ -127,6 +127,165 @@ def user_logout(request):
     list(messages.get_messages(request))
     messages.success(request, "You have been logged out successfully")
     return redirect('login')
+# Multi-step forgot password flow: email → OTP → reset password
+def forgot_password(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        email = request.POST.get('email', '').strip()
+        
+        # Send OTP 
+        if action == 'send_otp':
+            if not email:
+                messages.error(request, "Please enter your email address.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            try:
+                user = User.objects.get(email=email)
+                profile = UserProfile.objects.get(user=user)
+            except (User.DoesNotExist, UserProfile.DoesNotExist):
+                messages.error(request, "No account found with that email address.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            # Generate and save OTP
+            otp = generate_otp()
+            profile.otp = otp
+            profile.otp_created_at = timezone.now()
+            profile.save()
+            
+            # Send OTP email
+            subject = 'FitZone - Password Reset OTP'
+            message = f"""
+Hello {user.first_name or user.username},
+
+Your OTP for password reset is: {otp}
+
+This OTP will expire in 10 minutes.
+
+If you didn't request this, please ignore this email.
+
+Best regards,
+FitZone Team
+"""
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [email],
+                    fail_silently=False,
+                )
+                if settings.EMAIL_BACKEND == 'django.core.mail.backends.console.EmailBackend':
+                    messages.success(request, f"✅ OTP Generated: {otp} (Check your terminal/console)")
+                else:
+                    messages.success(request, f"OTP has been sent to {email}")
+            except Exception as e:
+                print(f"Forgot password email error: {e}")
+                messages.error(request, "Failed to send OTP. Please try again.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            return render(request, 'forgot_password.html', {
+                'step': 'verify_otp',
+                'email': email,
+            })
+        
+        # OTP verification
+        elif action == 'verify_otp':
+            entered_otp = request.POST.get('otp', '').strip()
+            
+            if not email:
+                messages.error(request, "Session expired. Please start over.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            try:
+                user = User.objects.get(email=email)
+                profile = UserProfile.objects.get(user=user)
+            except (User.DoesNotExist, UserProfile.DoesNotExist):
+                messages.error(request, "Account not found. Please start over.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            # Check OTP exists
+            if not profile.otp or not profile.otp_created_at:
+                messages.error(request, "No OTP found. Please request a new one.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            # Check if OTP expired (10 minutes)
+            time_diff = timezone.now() - profile.otp_created_at
+            if time_diff.total_seconds() > 600:
+                profile.otp = None
+                profile.otp_created_at = None
+                profile.save()
+                messages.error(request, "OTP has expired. Please request a new one.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            # Verify OTP
+            if entered_otp == profile.otp:
+                # Clear OTP after successful verification
+                profile.otp = None
+                profile.otp_created_at = None
+                profile.save()
+                
+                # Store verified state in session
+                request.session['forgot_pw_verified_email'] = email
+                
+                return render(request, 'forgot_password.html', {
+                    'step': 'reset_password',
+                    'email': email,
+                    'found_username': user.username,
+                })
+            else:
+                messages.error(request, "Invalid OTP. Please try again.")
+                return render(request, 'forgot_password.html', {
+                    'step': 'verify_otp',
+                    'email': email,
+                })
+        
+        # Reset Password 
+        elif action == 'reset_password':
+            new_password = request.POST.get('new_password', '')
+            confirm_password = request.POST.get('confirm_password', '')
+            
+            # Verify session
+            verified_email = request.session.get('forgot_pw_verified_email')
+            if not verified_email or verified_email != email:
+                messages.error(request, "Unauthorized. Please start the process again.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                messages.error(request, "Account not found.")
+                return render(request, 'forgot_password.html', {'step': 'email'})
+            
+            errors = {}
+            if len(new_password) < 8:
+                errors['new_password'] = "Password must be at least 8 characters long."
+            if new_password != confirm_password:
+                errors['confirm_password'] = "Passwords do not match."
+            
+            if errors:
+                return render(request, 'forgot_password.html', {
+                    'step': 'reset_password',
+                    'email': email,
+                    'found_username': user.username,
+                    'errors': errors,
+                })
+            
+            # Reset password
+            user.set_password(new_password)
+            user.save()
+            
+            # Clean up session
+            del request.session['forgot_pw_verified_email']
+            
+            messages.success(request, "Your password has been reset successfully!")
+            return render(request, 'forgot_password.html', {
+                'step': 'success',
+                'found_username': user.username,
+            })
+    
+    # GET request - show email form
+    return render(request, 'forgot_password.html', {'step': 'email'})
+
 @login_required
 def edit_profile(request):
     try:
