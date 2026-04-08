@@ -7,7 +7,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q
 
-
 def cancel_overdue_bookings(user):
     from notifications.models import UserNotification, TrainerNotification
     from trainer.models import TrainerBooking

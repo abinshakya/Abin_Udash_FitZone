@@ -119,6 +119,17 @@
       border-bottom: 1px solid rgba(0,0,0,0.06);
     }
 
+    .photo-count-badge {
+      background: var(--nav-bg);
+      color: var(--text-muted);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
     .card-head h2{
       margin: 0;
       font-size: 1.25rem;
@@ -362,80 +373,104 @@
     }
     .cta-link:hover{ filter: brightness(1.02); }
 
-    /* ---------- Photo Gallery ---------- */
-    .photo-upload{
-      padding: 20px 24px;
+    /* ---------- Photo Gallery Upload Form Modern UI ---------- */
+    .photo-upload-container {
+      padding: 0 24px 24px;
       border-bottom: 1px solid rgba(0,0,0,0.06);
     }
 
-    .form-group{ margin-bottom: 14px; }
-
-    .form-label{
-      display: block;
-      color: rgba(0,0,0,0.5);
-      margin-bottom: 8px;
-      font-size: 13px;
-      font-weight: 600;
+    .upload-dropzone {
+      background: rgba(0, 0, 0, 0.02);
+      border: 2px dashed rgba(255, 122, 24, 0.3);
+      border-radius: 12px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
     }
 
-    .caption-input{
-      width: 100%;
-      padding: 10px 14px;
+    .upload-dropzone:hover {
+      background: rgba(255, 122, 24, 0.05);
+      border-color: var(--orange);
+    }
+
+    .upload-dropzone.has-file {
+      background: rgba(40, 167, 69, 0.05);
+      border-color: #28a745;
+    }
+
+    .upload-dropzone .upload-icon {
+      font-size: 32px;
+      color: var(--orange);
+      margin-bottom: 12px;
+      transition: transform 0.3s;
+    }
+
+    .upload-dropzone:hover .upload-icon {
+      transform: translateY(-4px);
+    }
+
+    .upload-dropzone.has-file .upload-icon {
+      color: #28a745;
+    }
+
+    .upload-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 6px;
+    }
+
+    .upload-hint {
+      display: block;
+      font-size: 12px;
+      color: rgba(0,0,0,0.4);
+      font-weight: 500;
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .caption-input-modern {
+      flex: 1;
+      padding: 12px 16px;
       background: rgba(0,0,0,0.03);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 10px;
       color: #1a1a1a;
-      font-size: 13px;
-      font-family: inherit;
-      transition: border-color 0.2s;
-    }
-
-    .caption-input:focus{
-      outline: none;
-      border-color: rgba(255,122,24,0.4);
-    }
-
-    .custom-file-button{
-      width: 100%;
-      padding: 12px;
-      background: rgba(0,0,0,0.03);
-      border: 1px solid rgba(0,0,0,0.10);
-      border-radius: 10px;
-      color: rgba(0,0,0,0.6);
-      font-size: 13px;
-      font-family: inherit;
-      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
     }
 
-    .custom-file-button:hover{
-      background: rgba(255,122,24,0.1);
-      border-color: rgba(255,122,24,0.35);
-      color: var(--orange);
-      transform: translateY(-1px);
+    .caption-input-modern:focus {
+      outline: none;
+      background: #fff;
+      border-color: rgba(255, 122, 24, 0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    .upload-btn{
-      width: 100%;
-      padding: 12px;
+    .btn-upload-modern {
+      padding: 0 24px;
       background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
       border: none;
       border-radius: 10px;
       color: #fff;
       font-weight: 700;
-      font-family: inherit;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
-      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .upload-btn:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(255,122,24,0.25);
+    .btn-upload-modern:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 122, 24, 0.25);
     }
 
     .photo-grid{
@@ -768,28 +803,49 @@
         <div class="card">
           <div class="card-head">
             <h2><i class="fa-solid fa-images card-icon-orange"></i> Photo Gallery</h2>
+            <span class="photo-count-badge">{{ photos|length|default:0 }} / 6 Photos</span>
           </div>
 
           <!-- Upload Form -->
-          <form method="post" action="{% url 'upload_trainer_photo' %}" enctype="multipart/form-data" class="photo-upload">
-            {% csrf_token %}
-
-            <div class="form-group">
-              <label class="form-label"><i class="fas fa-image"></i> Select Photo</label>
-              <input type="file" name="photo" accept="image/*" required id="photoFileInput" class="visually-hidden">
-              <button type="button" onclick="document.getElementById('photoFileInput').click()" class="custom-file-button">
-                <i class="fas fa-folder-open"></i>
-                <span id="fileNameDisplay">Choose File</span>
-              </button>
+          {% if photos|length >= 6 %}
+            <div class="alert alert-warning" style="margin: 1.5rem; padding: 1rem; border-radius: 8px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+              <i class="fas fa-exclamation-triangle"></i> You have reached the maximum limit of 6 photos. Delete some photos to upload new ones.
             </div>
-
-            <div class="form-group">
-              <label class="form-label"><i class="fas fa-comment"></i> Caption (Optional)</label>
-              <input type="text" name="caption" placeholder="Add a caption..." class="caption-input">
+          {% else %}
+            <div class="photo-upload-container">
+              <form method="post" action="{% url 'upload_trainer_photo' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="upload-dropzone" id="uploadDropzone" onclick="document.getElementById('photoFileInput').click()">
+                  <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                  <p class="upload-text" id="fileNameDisplay">Click or drag photo to select</p>
+                  <span class="upload-hint">Supports: JPG, PNG, WEBP (Max 5MB)</span>
+                  <input type="file" name="photo" accept="image/*" required id="photoFileInput" class="visually-hidden" 
+                         onchange="handleFileSelect(this)">
+                </div>
+                
+                <div class="upload-actions">
+                  <input type="text" name="caption" placeholder="Add a short caption... (Optional)" class="caption-input-modern">
+                  <button type="submit" class="btn-upload-modern"><i class="fas fa-upload"></i> Upload</button>
+                </div>
+              </form>
             </div>
-
-            <button type="submit" class="upload-btn"><i class="fas fa-upload"></i> Upload Photo</button>
-          </form>
+            
+            <script>
+              function handleFileSelect(input) {
+                const dropzone = document.getElementById('uploadDropzone');
+                const display = document.getElementById('fileNameDisplay');
+                if (input.files && input.files[0]) {
+                  display.innerText = input.files[0].name;
+                  dropzone.classList.add('has-file');
+                  dropzone.querySelector('.upload-icon').className = 'fas fa-check-circle upload-icon';
+                } else {
+                  display.innerText = 'Click or drag photo to select';
+                  dropzone.classList.remove('has-file');
+                  dropzone.querySelector('.upload-icon').className = 'fas fa-cloud-upload-alt upload-icon';
+                }
+              }
+            </script>
+          {% endif %}
 
           <!-- Photo Grid -->
           {% if photos %}

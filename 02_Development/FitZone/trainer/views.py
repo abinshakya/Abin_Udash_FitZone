@@ -275,6 +275,11 @@ def upload_trainer_photo(request):
         return redirect('trainer_settings')
     
     if request.method == 'POST':
+        # Add check for photo limit
+        if registration.photos.count() >= 6:
+            messages.error(request, "You can only upload up to 6 photos.")
+            return redirect('trainer_settings')
+
         photo_file = request.FILES.get('photo')
         caption = request.POST.get('caption', '')
         
@@ -288,7 +293,7 @@ def upload_trainer_photo(request):
         else:
             messages.error(request, "Please select a photo to upload.")
     
-    return redirect('trainer_dashboard')
+    return redirect('trainer_settings')
 
 
 @login_required
