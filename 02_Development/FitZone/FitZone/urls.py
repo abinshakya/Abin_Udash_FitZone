@@ -34,6 +34,7 @@ urlpatterns = [
     path('', include('chat.urls')),
     path('', include('fitness_plan.urls')),
     path('food-recommendation/', include('food_recommendation_system.urls')),
+    path('about/', views.about, name='about'),
 ]
 
 if settings.DEBUG:

@@ -1,19 +1,7 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'Footer.css'%}">
-    
-</head>
+<link rel="stylesheet" href="{% static 'Footer.css'%}">
 
-
-
-<body>
-    
-   <footer class="footer-section">
+<footer class="footer-section">
     <div class="container">
         <div class="footer-top">
             <!-- Brand -->
@@ -34,11 +22,11 @@
             <div class="footer-links">
                 <h5>Quick Links</h5>
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Trainers</a></li>
-                    <li><a href="#">Pricing</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="{% url 'about' %}">About Us</a></li>
+                    <li><a href="{% url 'about' %}#about-overview">Services</a></li>
+                    <li><a href="/trainer">Trainers</a></li>
+                    <li><a href="{% url 'membership' %}">Pricing</a></li>
                 </ul>
             </div>
 
@@ -46,29 +34,20 @@
             <div class="footer-services">
                 <h5>Our Services</h5>
                 <ul>
-                    <li><a href="#">Personal Training</a></li>
-                    <li><a href="#">Nutrition Planning</a></li>
-                    <li><a href="#">Ai Power Fitness</a></li>
-                    <li><a href="#">Ai Food Recommendation</a></li>
+                    <li><a href="{% url 'about' %}#personal-training">Personal Training</a></li>
+                    <li><a href="{% url 'about' %}#nutrition-planning">Nutrition Planning</a></li>
+                    <li><a href="{% url 'about' %}#ai-fitness">AI Power Fitness</a></li>
+                    <li><a href="{% url 'about' %}#food-recommendation">AI Food Recommendation</a></li>
                 </ul>
             </div>
 
             <!-- Contact -->
             <div class="footer-contact">
                 <h5>Contact Us</h5>
-                <p><i class="fas fa-map-marker-alt"></i> 123 Fitness Street, Kathmandu</p>
                 <p><i class="fas fa-phone"></i> +977 9869044466</p>
                 <p><i class="fas fa-envelope"></i> info@fitzone.com</p>
             </div>
         </div>
 
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <p>&copy; 2025 FitZone. All Rights Reserved.</p>
-        </div>
     </div>
 </footer>
-
-
-</body>
-</html>

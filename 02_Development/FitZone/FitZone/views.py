@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q
 
+
 def cancel_overdue_bookings(user):
     from notifications.models import UserNotification, TrainerNotification
     from trainer.models import TrainerBooking
@@ -81,6 +82,7 @@ def cancel_overdue_bookings(user):
             )
         except Exception:
             pass
+
 
 def home(request):
     from .models import HomeBanner, PremiumService
@@ -188,6 +190,9 @@ def trainer_client_dashboard(request):
     }
     
     return render(request, 'trainer_client/dashboard.html', context)
+
+def about(request):
+    return render(request, 'about.html')
 
 @login_required
 def ai_chat(request):

@@ -1,0 +1,494 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - FitZone</title>
+    <meta name="description" content="Learn about FitZone's AI-powered fitness platform — food recommendations, trainer booking, AI chatbot trainer, and personalized fitness plans.">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'about.css' %}">
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <!-- Hero Section -->
+    <section class="about-hero" id="about-hero">
+        <div class="about-hero-overlay"></div>
+        <div class="about-hero-content">
+            <span class="about-hero-badge">
+                <i class="fas fa-dumbbell"></i> About FitZone
+            </span>
+            <h1>Your AI-Powered<br><span class="gradient-text">Fitness Companion</span></h1>
+            <p>FitZone is a next-generation fitness platform that combines artificial intelligence with professional training to help you achieve your health and fitness goals. From personalized meal plans to expert trainer booking — everything you need, in one place.</p>
+            <div class="about-hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">4+</span>
+                    <span class="stat-label">AI Features</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">AI Support</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Personalized</span>
+                </div>
+            </div>
+            <a href="#about-overview" class="about-scroll-btn">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Project Overview -->
+    <section class="about-section about-overview" id="about-overview">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Overview</span>
+                <h2>What is <span class="gradient-text">FitZone</span>?</h2>
+                <p class="section-subtitle">A comprehensive fitness ecosystem designed for the modern fitness enthusiast</p>
+            </div>
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="overview-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI-Powered</h3>
+                    <p>Our platform leverages cutting-edge AI technology to provide intelligent food recommendations, personalized fitness plans, and 24/7 chatbot support for all your fitness queries.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Expert Trainers</h3>
+                    <p>Connect with certified professional trainers who can guide your fitness journey. Book sessions, communicate in real-time, and get personalized workout plans.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Smart Nutrition</h3>
+                    <p>Get AI-generated food recommendations tailored to your dietary preferences, health goals, and nutritional needs. Make smarter food choices every day.</p>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Secure & Reliable</h3>
+                    <p>Your data is safe with us. FitZone uses secure authentication, email verification, and encrypted payment processing to protect your information.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Food Recommendation System -->
+    <section class="about-section feature-section" id="food-recommendation">
+        <div class="container">
+            <div class="feature-layout">
+                <div class="feature-visual">
+                    <div class="feature-icon-large">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <div class="feature-float-card float-card-1">
+                        <i class="fas fa-carrot"></i>
+                        <span>Smart Suggestions</span>
+                    </div>
+                    <div class="feature-float-card float-card-2">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Macro Tracking</span>
+                    </div>
+                    <div class="feature-float-card float-card-3">
+                        <i class="fas fa-leaf"></i>
+                        <span>Diet Plans</span>
+                    </div>
+                </div>
+                <div class="feature-info">
+                    <span class="section-tag">AI Nutrition</span>
+                    <h2>AI Food Recommendation System</h2>
+                    <p class="feature-desc">Our AI-powered food recommendation engine analyzes your dietary preferences, health conditions, fitness goals, and nutritional requirements to suggest the perfect meals for you.</p>
+                    
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Personalized Meal Suggestions</h4>
+                                <p>Get food recommendations based on your specific dietary needs, allergies, and taste preferences.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Nutritional Analysis</h4>
+                                <p>Every recommendation includes detailed nutritional breakdown — calories, protein, carbs, fats, vitamins, and minerals.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Goal-Based Planning</h4>
+                                <p>Whether you want to lose weight, gain muscle, or maintain — the AI adjusts recommendations to match your fitness goals.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-to-use">
+                        <h3><i class="fas fa-lightbulb"></i> How to Use</h3>
+                        <ol>
+                            <li>Navigate to the <strong>AI Nutrition</strong> page from the main menu.</li>
+                            <li>Enter your dietary preferences and fitness goals.</li>
+                            <li>Click <strong>"Get Recommendations"</strong> to receive AI-generated food suggestions.</li>
+                            <li>Browse through the recommended meals with full nutritional details.</li>
+                            <li>Save your favorite meals to your profile for easy access later.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trainer Booking System -->
+    <section class="about-section feature-section feature-reverse" id="personal-training">
+        <div class="container">
+            <div class="feature-layout">
+                <div class="feature-visual">
+                    <div class="feature-icon-large trainer-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="feature-float-card float-card-1">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Easy Booking</span>
+                    </div>
+                    <div class="feature-float-card float-card-2">
+                        <i class="fas fa-star"></i>
+                        <span>Top Rated</span>
+                    </div>
+                    <div class="feature-float-card float-card-3">
+                        <i class="fas fa-comments"></i>
+                        <span>Live Chat</span>
+                    </div>
+                </div>
+                <div class="feature-info">
+                    <span class="section-tag">Personal Trainers</span>
+                    <h2>Trainer Booking System</h2>
+                    <p class="feature-desc">Find and book certified professional trainers who match your fitness goals. Our platform makes it easy to connect, communicate, and train with the best in the industry.</p>
+                    
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Browse & Book Trainers</h4>
+                                <p>Explore trainer profiles with their specializations, experience, certifications, and client reviews. Book your preferred trainer with just a few clicks.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Real-Time Communication</h4>
+                                <p>Chat directly with your trainer through our built-in messaging system. Share progress, ask questions, and get instant feedback.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Secure Payment</h4>
+                                <p>Complete payments securely through our integrated payment system. Track booking status, payment history, and manage your trainer subscriptions.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-to-use">
+                        <h3><i class="fas fa-lightbulb"></i> How to Use</h3>
+                        <ol>
+                            <li>Go to the <strong>Trainers</strong> page to browse all available trainers.</li>
+                            <li>View trainer profiles — check their specialization, experience, and rates.</li>
+                            <li>Click <strong>"Book Now"</strong> and select your preferred date and training type.</li>
+                            <li>Wait for trainer confirmation. You'll receive a notification once confirmed.</li>
+                            <li>Complete payment within the due date to activate your training sessions.</li>
+                            <li>Access your trainer dashboard via <strong>"My Trainers"</strong> to chat and track progress.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chatbot Trainer -->
+    <section class="about-section feature-section" id="ai-fitness">
+        <div class="container">
+            <div class="feature-layout">
+                <div class="feature-visual">
+                    <div class="feature-icon-large chatbot-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="feature-float-card float-card-1">
+                        <i class="fas fa-bolt"></i>
+                        <span>Instant Replies</span>
+                    </div>
+                    <div class="feature-float-card float-card-2">
+                        <i class="fas fa-clock"></i>
+                        <span>24/7 Available</span>
+                    </div>
+                    <div class="feature-float-card float-card-3">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Expert Knowledge</span>
+                    </div>
+                </div>
+                <div class="feature-info">
+                    <span class="section-tag">AI Trainer</span>
+                    <h2>AI Chatbot Fitness Trainer</h2>
+                    <p class="feature-desc">Meet your virtual fitness coach! Our AI chatbot trainer is available 24/7 to answer your fitness questions, provide workout guidance, and help you stay on track with your health goals.</p>
+                    
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Intelligent Conversations</h4>
+                                <p>Ask anything about workouts, exercises, form corrections, nutrition tips, and more. The AI understands context and provides detailed, accurate answers.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Workout Recommendations</h4>
+                                <p>Get personalized workout routines based on your fitness level, available equipment, and goals. The AI adapts suggestions to your needs.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Always Available</h4>
+                                <p>Unlike human trainers, our AI chatbot is available round the clock. Get fitness advice anytime, anywhere — no appointments needed.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-to-use">
+                        <h3><i class="fas fa-lightbulb"></i> How to Use</h3>
+                        <ol>
+                            <li>Purchase a <strong>membership plan</strong> to access AI features.</li>
+                            <li>Navigate to your <strong>Dashboard</strong> and click on <strong>"AI Chat"</strong>.</li>
+                            <li>Type your fitness question or request in the chat input box.</li>
+                            <li>The AI will instantly respond with detailed, personalized advice.</li>
+                            <li>Continue the conversation — the AI remembers context for better follow-ups.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nutrition Planning -->
+    <section class="about-section feature-section feature-reverse" id="nutrition-planning">
+        <div class="container">
+            <div class="feature-layout">
+                <div class="feature-visual">
+                    <div class="feature-icon-large nutrition-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="feature-float-card float-card-1">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Custom Plans</span>
+                    </div>
+                    <div class="feature-float-card float-card-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Track Progress</span>
+                    </div>
+                    <div class="feature-float-card float-card-3">
+                        <i class="fas fa-trophy"></i>
+                        <span>Achieve Goals</span>
+                    </div>
+                </div>
+                <div class="feature-info">
+                    <span class="section-tag">Fitness Plans</span>
+                    <h2>Personalized Fitness & Nutrition Plans</h2>
+                    <p class="feature-desc">Get comprehensive fitness and nutrition plans created by your trainer. Track your progress, follow structured workout routines, and achieve your fitness milestones with professional guidance.</p>
+                    
+                    <div class="feature-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Trainer-Created Plans</h4>
+                                <p>Your booked trainer creates customized fitness plans tailored to your body type, fitness level, and personal goals.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Structured Routines</h4>
+                                <p>Follow day-by-day workout schedules with exercise details, sets, reps, and rest periods — all designed by your trainer.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <h4>Progress Tracking</h4>
+                                <p>Monitor your fitness journey with detailed progress tracking. See how far you've come and what's next on your plan.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="how-to-use">
+                        <h3><i class="fas fa-lightbulb"></i> How to Use</h3>
+                        <ol>
+                            <li>Book a trainer and complete payment to activate your training.</li>
+                            <li>Your trainer will create a personalized fitness plan for you.</li>
+                            <li>View your plans from the <strong>"My Fitness Plans"</strong> section in your account menu.</li>
+                            <li>Follow the daily workout routines and nutrition guidelines.</li>
+                            <li>Communicate with your trainer via chat for adjustments and feedback.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It All Works Together -->
+    <section class="about-section workflow-section" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Workflow</span>
+                <h2>How It All <span class="gradient-text">Works Together</span></h2>
+                <p class="section-subtitle">A simple step-by-step flow to get started with FitZone</p>
+            </div>
+            <div class="workflow-timeline">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Create Your Account</h3>
+                        <p>Sign up with your email and verify your account. Set up your profile with your fitness goals and preferences.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Choose a Membership</h3>
+                        <p>Browse our membership plans and select the one that fits your needs. Unlock premium AI features and trainer access.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Explore AI Features</h3>
+                        <p>Use the AI Food Recommendation system for smart meal planning and chat with our AI Trainer for instant fitness guidance.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Book a Trainer</h3>
+                        <p>Browse certified trainers, check their profiles and reviews, and book sessions with your preferred trainer.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Train & Transform</h3>
+                        <p>Follow your personalized fitness plan, chat with your trainer, track your progress, and achieve your fitness goals!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="about-section cta-section">
+        <div class="container">
+            <div class="cta-card">
+                <div class="cta-content">
+                    <h2>Ready to Start Your Fitness Journey?</h2>
+                    <p>Join FitZone today and experience the future of fitness — powered by AI, guided by experts.</p>
+                    <div class="cta-buttons">
+                        <a href="{% url 'membership' %}" class="btn-cta btn-cta-primary">
+                            <i class="fas fa-rocket"></i> Get Started
+                        </a>
+                        <a href="/trainer" class="btn-cta btn-cta-outline">
+                            <i class="fas fa-dumbbell"></i> Browse Trainers
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'footer.html' %}
+
+    <!-- Smooth Scroll Script -->
+    <script>
+        // Smooth scroll for all links containing a hash (even if they specify the full path like /about/#section)
+        document.querySelectorAll('a[href*="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                const parts = href.split('#');
+                const path = parts[0];
+                const hash = '#' + parts[1];
+
+                // If it's a purely hash link or points to the current page
+                if (!path || path === window.location.pathname || path === '') {
+                    const target = document.querySelector(hash);
+                    if (target) {
+                        e.preventDefault();
+                        const navbarHeight = document.querySelector('.fz-navbar') ? document.querySelector('.fz-navbar').offsetHeight : 80;
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                        
+                        // Update the URL hash
+                        if(history.pushState) {
+                            history.pushState(null, null, hash);
+                        } else {
+                            window.location.hash = hash;
+                        }
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // Handle hash navigation from other pages (footer links on load)
+        window.addEventListener('load', function() {
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const target = document.querySelector(window.location.hash);
+                    if (target) {
+                        const navbarHeight = document.querySelector('.fz-navbar') ? document.querySelector('.fz-navbar').offsetHeight : 80;
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 100);
+            }
+        });
+
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.overview-card, .feature-layout, .workflow-step, .cta-card').forEach(el => {
+            el.classList.add('reveal-on-scroll');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
