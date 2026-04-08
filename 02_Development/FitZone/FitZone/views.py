@@ -83,7 +83,6 @@ def cancel_overdue_bookings(user):
         except Exception:
             pass
 
-
 def home(request):
     from .models import HomeBanner, PremiumService
     banners = HomeBanner.objects.filter(is_active=True)

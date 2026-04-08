@@ -8,473 +8,653 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Trainer CSS (shared booking modal classes) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="sty    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Trainer CSS -->
     <link rel="stylesheet" href="{% static 'trainer/trainer.css' %}">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-orange: #ff7a18;
+            --primary-orange-hover: #e06510;
+            --bg-light: #f8f9fa;
+            --text-dark: #1a1a1a;
+            --text-muted: #6c757d;
+            --border-color: rgba(0,0,0,0.08);
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --header-bg: linear-gradient(135deg, #1c1c1c, #2a2a2a);
         }
 
         body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #1a1a1a;
-            min-height: 100vh;
+            background-color: #f4f6f8;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+
+          /* Header and hero banner */
+        .profile-hero {
+            position: relative;
+            background: var(--header-bg);
+            height: 250px;
+            width: 100%;
         }
 
         .profile-container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 1140px;
+            margin: -100px auto 40px;
+            padding: 0 15px;
+            position: relative;
+            z-index: 10;
         }
 
-        /* Header Section */
-        .profile-header {
-            background: linear-gradient(135deg, rgba(255,122,24,0.15), rgba(255,154,60,0.08));
-            border: 2px solid rgba(255,122,24,0.3);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
+          /* Two-column layout */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 991px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+          /* Card styling */
+        .content-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
             display: flex;
-            gap: 40px;
-            align-items: flex-start;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .profile-image-section {
+        .section-title i {
+            color: var(--primary-orange);
+        }
+
+          /* Left column: main info */
+        .profile-main-info {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar-wrapper {
             flex-shrink: 0;
+            position: relative;
         }
 
         .profile-avatar {
-            width: 200px;
-            height: 200px;
-            border-radius: 20px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #ff7a18;
-            box-shadow: 0 10px 30px rgba(255,122,24,0.4);
+            border: 5px solid #ffffff;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
 
-        .profile-info {
-            flex: 1;
+        .verified-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #22c55e;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 10px rgba(34,197,94,0.3);
+        }
+
+        .profile-details {
+            padding-top: 100px; /* Offset for overlap */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .profile-name {
-            font-size: 36px;
-            font-weight: 700;
-            color: #ff7a18;
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            line-height: 1.2;
         }
 
-        .profile-role {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(34,197,94,0.2);
-            border: 1px solid rgba(34,197,94,0.4);
-            border-radius: 20px;
-            color: #22c55e;
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 20px;
+        .profile-headline {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
         }
 
         .profile-stats {
             display: flex;
-            gap: 30px;
-            margin-top: 20px;
-        }
-
-        .profile-fee-card {
-            min-width: 260px;
-            padding: 22px 24px;
-            background: rgba(255,255,255,0.85);
-            border: 1.5px solid rgba(255,122,24,0.25);
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(255,122,24,0.12);
-            text-align: center;
-        }
-
-        .fee-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(0,0,0,0.55);
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-
-        .fee-amount {
-            font-size: 34px;
-            font-weight: 800;
-            color: #ff7a18;
-            margin: 10px 0 6px;
-        }
-
-        .fee-sub {
-            font-size: 12px;
-            color: rgba(0,0,0,0.55);
-            font-weight: 600;
-        }
-
-        .stat-box {
-            text-align: center;
-            padding: 15px 25px;
-            background: rgba(0,0,0,0.03);
-            border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.08);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #ff7a18;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: rgba(0,0,0,0.5);
-            margin-top: 5px;
-        }
-
-        /* Bio Section */
-        .bio-section {
-            background: rgba(255,255,255,0.95);
-            border: 1.5px solid rgba(0,0,0,0.06);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ff7a18;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .bio-text {
-            color: rgba(0,0,0,0.75);
-            line-height: 1.8;
-            font-size: 15px;
-        }
-
-        /* Specializations */
-        .specializations-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .spec-badge {
-            padding: 10px 18px;
-            background: rgba(255,122,24,0.15);
-            border: 1.5px solid rgba(255,122,24,0.3);
-            border-radius: 25px;
-            color: #ff7a18;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Certificates Section */
-        .certificates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .cert-card {
-            background: rgba(0,0,0,0.02);
-            border: 1.5px solid rgba(0,0,0,0.06);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .cert-card:hover {
-            border-color: rgba(255,122,24,0.5);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
-
-        .cert-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: rgba(0,0,0,0.03);
-        }
-
-        .cert-info {
-            padding: 15px;
-        }
-
-        .cert-title {
-            font-size: 14px;
-            color: #1a1a1a;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .cert-link {
-            color: #ff7a18;
-            font-size: 13px;
-            text-decoration: none;
+        .stat-item {
             display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .cert-link:hover {
-            color: #ff9a3c;
-        }
-
-        /* Availability Card */
-        .availability-card {
-            background: rgba(34,197,94,0.08);
-            border: 1.5px solid rgba(34,197,94,0.3);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .availability-text {
-            color: #22c55e;
-            font-size: 15px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Price Card */
-        .price-card {
-            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            color: #141416;
-        }
-
-        .price-amount {
-            font-size: 48px;
-            font-weight: 700;
-            margin: 15px 0;
-        }
-
-        .price-label {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .book-btn {
-            width: 100%;
-            padding: 15px;
-            background: #ffffff;
-            color: #ff7a18;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .profile-fee-card .book-btn {
-            margin-top: 14px;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
-            color: #141416;
-            border: 1px solid rgba(255,122,24,0.35);
-            box-shadow: 0 10px 22px rgba(255,122,24,0.18);
-        }
-
-        .book-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .back-btn {
-            padding: 12px 24px;
-            background: rgba(0,0,0,0.03);
-            color: #1a1a1a;
-            border: 1.5px solid rgba(0,0,0,0.12);
-            border-radius: 10px;
-            text-decoration: none;
-            display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover {
-            background: rgba(0,0,0,0.06);
-            border-color: rgba(255,122,24,0.5);
-            color: #ff7a18;
-        }
-
-        /* Photo Carousel */
-        .photo-carousel-section {
-            margin: 30px 0;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 2px solid rgba(255,122,24,0.3);
-            background: linear-gradient(135deg, rgba(255,122,24,0.1), rgba(255,154,60,0.05));
-        }
-
-        .carousel-inner {
-            border-radius: 18px;
-        }
-
-        .carousel-item img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-radius: 18px;
-        }
-
-        .carousel-caption {
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            padding: 40px 20px 20px;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            border-radius: 0 0 18px 18px;
-        }
-
-        .carousel-caption h5 {
-            font-size: 18px;
+            background: var(--bg-light);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
         }
 
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-            background-color: rgba(255,122,24,0.8);
-            border-radius: 50%;
-            padding: 20px;
+        .stat-item i {
+            color: var(--primary-orange);
+            font-size: 16px;
         }
 
-        .carousel-control-prev:hover .carousel-control-prev-icon,
-        .carousel-control-next:hover .carousel-control-next-icon {
-            background-color: rgba(255,122,24,1);
-        }
-
-        .carousel-indicators [data-bs-target] {
-            background-color: #ff7a18;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        @media (max-width: 768px) {
-            .carousel-item img {
-                height: 220px;
-            }
-        }
-
-        /* Certificate & Experience Carousels */
-        .cert-carousel-wrapper {
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1.5px solid rgba(0,0,0,0.08);
-            background: rgba(0,0,0,0.01);
-        }
-
-        .cert-card-carousel {
-            background: rgba(0,0,0,0.02);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .cert-card-carousel:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .cert-image-carousel {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            background: rgba(0,0,0,0.03);
-        }
-
-        #certCarousel .carousel-control-prev-icon,
-        #certCarousel .carousel-control-next-icon {
-            background-color: rgba(255,122,24,0.8);
-            border-radius: 50%;
-            padding: 15px;
-        }
-
-        #expCarousel .carousel-control-prev-icon,
-        #expCarousel .carousel-control-next-icon {
-            background-color: rgba(59,130,246,0.8);
-            border-radius: 50%;
-            padding: 15px;
-        }
-
-        #certCarousel .carousel-indicators [data-bs-target] {
-            background-color: #ff7a18;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        #expCarousel .carousel-indicators [data-bs-target] {
-            background-color: #3b82f6;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        /* Booking Modal */
-        .modal-content {
-            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,249,250,0.98));
-            border: 2px solid rgba(255,122,24,0.3);
-            color: #1a1a1a;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-        }
-
-        .modal-title {
-            color: #ff7a18;
-        }
-
-        .btn-close {
-            filter: none;
-        }
-
-        @media (max-width: 768px) {
-            .profile-header {
+        @media (max-width: 576px) {
+            .profile-main-info {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
             }
-
-            .profile-stats {
-                flex-wrap: wrap;
-                justify-content: center;
+            .profile-details {
+                padding-top: 10px;
+                align-items: center;
             }
-
-            .profile-fee-card {
-                width: 100%;
+            .profile-stats {
+                justify-content: center;
             }
         }
 
-        /* Messages Container */
+          /* Bio and specializations */
+        .bio-text {
+            color: #4a4a4a;
+            line-height: 1.7;
+            font-size: 15.5px;
+        }
+
+        .specializations-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .spec-badge {
+            padding: 8px 16px;
+            background: rgba(255,122,24,0.1);
+            color: var(--primary-orange);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+          /* Right column: sticky sidebar */
+        .sidebar {
+            position: sticky;
+            top: 90px; /* stick below navbar */
+        }
+
+        .booking-card {
+            text-align: center;
+        }
+
+        .fee-amount {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .fee-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .booking-rules {
+            margin: 20px 0;
+            text-align: left;
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rule-item i {
+            color: var(--primary-orange);
+            margin-top: 3px;
+        }
+
+        .btn-book-action {
+            width: 100%;
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-book-action:hover {
+            background: var(--primary-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,122,24,0.3);
+            color: #fff;
+        }
+
+        .contact-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-info-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4a4a4a;
+            font-size: 14px;
+        }
+
+        .contact-info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .contact-info-list i {
+            color: var(--primary-orange);
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Gallery and certifications */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .cert-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cert-card:hover {
+            border-color: var(--primary-orange);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .cert-img-wrapper {
+            height: 140px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaeaea;
+            overflow: hidden;
+        }
+
+        .cert-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cert-img-wrapper i {
+            font-size: 40px;
+            color: var(--text-muted);
+        }
+
+        .cert-info {
+            padding: 12px;
+        }
+
+        .cert-info h6 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cert-info span {
+            font-size: 12px;
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Photo gallery grid */
+        .photo-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            aspect-ratio: 4 / 3;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #000;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.06);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75), transparent 55%);
+            padding: 16px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            display: flex;
+            align-items: flex-end;
+            transition: opacity 0.25s ease;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .gallery-item:hover .gallery-caption {
+            opacity: 1;
+        }
+
+          /* Reviews section */
+        .review-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .review-rating {
+            background: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .review-text {
+            font-size: 14.5px;
+            color: #4a4a4a;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Layout Utilities */
+        .mb-4 { margin-bottom: 1.5rem; }
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        .back-link:hover {
+            background: var(--primary-orange);
+            color: #fff;
+        }
+
+          /* Booking modal styles */
+        .modal-content.booking-modal-content {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .booking-modal-hero {
+            background: var(--header-bg);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        .booking-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            filter: invert(1);
+            opacity: 0.8;
+        }
+        .booking-avatar {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-orange);
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        .booking-modal-title {
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .booking-modal-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin: 0;
+        }
+        .booking-body {
+            padding: 25px;
+        }
+        .booking-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .booking-info-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        .booking-info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .booking-info-value {
+            font-size: 22px;
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+        .booking-field-group {
+            margin-bottom: 20px;
+        }
+        .booking-field-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .booking-input, .booking-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .booking-input:focus, .booking-textarea:focus {
+            border-color: var(--primary-orange);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,122,24,0.15);
+        }
+        .booking-footer {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8f9fa;
+        }
+        .booking-submit-btn {
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .booking-submit-btn:hover {
+            background: var(--primary-orange-hover);
+            color: white;
+        }
+        .booking-cancel-btn {
+            background: white;
+            border: 1px solid #ced4da;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        .booking-cancel-btn:hover {
+            background: #e2e6ea;
+            color: #212529;
+        }
+        
+        .booking-warning {
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .booking-warning.warn {
+            background: rgba(251,191,36,0.15);
+            color: #d97706;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+        .booking-warning.danger {
+            background: rgba(239,68,68,0.15);
+            color: #b91c1c;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+          /* Messages container */
         .messages-container {
             position: fixed;
             top: 20px;
@@ -482,7 +662,6 @@
             z-index: 9999;
             max-width: 400px;
         }
-
         .alert-msg {
             margin-bottom: 15px;
             padding: 15px 20px;
@@ -493,36 +672,15 @@
             align-items: center;
             gap: 12px;
         }
-
-        .alert-msg.msg-success {
-            background: rgba(34,197,94,0.15);
-            border-left: 4px solid #22c55e;
-        }
-
-        .alert-msg.msg-error {
-            background: rgba(239,68,68,0.15);
-            border-left: 4px solid #ef4444;
-        }
-
-        .alert-msg.msg-warning {
-            background: rgba(251,191,36,0.15);
-            border-left: 4px solid #fbbf24;
-        }
-
-        .alert-msg.msg-info {
-            background: rgba(59,130,246,0.15);
-            border-left: 4px solid #3b82f6;
-        }
-
-        .alert-msg-icon {
-            font-size: 20px;
-        }
-
+        .msg-success { background: rgba(34,197,94,0.15); border-left: 4px solid #22c55e; }
+        .msg-error { background: rgba(239,68,68,0.15); border-left: 4px solid #ef4444; }
+        .msg-warning { background: rgba(251,191,36,0.15); border-left: 4px solid #fbbf24; }
+        .msg-info { background: rgba(59,130,246,0.15); border-left: 4px solid #3b82f6; }
+        .alert-msg-icon { font-size: 20px; }
         .msg-success .alert-msg-icon { color: #22c55e; }
         .msg-error .alert-msg-icon { color: #ef4444; }
         .msg-warning .alert-msg-icon { color: #fbbf24; }
         .msg-info .alert-msg-icon { color: #3b82f6; }
-
         .alert-msg-close {
             margin-left: auto;
             background: none;
@@ -532,406 +690,317 @@
             cursor: pointer;
             opacity: 0.7;
         }
-
-        /* Sidebar sections */
-        .bio-section-sidebar {
-            margin-top: 20px;
-        }
-
-        .sidebar-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .sidebar-stack .bio-section-sidebar {
-            margin-top: 0;
-        }
-
-        .sidebar-stack .bio-section {
-            margin-bottom: 0;
-        }
-
-        .section-title-sm {
-            font-size: 18px;
-        }
-
-        .contact-info {
-            color: rgba(0,0,0,0.55);
-            font-size: 14px;
-        }
-
-        .contact-icon {
-            color: #ff7a18;
-            margin-right: 8px;
-        }
-
-        /* Cert/Exp PDF placeholder */
-        .cert-pdf-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cert-pdf-placeholder.orange-bg {
-            background: rgba(255,122,24,0.1);
-        }
-
-        .cert-pdf-placeholder.blue-bg {
-            background: rgba(59,130,246,0.1);
-        }
-
-        .cert-pdf-icon {
-            font-size: 64px;
-        }
-
-        .cert-pdf-icon.orange { color: #ff7a18; }
-        .cert-pdf-icon.blue { color: #3b82f6; }
-
-        /* Photo carousel no margin */
-        .photo-carousel-no-margin {
-            margin: 0;
-        }
-
-        /* Bio section full height */
-        .bio-section-full {
-            margin-top: 0;
-            height: 100%;
-        }
-
-        /* Row top gap */
-        .row-top-gap {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     {% include 'navbar.html' %}
+    
     <!-- Messages -->
     {% if messages %}
     <div id="messages-container" class="messages-container">
         {% for message in messages %}
             <div class="alert-msg {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' %}msg-error{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}">
                 <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} alert-msg-icon"></i>
-                <span>{{ message }}</span>
-                <button onclick="this.parentElement.remove()" class="alert-msg-close"><i class="fas fa-times"></i></button>
+                <span style="color:#1a1a1a; font-weight:500;">{{ message }}</span>
+                <button onclick="this.parentElement.remove()" class="alert-msg-close"><i class="fas fa-times" style="color:#1a1a1a;"></i></button>
             </div>
         {% endfor %}
     </div>
     <script>setTimeout(function(){document.querySelectorAll('.alert-msg').forEach(function(a){a.style.transition='all 0.3s';a.style.opacity='0';setTimeout(function(){a.remove();},300);});},5000);</script>
     {% endif %}
 
-    <div class="profile-container">
-        <a href="{% url 'trainer' %}" class="back-btn">
+    <!-- Top Hero Banner -->
+    <div class="profile-hero">
+        <a href="{% url 'trainer' %}" class="back-link">
             <i class="fas fa-arrow-left"></i> Back to Trainers
         </a>
+    </div>
 
-        <!-- Profile Header -->
-        <div class="profile-header">
-            <div class="profile-image-section">
-                {% if profile_pic %}
-                    <img src="{{ profile_pic.file.url }}" alt="{{ trainer.user.get_full_name|default:trainer.user.username }}" class="profile-avatar">
-                {% else %}
-                    <img src="https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=400&background=ff7a18&color=fff" alt="Profile" class="profile-avatar">
-                {% endif %}
-            </div>
-
-            <div class="profile-info">
-                <h1 class="profile-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</h1>
-                <span class="profile-role">
-                    <i class="fas fa-check-circle"></i> Verified Trainer
-                </span>
-
-                <div class="profile-stats">
-                    <div class="stat-box">
-                        <div class="stat-value">{{ trainer.experience }}</div>
-                        <div class="stat-label">Years Experience</div>
-                    </div>
-
-                    <div class="stat-box">
-                    <div class="stat-value">{{ avg_rating|default:"0.0" }}</div>
-                    </div>
-
-                    <div class="stat-box">
-                        <div class="stat-value">0</div>
-                        <div class="stat-label">Active Clients</div>
+    <!-- Main Content Container -->
+    <div class="profile-container">
+        
+        <!-- Header Info Card -->
+        <div class="content-card" style="padding-top: 0; padding-bottom: 25px;">
+            <div class="profile-main-info">
+                <!-- Avatar -->
+                <div class="profile-avatar-wrapper" style="margin-top: -60px;">
+                    {% if profile_pic %}
+                        <img src="{{ profile_pic.file.url }}" alt="{{ trainer.user.get_full_name|default:trainer.user.username }}" class="profile-avatar">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ trainer.user.get_full_name|default:trainer.user.username }}&size=400&background=ff7a18&color=fff" alt="Profile" class="profile-avatar">
+                    {% endif %}
+                    <div class="verified-badge" title="Verified Trainer">
+                        <i class="fas fa-check"></i>
                     </div>
                 </div>
-            </div>
 
-            <div class="profile-fee-card">
-                <div class="fee-label">Monthly Training Fee</div>
-                <div class="fee-amount">
-                    {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}{% else %}TBD{% endif %}
+                <!-- Text Details -->
+                <div class="profile-details" style="padding-top: 20px;">
+                    <h1 class="profile-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</h1>
+                    <div class="profile-headline">
+                        <i class="fas fa-certificate" style="color:var(--primary-orange); margin-right:5px;"></i> Certified Professional Trainer
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item" title="Experience">
+                            <i class="fas fa-dumbbell"></i>
+                            {{ trainer.experience }} Years
+                        </div>
+                        <div class="stat-item" title="Rating">
+                            <i class="fas fa-star" style="color:#f59e0b"></i>
+                            {{ avg_rating|default:"0.0" }} Rating
+                        </div>
+                        <div class="stat-item" title="Clients">
+                            <i class="fas fa-users"></i>
+                            Active Clients
+                        </div>
+                    </div>
                 </div>
-                <div class="fee-sub">per month</div>
-                <button class="book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal">
-                    <i class="fas fa-calendar-check"></i> Book Training Session
-                </button>
             </div>
         </div>
 
-        <!-- Photo Carousel & About Me Section -->
-        <div class="row g-4 row-top-gap">
-            <!-- Photo Carousel -->
-            {% if photos %}
-            <div class="col-lg-6">
-                <div class="photo-carousel-section photo-carousel-no-margin">
-                    <div id="trainerPhotoCarousel" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            {% for photo in photos %}
-                                <button type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ forloop.counter }}"></button>
-                            {% endfor %}
-                        </div>
-                        <div class="carousel-inner">
-                            {% for photo in photos %}
-                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                    <img src="{{ photo.photo.url }}" alt="{{ photo.caption }}">
-                                    {% if photo.caption %}
-                                        <div class="carousel-caption d-md-block">
-                                            <h5>{{ photo.caption }}</h5>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#trainerPhotoCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            <!-- About Me Section -->
-            <div class="{% if photos %}col-lg-6{% else %}col-lg-12{% endif %}">
+        <div class="layout-grid">
+            
+            <!-- LEFT COLUMN (Main Content) -->
+            <div class="col-left">
+                
+                <!-- About Me -->
                 {% if trainer.bio %}
-                <div class="bio-section bio-section-full">
+                <div class="content-card">
                     <h2 class="section-title">
-                        <i class="fas fa-quote-left"></i> About Me
+                        <i class="fas fa-user-circle"></i> About Me
                     </h2>
                     <p class="bio-text">{{ trainer.bio }}</p>
                 </div>
                 {% endif %}
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-8">
 
                 <!-- Specializations -->
-                <div class="bio-section">
+                {% if specializations %}
+                <div class="content-card">
                     <h2 class="section-title">
-                        <i class="fas fa-dumbbell"></i> Areas of Expertise
+                        <i class="fas fa-bullseye"></i> Areas of Expertise
                     </h2>
                     <div class="specializations-grid">
                         {% for spec in specializations %}
                             <div class="spec-badge">
-                                <i class="fas fa-check"></i> {{ spec }}
+                                <i class="fas fa-check-circle" style="opacity: 0.7;"></i> {{ spec }}
                             </div>
                         {% endfor %}
                     </div>
                 </div>
+                {% endif %}
 
-                <!-- Certifications & Experience Documents -->
-                {% if certifications or experience_docs %}
-                <div class="bio-section">
-                    <div class="row g-4">
-                        <!-- Certifications -->
-                        {% if certifications %}
-                        <div class="col-lg-6">
-                            <h2 class="section-title">
-                                <i class="fas fa-certificate"></i> Certifications
-                            </h2>
-                            
-                            <!-- Certifications Grid -->
-                            <div class="certificates-grid">
-                                {% for cert in certifications %}
-                                    <div class="cert-card" onclick="window.open('{{ cert.file.url }}', '_blank')">
-                                        {% if cert.file.url|slice:"-4:" == '.pdf' %}
-                                            <div class="cert-image cert-pdf-placeholder orange-bg">
-                                                <i class="fas fa-file-pdf cert-pdf-icon orange"></i>
-                                            </div>
-                                        {% else %}
-                                            <img src="{{ cert.file.url }}" alt="Certificate" class="cert-image">
-                                        {% endif %}
-                                        <div class="cert-info">
-                                            <div class="cert-title">Certification Document {{ forloop.counter }}</div>
-                                            <a href="{{ cert.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
-                                                <i class="fas fa-external-link-alt"></i> View Document
-                                            </a>
-                                        </div>
+                <!-- Photo Gallery Grid -->
+                {% if photos %}
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-images"></i> Gallery ({{ photos|length }})
+                    </h2>
+                    <div class="photo-gallery-grid">
+                        {% for photo in photos %}
+                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#photoModal"
+                                 data-photo-url="{{ photo.photo.url }}"
+                                 data-photo-alt="{{ photo.caption|default:'Trainer Photo' }}">
+                                <img src="{{ photo.photo.url }}" alt="{{ photo.caption|default:'Trainer Photo' }}">
+                                {% if photo.caption %}
+                                    <div class="gallery-caption">
+                                        {{ photo.caption }}
                                     </div>
-                                {% endfor %}
+                                {% endif %}
                             </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Experience Documents -->
-                        {% if experience_docs %}
-                        <div class="col-lg-6">
-                            <h2 class="section-title">
-                                <i class="fas fa-briefcase"></i> Experience Verification
-                            </h2>
-                            
-                            <!-- Experience Grid -->
-                            <div class="certificates-grid">
-                                {% for doc in experience_docs %}
-                                    <div class="cert-card" onclick="window.open('{{ doc.file.url }}', '_blank')">
-                                        {% if doc.file.url|slice:"-4:" == '.pdf' %}
-                                            <div class="cert-image cert-pdf-placeholder blue-bg">
-                                                <i class="fas fa-file-pdf cert-pdf-icon blue"></i>
-                                            </div>
-                                        {% else %}
-                                            <img src="{{ doc.file.url }}" alt="Experience Document" class="cert-image">
-                                        {% endif %}
-                                        <div class="cert-info">
-                                            <div class="cert-title">Experience Document {{ forloop.counter }}</div>
-                                            <a href="{{ doc.file.url }}" target="_blank" class="cert-link" onclick="event.stopPropagation()">
-                                                <i class="fas fa-external-link-alt"></i> View Document
-                                            </a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
+                        {% endfor %}
                     </div>
+                    <p class="text-muted small mt-2 mb-0">Click any photo to view it in full size.</p>
                 </div>
                 {% endif %}
-            </div>
 
-            <div class="col-lg-4 sidebar-stack">
-                <!-- Availability -->
-                {% if trainer.available_time %}
-                <div class="bio-section bio-section-sidebar">
-                    <h2 class="section-title section-title-sm">
-                        <i class="fas fa-clock"></i> Availability
+                <!-- Certifications -->
+                {% if certifications %}
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-award"></i> Certifications
                     </h2>
-                    <div class="availability-card">
-                        <div class="availability-text">
-                            <i class="fas fa-calendar-week"></i>
-                            {{ trainer.available_time }}
-                        </div>
+                    <div class="cert-grid">
+                        {% for cert in certifications %}
+                            <div class="cert-card" onclick="window.open('{{ cert.file.url }}', '_blank')">
+                                <div class="cert-img-wrapper">
+                                    {% if cert.file.url|slice:"-4:" == '.pdf' %}
+                                        <i class="fas fa-file-pdf"></i>
+                                    {% else %}
+                                        <img src="{{ cert.file.url }}" alt="Certificate">
+                                    {% endif %}
+                                </div>
+                                <div class="cert-info">
+                                    <h6>Certification Document {{ forloop.counter }}</h6>
+                                    <span><i class="fas fa-external-link-alt"></i> View PDF</span>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Contact Info -->
-                <div class="bio-section bio-section-sidebar">
-                    <h2 class="section-title section-title-sm">
-                        <i class="fas fa-envelope"></i> Contact
+                <!-- Experience Verification Documents -->
+                {% if experience_docs %}
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-badge"></i> Experience Verification
                     </h2>
-                    <div class="contact-info">
-                        <p><i class="fas fa-user contact-icon"></i> {{ trainer.user.username }}</p>
-                        {% if trainer.user.userprofile.phone %}
-                        <p><i class="fas fa-phone contact-icon"></i> {{ trainer.user.userprofile.phone }}</p>
-                        {% endif %}
-                        <p><i class="fas fa-envelope contact-icon"></i> {{ trainer.user.email }}</p>
+                    <div class="cert-grid">
+                        {% for doc in experience_docs %}
+                            <div class="cert-card" onclick="window.open('{{ doc.file.url }}', '_blank')">
+                                <div class="cert-img-wrapper">
+                                    {% if doc.file.url|slice:"-4:" == '.pdf' %}
+                                        <i class="fas fa-file-pdf"></i>
+                                    {% else %}
+                                        <img src="{{ doc.file.url }}" alt="Experience Document">
+                                    {% endif %}
+                                </div>
+                                <div class="cert-info">
+                                    <h6>Experience Document {{ forloop.counter }}</h6>
+                                    <span><i class="fas fa-external-link-alt"></i> View PDF</span>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
-        </div>
+                {% endif %}
 
-        <!-- Reviews Section -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="bio-section">
-                    <h2 class="section-title"><i class="fas fa-star"></i> Client Reviews ({{ reviews|length }})</h2>
+                <!-- Client Reviews -->
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-comments"></i> Client Reviews ({{ reviews|length }})
+                    </h2>
                     {% if reviews %}
-                        <div class="row g-3">
+                        <div class="row">
                         {% for review in reviews %}
-                            <div class="col-md-6">
-                                <div class="card h-100 shadow-sm border-0" style="background:#f8f9fa; border-radius:10px;">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 class="mb-0 text-primary">{{ review.user.username }}</h6>
-                                            <span class="badge" style="background:#f59e0b; color:#fff;">
-                                                {{ review.rating }} <i class="fas fa-star" style="font-size:0.8rem;"></i>
-                                            </span>
+                            <div class="col-12">
+                                <div class="review-card">
+                                    <div class="review-header">
+                                        <div>
+                                            <h4 class="reviewer-name">{{ review.user.username }}</h4>
+                                            <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
                                         </div>
-                                        <p class="text-muted small mb-0 fst-italic">{{ review.created_at|date:"M d, Y" }}</p>
-                                        {% if review.comment %}
-                                            <p class="mt-2 mb-0" style="font-size:0.95rem;">{{ review.comment }}</p>
-                                        {% endif %}
+                                        <div class="review-rating">
+                                            {{ review.rating }} <i class="fas fa-star"></i>
+                                        </div>
                                     </div>
+                                    {% if review.comment %}
+                                        <p class="review-text">"{{ review.comment }}"</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
                         </div>
                     {% else %}
-                        <p class="text-muted">No reviews yet. Be the first to review after a session!</p>
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-comment-slash fs-3 mb-3" style="opacity:0.3;"></i>
+                            <p class="mb-0">No reviews yet. Be the first to review after a session!</p>
+                        </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
 
+            </div>
+            
+            <!-- RIGHT COLUMN (Sticky Sidebar) -->
+            <div class="col-right">
+                <div class="sidebar">
+                    
+                    <!-- Booking Card -->
+                    <div class="content-card booking-card">
+                        <h3 class="fee-amount">{% if trainer.monthly_price %}₹{{ trainer.monthly_price }}{% else %}TBD{% endif %}</h3>
+                        <p class="fee-label">Monthly Training Fee</p>
+
+                        <div class="booking-rules">
+                            <div class="rule-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Availability</strong><br>
+                                    {{ trainer.available_time|default:"Flexible Timings" }}
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-bolt"></i>
+                                <div>
+                                    <strong>Quick Response</strong><br>
+                                    Usually replies within a few hours
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn-book-action" data-bs-toggle="modal" data-bs-target="#bookingModal">
+                            <i class="fas fa-calendar-check"></i> Book Training Session
+                        </button>
+                    </div>
+
+                    <!-- Contact Card -->
+                    <div class="content-card" style="padding: 20px;">
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; color: var(--text-dark);">
+                            Trainer Details
+                        </h4>
+                        <ul class="contact-info-list">
+                            <li>
+                                <i class="fas fa-user"></i>
+                                <span>{{ trainer.user.username }}</span>
+                            </li>
+                            {% if trainer.user.userprofile.phone %}
+                            <li>
+                                <i class="fas fa-phone"></i>
+                                <span>{{ trainer.user.userprofile.phone }}</span>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <span style="word-break: break-all;">{{ trainer.user.email }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /layout-grid -->
     </div>
 
-    <!-- Booking Modal -->
+    <!-- Booking Modal (Kept purely for form functionality) -->
     <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content booking-modal-content">
                 <form method="post" action="{% url 'book_trainer' trainer.id %}">
                     {% csrf_token %}
-                    <!-- Hero Header -->
                     <div class="booking-modal-hero">
-                        <div class="booking-hero-accent"></div>
                         <button type="button" class="btn-close booking-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                         <div class="booking-avatar">
                             {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
                         </div>
-                        <h5 class="booking-modal-title">
-                            Book Training Session
-                        </h5>
-                        <p class="booking-modal-subtitle">
-                            with <span class="booking-trainer-name">{{ trainer.user.get_full_name|default:trainer.user.username }}</span>
-                        </p>
+                        <h5 class="booking-modal-title">Book Training Session</h5>
+                        <p class="booking-modal-subtitle">with <span style="font-weight:600;">{{ trainer.user.get_full_name|default:trainer.user.username }}</span></p>
                     </div>
 
                     <div class="modal-body booking-body">
-                        <!-- Pricing & Time Row -->
                         <div class="booking-info-grid">
-                            <div class="booking-info-card orange">
-                                <div class="booking-info-icon orange"><i class="fas fa-tags"></i></div>
+                            <div class="booking-info-card">
                                 <div class="booking-info-label">Price</div>
-                                <div class="booking-info-value">
-                                    {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}<span class="booking-price-suffix">/mo</span>{% else %}TBD{% endif %}
+                                <div class="booking-info-value" style="color: var(--primary-orange);">
+                                    {% if trainer.monthly_price %}₹{{ trainer.monthly_price }}{% else %}TBD{% endif %}
                                 </div>
                             </div>
-                            <div class="booking-info-card green">
-                                <div class="booking-info-icon green"><i class="fas fa-clock"></i></div>
+                            <div class="booking-info-card">
                                 <div class="booking-info-label">Availability</div>
-                                <div class="booking-avail-value">
+                                <div style="font-weight: 600; font-size: 14px; margin-top: 5px;">
                                     {{ trainer.available_time|default:"Flexible" }}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Date Picker -->
                         <div class="booking-field-group">
-                            <label class="booking-field-label">
-                                <span class="booking-label-icon purple"><i class="fas fa-calendar-alt"></i></span>
-                                Start Date <span class="booking-required">*</span>
-                            </label>
+                            <label class="booking-field-label">Start Date *</label>
                             <input type="date" name="booking_date" required value="{{ today }}" class="booking-input" readonly>
                         </div>
 
-                        <!-- Message -->
                         <div class="booking-field-group">
-                            <label class="booking-field-label">
-                                <span class="booking-label-icon pink"><i class="fas fa-pen-fancy"></i></span>
-                                Message <span class="booking-optional">(optional)</span>
-                            </label>
-                            <textarea name="message" rows="3" placeholder="Tell the trainer about your fitness goals, preferred workout style..." class="booking-textarea"></textarea>
+                            <label class="booking-field-label">Message (optional)</label>
+                            <textarea name="message" rows="3" placeholder="Tell the trainer about your fitness goals..." class="booking-textarea"></textarea>
                         </div>
 
-                        <!-- Warnings -->
                         {% if has_pending_booking %}
                         <div class="booking-warning warn">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -946,21 +1015,14 @@
                         {% endif %}
                     </div>
 
-                    <!-- Footer -->
                     <div class="booking-footer">
-                        <button type="button" class="btn booking-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="booking-cancel-btn" data-bs-dismiss="modal">Cancel</button>
                         {% if user.is_authenticated and user_is_email_verified and not has_pending_booking %}
-                            <button type="submit" class="btn booking-submit-btn">
-                                <i class="fas fa-bolt me-1"></i> Confirm Booking
-                            </button>
+                            <button type="submit" class="booking-submit-btn">Confirm Booking</button>
                         {% elif not user.is_authenticated %}
-                            <a href="{% url 'login' %}" class="btn booking-login-btn">
-                                <i class="fas fa-sign-in-alt me-1"></i> Login to Book
-                            </a>
+                            <a href="{% url 'login' %}" class="booking-submit-btn" style="text-decoration: none;">Login to Book</a>
                         {% else %}
-                            <button type="button" class="btn booking-disabled-btn" disabled>
-                                <i class="fas fa-lock me-1"></i> Cannot Book
-                            </button>
+                            <button type="button" class="booking-cancel-btn" disabled>Cannot Book</button>
                         {% endif %}
                     </div>
                 </form>
@@ -968,16 +1030,60 @@
         </div>
     </div>
 
+    <!-- Shared Photo Modal for Trainer Gallery -->
+    <div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-header border-0 pb-0 position-absolute w-100" style="z-index: 10;">
+                    <button type="button" class="btn-close btn-close-white ms-auto btn-close-large" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1); background-color: rgba(255,255,255,0.8); border-radius: 50%; opacity: 1; padding: 10px;"></button>
+                </div>
+                <div class="modal-body p-0 text-center">
+                    <img src="" class="img-fluid rounded-3 shadow-lg" alt="Trainer Photo" style="max-height: 85vh; cursor: pointer;" data-bs-dismiss="modal">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Bootstrap JS (loaded from navbar.html) -->
     <script>
-        // Auto-open booking modal if redirected with ?book=true
         document.addEventListener('DOMContentLoaded', function() {
+            // Auto-open booking modal if redirected with ?book=true
             const params = new URLSearchParams(window.location.search);
             if (params.get('book') === 'true') {
                 const bookingModal = document.getElementById('bookingModal');
                 if (bookingModal) {
                     const modal = new bootstrap.Modal(bookingModal);
                     modal.show();
+                }
+            }
+
+            // Trainer gallery: open single shared modal with full-size image
+            const photoModalEl = document.getElementById('photoModal');
+            if (photoModalEl) {
+                const photoImg = photoModalEl.querySelector('img');
+                const closeBtn = photoModalEl.querySelector('.btn-close-large');
+
+                document.querySelectorAll('.gallery-item').forEach(function (item) {
+                    item.addEventListener('click', function () {
+                        const url = this.getAttribute('data-photo-url');
+                        const alt = this.getAttribute('data-photo-alt') || 'Trainer Photo';
+                        if (url && photoImg) {
+                            photoImg.src = url;
+                            photoImg.alt = alt;
+                        }
+                    });
+                });
+
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function () {
+                        const modalInstance = bootstrap.Modal.getInstance(photoModalEl);
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+                    });
                 }
             }
         });
