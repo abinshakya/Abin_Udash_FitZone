@@ -12,17 +12,18 @@
 
   <style>
     :root {
-      --bg-main: #f4f6f9;
-      --text-dark: #1e293b;
+      --bg-main: #f8fafc;
+      --text-dark: #0f172a;
       --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --orange: #f97316;
-      --orange-hover: #ea580c;
-      --orange-light: #fff7ed;
+      --border-color: rgba(0,0,0,0.06);
+      --orange: #ff7a18;
+      --orange-hover: #ff6000;
+      --orange-light: rgba(255,122,24,0.1);
       --white: #ffffff;
-      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.05);
+      --shadow-hover: 0 25px 50px rgba(0, 0, 0, 0.08);
+      --shadow-orange: 0 10px 25px rgba(255,122,24,0.25);
     }
 
     * { box-sizing: border-box; }
@@ -32,8 +33,8 @@
       color: var(--text-dark);
       background-color: var(--bg-main);
       background-image: 
-        radial-gradient(at 0% 0%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, hsla(28,100%,74%,0.1) 0px, transparent 50%);
+        radial-gradient(circle at 10% 0%, rgba(255,122,24,0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 100%, rgba(59,130,246,0.08) 0%, transparent 45%);
       background-attachment: fixed;
       min-height: 100vh;
     }
@@ -57,11 +58,15 @@
 
     .hello h1 {
       margin: 0;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 800;
       letter-spacing: -0.5px;
-      color: var(--text-dark);
+      background: linear-gradient(135deg, var(--text-dark) 0%, #334155 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
     }
+    
     .hello p {
       margin: 8px 0 0;
       color: var(--text-muted);
@@ -75,9 +80,10 @@
       gap: 6px;
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 0.8rem;
       font-weight: 700;
-      margin-top: 12px;
+      margin-top: 14px;
+      box-shadow: var(--shadow-sm);
     }
 
     .verification-badge.verified {
@@ -94,12 +100,33 @@
 
     /* Modern Card Layout */
     .card {
-      background: var(--white);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: 24px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
       margin-bottom: 40px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--orange), #ff9a3c);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-4px);
+    }
+    
+    .card:hover::before {
+      opacity: 1;
     }
 
     .card-head {
@@ -108,7 +135,7 @@
       justify-content: space-between;
       padding: 24px 32px;
       border-bottom: 1px solid var(--border-color);
-      background: var(--white);
+      background: transparent;
     }
 
     .card-head h2 {
@@ -123,7 +150,8 @@
 
     .card-icon-orange {
       color: var(--orange);
-      font-size: 1.3rem;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 2px 4px rgba(255,122,24,0.3));
     }
 
     .card-body {
@@ -143,12 +171,15 @@
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
-      gap: 20px;
-      transition: background-color 0.2s ease;
+      gap: 24px;
+      transition: all 0.2s ease;
+      background-color: transparent;
     }
 
     .booking-item:hover {
       background-color: #f8fafc;
+      padding-left: 36px;
+      padding-right: 28px;
     }
 
     .booking-item:last-child {
@@ -157,29 +188,35 @@
 
     /* Client Avatar */
     .booking-avatar {
-      width: 54px;
-      height: 54px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: var(--orange-light);
+      background: linear-gradient(135deg, var(--orange-light), #fff);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--orange);
       font-weight: 800;
-      font-size: 20px;
+      font-size: 22px;
       flex-shrink: 0;
-      border: 2px solid rgba(249,115,22,0.2);
+      border: 2px solid rgba(255,122,24,0.25);
+      box-shadow: 0 4px 10px rgba(255,122,24,0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .booking-item:hover .booking-avatar {
+      transform: scale(1.05);
     }
 
     .booking-info {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
 
     .booking-name {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--text-dark);
     }
@@ -187,6 +224,7 @@
     .booking-email {
       font-size: 0.9rem;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
     .booking-meta {
@@ -201,46 +239,51 @@
       color: var(--text-muted);
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 500;
+      gap: 8px;
+      font-weight: 600;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 8px;
+      display: inline-flex;
     }
     
     .booking-date i {
-      color: #94a3b8;
+      color: var(--orange);
     }
 
     /* Status Badges */
     .status-badge {
-      padding: 6px 16px;
+      padding: 8px 18px;
       border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      font-size: 0.75rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      box-shadow: var(--shadow-sm);
     }
 
     .status-pending {
-      background: #fef3c7;
-      color: #d97706;
-      border: 1px solid rgba(251,191,36,0.3);
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #b45309;
+      border: 1px solid rgba(251,191,36,0.4);
     }
 
     .status-confirmed {
-      background: #dcfce7;
-      color: #059669;
-      border: 1px solid rgba(16,185,129,0.3);
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      color: #047857;
+      border: 1px solid rgba(16,185,129,0.4);
     }
 
     .status-rejected {
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid rgba(239,68,68,0.3);
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #b91c1c;
+      border: 1px solid rgba(239,68,68,0.4);
     }
 
     .status-cancelled {
-      background: #f1f5f9;
-      color: #64748b;
-      border: 1px solid rgba(148,163,184,0.3);
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      color: #475569;
+      border: 1px solid rgba(148,163,184,0.4);
     }
 
     /* Action Buttons */
@@ -251,14 +294,14 @@
       margin-left: 16px;
     }
     
-    .booking-actions form{
+    .booking-actions form {
       margin: 0;
     }
 
     .action-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
       font-size: 16px;
@@ -266,36 +309,45 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
     }
 
     .action-btn.view-details {
       background: #eff6ff;
       color: #3b82f6;
+      border-color: rgba(59,130,246,0.2);
     }
     .action-btn.view-details:hover {
-      background: #dbeafe;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59,130,246,0.2);
+      background: #3b82f6;
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(59,130,246,0.25);
     }
 
     .action-btn.accept {
       background: #dcfce7;
-      color: #059669;
+      color: #10b981;
+      border-color: rgba(16,185,129,0.2);
     }
     .action-btn.accept:hover {
-      background: #bbf7d0;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(16,185,129,0.2);
+      background: #10b981;
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(16,185,129,0.25);
     }
 
     .action-btn.reject {
       background: #fee2e2;
-      color: #dc2626;
+      color: #ef4444;
+      border-color: rgba(239,68,68,0.2);
     }
     .action-btn.reject:hover {
-      background: #fecaca;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(220,38,38,0.2);
+      background: #ef4444;
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(239,68,68,0.25);
     }
 
     .action-btn.cancel {
@@ -303,15 +355,16 @@
       color: #64748b;
     }
     .action-btn.cancel:hover {
-      background: #e2e8f0;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(100,116,139,0.2);
+      background: #64748b;
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(100,116,139,0.25);
     }
 
     /* Internal Booking Messages (Quotes, Errors) */
     .booking-message {
-      padding: 16px 32px 16px 106px;
-      background: #f8fafc;
+      padding: 16px 32px 16px 115px; /* Aligned with item content */
+      background: linear-gradient(90deg, #f8fafc, transparent);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       gap: 12px;
@@ -322,7 +375,8 @@
       margin: 0;
       font-size: 0.9rem;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      font-style: italic;
     }
 
     .booking-message .quote-icon {
@@ -332,7 +386,7 @@
     }
 
     .booking-message.msg-error {
-      background: #fff5f5;
+      background: linear-gradient(90deg, #fff5f5, transparent);
       padding-left: 32px;
       border-left: 4px solid #ef4444;
     }
@@ -340,66 +394,73 @@
     /* Empty States */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
     }
 
     .empty-icon {
-      font-size: 4rem;
-      color: #cbd5e1;
-      margin-bottom: 20px;
+      font-size: 5rem;
+      color: #e2e8f0;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.02));
     }
 
     .empty-title {
-      margin: 0 0 8px;
-      font-size: 1.25rem;
-      font-weight: 700;
+      margin: 0 0 12px;
+      font-size: 1.4rem;
+      font-weight: 800;
       color: var(--text-dark);
     }
 
     .empty-text {
       margin: 0;
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
 
     /* Alerts and Toasts */
     .alert-box {
       display: flex;
       align-items: flex-start;
-      gap: 16px;
-      padding: 20px 24px;
+      gap: 18px;
+      padding: 24px 28px;
       border-radius: 20px;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       border: 1px solid var(--border-color);
-      background: var(--white);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
       box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .alert-box:hover {
+      box-shadow: var(--shadow-md);
     }
 
     .alert-box.alert-info {
-      border-left: 5px solid #3b82f6;
+      border-left: 6px solid #3b82f6;
     }
     .alert-box.alert-info .alert-icon-box { color: #3b82f6; }
 
     .alert-box.alert-success {
-      border-left: 5px solid #10b981;
+      border-left: 6px solid #10b981;
     }
     .alert-box.alert-success .alert-icon-box { color: #10b981; }
 
     .alert-icon-box {
-      font-size: 24px;
+      font-size: 28px;
       flex-shrink: 0;
     }
 
     .alert-content h4 {
-      margin: 0 0 6px;
-      font-size: 1.1rem;
-      font-weight: 700;
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: var(--text-dark);
     }
 
     .alert-content p {
       margin: 0;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
       line-height: 1.6;
     }
@@ -410,135 +471,137 @@
       border: none;
       color: rgba(0,0,0,0.3);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
       transition: color 0.2s;
     }
 
     .alert-close-btn:hover{
-      color: rgba(0,0,0,0.6);
+      color: rgba(0,0,0,0.8);
     }
 
     .toast-container{
       position: fixed;
-      top: 20px;
-      right: 20px;
+      top: 24px;
+      right: 24px;
       z-index: 9999;
       max-width: 400px;
     }
 
     .toast-msg{
-      margin-bottom: 12px;
-      padding: 14px 18px;
-      border-radius: 12px;
-      color: #1a1a1a;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-md);
       display: flex;
       align-items: center;
-      gap: 12px;
-      animation: toastIn 0.3s ease-out;
-      font-size: 14px;
+      gap: 14px;
+      animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 0.95rem;
       font-weight: 600;
     }
 
     .toast-msg.toast-success{
-      background: #dcfce7;
-      border-left: 4px solid #22c55e;
+      background: linear-gradient(to right, #dcfce7, #ffffff);
+      border-left: 5px solid #10b981;
     }
 
     .toast-msg.toast-error{
-      background: #fee2e2;
-      border-left: 4px solid #ef4444;
+      background: linear-gradient(to right, #fee2e2, #ffffff);
+      border-left: 5px solid #ef4444;
     }
 
     .toast-msg.toast-warning{
-      background: #fef3c7;
-      border-left: 4px solid #fbbf24;
+      background: linear-gradient(to right, #fef3c7, #ffffff);
+      border-left: 5px solid #f59e0b;
     }
 
     .toast-msg.toast-info{
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
+      background: linear-gradient(to right, #eff6ff, #ffffff);
+      border-left: 5px solid #3b82f6;
     }
 
-    .toast-icon{ font-size: 18px; }
-    .toast-success .toast-icon{ color: #22c55e; }
+    .toast-icon{ font-size: 20px; }
+    .toast-success .toast-icon{ color: #10b981; }
     .toast-error .toast-icon{ color: #ef4444; }
-    .toast-warning .toast-icon{ color: #fbbf24; }
+    .toast-warning .toast-icon{ color: #f59e0b; }
     .toast-info .toast-icon{ color: #3b82f6; }
 
     .toast-close{
       margin-left: auto;
       background: none;
       border: none;
-      color: rgba(0,0,0,0.5);
-      font-size: 16px;
+      color: rgba(0,0,0,0.4);
+      font-size: 18px;
       cursor: pointer;
       transition: color 0.2s;
     }
 
-    .toast-close:hover{ color: #1a1a1a; }
+    .toast-close:hover{ color: var(--text-dark); }
 
     @keyframes toastIn{
-      from{ transform: translateX(100%); opacity: 0; }
+      from{ transform: translateX(120%); opacity: 0; }
       to{ transform: translateX(0); opacity: 1; }
     }
 
     @keyframes toastOut{
       from{ transform: translateX(0); opacity: 1; }
-      to{ transform: translateX(100%); opacity: 0; }
+      to{ transform: translateX(120%); opacity: 0; }
     }
 
     /* Modals */
     .client-modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6);
-      z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+      z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(6px);
     }
     .client-modal-overlay.open { display: flex; }
     
     .client-modal {
-      background: var(--white); border-radius: 24px; padding: 0; width: 100%; max-width: 480px;
-      box-shadow: var(--shadow-md); overflow: hidden; transform: scale(0.95); animation: modalIn 0.2s forwards;
+      background: var(--white); border-radius: 28px; padding: 0; width: 100%; max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; transform: scale(0.95); animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
     @keyframes modalIn { to { transform: scale(1); } }
 
     .client-modal-header {
       display: flex; align-items: center; justify-content: space-between; 
-      padding: 24px 32px; border-bottom: 1px solid var(--border-color); background: #f8fafc;
+      padding: 28px 36px; border-bottom: 1px solid var(--border-color); background: #f8fafc;
     }
     .client-modal-title {
-      font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin: 0;
+      font-size: 1.3rem; font-weight: 800; color: var(--text-dark); margin: 0;
       display: flex; align-items: center; gap: 12px;
     }
     .client-modal-close {
-      background: #e2e8f0; border: none; width: 32px; height: 32px; border-radius: 50%;
+      background: #e2e8f0; border: none; width: 36px; height: 36px; border-radius: 50%;
       color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
+      transition: all 0.2s; font-size: 16px;
     }
-    .client-modal-close:hover { background: #cbd5e1; color: var(--text-dark); }
+    .client-modal-close:hover { background: #cbd5e1; color: var(--text-dark); transform: rotate(90deg); }
     
-    .client-modal-body { padding: 32px; font-size: 0.95rem; }
+    .client-modal-body { padding: 36px; font-size: 1rem; }
     .client-modal-av {
-      width: 80px; height: 80px; background: linear-gradient(135deg, #f97316 0%, #fb923c 100%); 
+      width: 88px; height: 88px; background: linear-gradient(135deg, var(--orange) 0%, #fb923c 100%); 
       color: var(--white); border-radius: 50%; display: flex; align-items: center; 
-      justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 24px;
-      box-shadow: 0 8px 16px rgba(249,115,22,0.2);
+      justify-content: center; font-size: 2.2rem; font-weight: 800; margin: 0 auto 28px;
+      box-shadow: 0 10px 20px rgba(249,115,22,0.3); border: 4px solid var(--white);
     }
     .client-modal-item {
-      display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);
     }
     .client-modal-item:last-child { border: none; }
     .client-modal-label { font-weight: 600; color: var(--text-muted); }
-    .client-modal-value { font-weight: 500; color: var(--text-dark); text-align: right; }
+    .client-modal-value { font-weight: 600; color: var(--text-dark); text-align: right; }
 
     @media (max-width: 900px) {
       .main { margin-left: 64px; padding: 30px 20px; }
-      .booking-item { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .booking-item { flex-direction: column; align-items: flex-start; gap: 16px; padding: 24px; }
+      .booking-item:hover { padding-left: 24px; padding-right: 24px; }
       .booking-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
       .status-badge { align-self: flex-start; }
       .booking-message { padding: 16px 24px; }
     }
     @media (max-width: 600px) {
-      .main { margin-left: 0; }
+      .main { margin-left: 0; padding: 20px 16px; }
+      .hello h1 { font-size: 1.8rem; }
     }
   </style>
 </head>
@@ -661,7 +724,11 @@
                 {% for booking in pending_requests %}
                   <div class="booking-item">
                     <div class="booking-avatar">
-                      {{ booking.user.username.0|upper }}
+                      {% if booking.user.userprofile.profile_picture %}
+                        <img src="{{ booking.user.userprofile.profile_picture.url }}" alt="{{ booking.user.username }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                      {% else %}
+                        {{ booking.user.username.0|upper }}
+                      {% endif %}
                     </div>
                     <div class="booking-info">
                       <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
@@ -731,7 +798,11 @@
                 {% for booking in active_clients %}
                   <div class="booking-item">
                     <div class="booking-avatar">
-                      {{ booking.user.username.0|upper }}
+                      {% if booking.user.userprofile.profile_picture %}
+                        <img src="{{ booking.user.userprofile.profile_picture.url }}" alt="{{ booking.user.username }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                      {% else %}
+                        {{ booking.user.username.0|upper }}
+                      {% endif %}
                     </div>
                     <div class="booking-info">
                       <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>

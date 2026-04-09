@@ -4,37 +4,173 @@
 {% block title %}Review {{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }} | FitZone{% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<style>
+    .review-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08) !important;
+        overflow: hidden;
+        margin-top: 30px;
+    }
+    .review-card-header {
+        background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+        color: #fff;
+        padding: 20px 25px;
+        border-bottom: 4px solid #ff7a18;
+    }
+    .review-card-header h4 {
+        margin: 0;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .review-card-header h4 i {
+        color: #ff7a18;
+    }
+    .star-rating-ui {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+    .star-rating-ui i {
+        font-size: 38px;
+        color: #e4e5e9;
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+    }
+    .star-rating-ui i.fas {
+        color: #ffc107;
+    }
+    .star-rating-ui i:hover {
+        transform: scale(1.15);
+    }
+    .btn-submit-review {
+        background: linear-gradient(135deg, #ff7a18, #e06510);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit-review:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 122, 24, 0.3);
+        color: white;
+    }
+    .btn-cancel-review {
+        background: #f8f9fa;
+        color: #4a4a4a;
+        border: 1px solid #e4e5e9;
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+        text-align: center;
+        text-decoration: none;
+    }
+    .btn-cancel-review:hover {
+        background: #e4e5e9;
+        color: #1a1a1a;
+    }
+    
+    /* Make the original select dropdown hidden securely */
+    .rating-select-hidden {
+        display: none !important;
+    }
+    
+    /* Force style on django form fields */
+    textarea[name="comment"] {
+        border-radius: 10px;
+        padding: 15px;
+        border: 1px solid #e4e5e9;
+        font-size: 15px;
+        resize: vertical;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+        width: 100%;
+        min-height: 120px;
+        transition: all 0.2s ease;
+    }
+    textarea[name="comment"]:focus {
+        border-color: #ff7a18;
+        box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.1);
+        outline: none;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+</style>
+
+<div class="container pb-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white" style="border-radius: 10px 10px 0 0;">
-                    <h4 class="mb-0"><i class="fas fa-star"></i> Rate your Trainer</h4>
+        <div class="col-md-9 col-lg-7">
+            <div class="card review-card">
+                <div class="review-card-header">
+                    <h4><i class="fas fa-star"></i> Rate your Trainer</h4>
                 </div>
-                <div class="card-body p-4">
-                    <p class="lead">How was your experience with <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>?</p>
+                <div class="card-body p-4 p-md-5">
+                    <p class="lead mb-4" style="font-size: 1.15rem; color: #4a4a4a;">
+                        How was your experience with <strong style="color: #1a1a1a;">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>?
+                    </p>
                     
-                    <form method="post">
+                    <form method="post" id="reviewForm">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Rating</label>
-                            {{ form.rating }}
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold" style="color: #1a1a1a; font-size: 1.05rem;">Rating <span class="text-danger">*</span></label>
+                            
+                            <!-- Custom Star Rating UI -->
+                            <div class="star-rating-ui" id="starRating">
+                                <i class="far fa-star" title="1 Star" data-value="1"></i>
+                                <i class="far fa-star" title="2 Stars" data-value="2"></i>
+                                <i class="far fa-star" title="3 Stars" data-value="3"></i>
+                                <i class="far fa-star" title="4 Stars" data-value="4"></i>
+                                <i class="far fa-star" title="5 Stars" data-value="5"></i>
+                            </div>
+                            
+                            <!-- Hidden Original Select container -->
+                            <div class="rating-select-hidden">
+                                {{ form.rating }}
+                            </div>
+
+                            <div class="invalid-feedback d-none text-danger fw-semibold" id="ratingError" style="display:block;">
+                                <i class="fas fa-exclamation-circle"></i> Please select a star rating.
+                            </div>
+
                             {% if form.rating.errors %}
-                                <div class="text-danger small mt-1">{{ form.rating.errors }}</div>
+                                <div class="text-danger small mt-2 fw-semibold">{{ form.rating.errors }}</div>
                             {% endif %}
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Review Comment</label>
+
+                        <div class="mb-4 pb-2">
+                            <label class="form-label fw-bold" style="color: #1a1a1a; font-size: 1.05rem;">Review Comment</label>
+                            
                             {{ form.comment }}
+                            
                             {% if form.comment.errors %}
-                                <div class="text-danger small mt-1">{{ form.comment.errors }}</div>
+                                <div class="text-danger small mt-1 fw-semibold">{{ form.comment.errors }}</div>
                             {% endif %}
-                            <small class="text-muted">Share your thoughts about your trainer's guidance, behavior, and results.</small>
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-info-circle text-primary opacity-75"></i> 
+                                Share your thoughts about your trainer's guidance, behavior, and results.
+                            </small>
                         </div>
                         
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn text-white w-100" style="background:#ea580c; border:none;">Submit Review</button>
-                            <a href="{% url 'trainer_client_dashboard' %}" class="btn btn-secondary w-100">Cancel</a>
+                        <div class="d-flex flex-column flex-sm-row gap-3 pt-2 border-top border-light">
+                            <button type="submit" class="btn btn-submit-review w-100 flex-grow-1 order-1 order-sm-2">
+                                <i class="fas fa-paper-plane me-1"></i> Submit Review
+                            </button>
+                            <a href="{% url 'trainer_client_dashboard' %}" class="btn btn-cancel-review w-100 flex-grow-1 order-2 order-sm-1">
+                                Cancel
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -42,4 +178,69 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating-ui i');
+    const selectBox = document.querySelector('select[name="rating"]');
+    const form = document.getElementById('reviewForm');
+    const ratingError = document.getElementById('ratingError');
+    
+    let currentRating = selectBox && selectBox.value ? parseInt(selectBox.value) : 0;
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            currentRating = parseInt(this.getAttribute('data-value'));
+            if(selectBox) {
+                selectBox.value = currentRating;
+            }
+            updateStars(currentRating);
+            ratingError.classList.add('d-none');
+            
+            // Add a little pop effect to the clicked star
+            this.style.transform = 'scale(1.25)';
+            setTimeout(() => { this.style.transform = 'scale(1)'; }, 150);
+        });
+        
+        star.addEventListener('mouseover', function() {
+            let val = parseInt(this.getAttribute('data-value'));
+            updateStars(val, true);
+        });
+        
+        star.addEventListener('mouseout', function() {
+            updateStars(currentRating);
+        });
+    });
+    
+    function updateStars(val, isHover = false) {
+        stars.forEach(s => {
+            let starVal = parseInt(s.getAttribute('data-value'));
+            if (starVal <= val) {
+                s.classList.remove('far');
+                s.classList.add('fas');
+            } else {
+                s.classList.remove('fas');
+                s.classList.add('far');
+            }
+        });
+    }
+    
+    // Initialize upon page load
+    if (currentRating > 0) {
+        updateStars(currentRating);
+    }
+
+    form.addEventListener('submit', function(e) {
+        if (selectBox && (!selectBox.value || selectBox.value === "")) {
+            e.preventDefault();
+            ratingError.classList.remove('d-none');
+            
+            // Shake animation on error
+            const starContainer = document.getElementById('starRating');
+            starContainer.style.animation = 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both';
+            setTimeout(() => { starContainer.style.animation = ''; }, 400);
+        }
+    });
+});
+</script>
 {% endblock %}
