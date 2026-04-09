@@ -22,7 +22,7 @@ def _active_paid_bookings(user, trainer_reg=None):
     If valid_until is null (older bookings), we treat them as active to avoid
     locking out existing users.
     """
-    today = timezone.now().date()
+    now = timezone.now()
     filters = {
         'user': user,
         'status': 'confirmed',
@@ -32,7 +32,7 @@ def _active_paid_bookings(user, trainer_reg=None):
         filters['trainer'] = trainer_reg
 
     return TrainerBooking.objects.filter(**filters).filter(
-        Q(valid_until__isnull=True) | Q(valid_until__gte=today)
+        Q(valid_until__isnull=True) | Q(valid_until__gte=now)
     )
 
 
@@ -62,9 +62,11 @@ def redirect_to_booking_checkout_with_alert(booking_id):
 # View/edit the user's fitness profile. Only accessible with a paid booking
 def fitness_profile(request):
     # Check for at least one paid booking
+    has_any_paid = TrainerBooking.objects.filter(user=request.user, status='confirmed', payment_status='completed').exists()
+    # active booking needed to EDIT, but read access persists if ever paid
     paid_booking = _active_paid_bookings(request.user).first()
 
-    if not paid_booking:
+    if not has_any_paid:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
             return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
@@ -96,9 +98,11 @@ def fitness_profile(request):
 @login_required
 # Client views their workout and diet plans
 def my_plans(request):
+    has_any_paid = TrainerBooking.objects.filter(user=request.user, status='confirmed', payment_status='completed').exists()
+    # active booking needed to EDIT, but read access persists if ever paid
     paid_booking = _active_paid_bookings(request.user).first()
 
-    if not paid_booking:
+    if not has_any_paid:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
             return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
@@ -121,8 +125,10 @@ def my_plans(request):
 @login_required
 # Client views a specific workout plan
 def view_workout_plan(request, plan_id):
+    has_any_paid = TrainerBooking.objects.filter(user=request.user, status='confirmed', payment_status='completed').exists()
+    # active booking needed to EDIT, but read access persists if ever paid
     paid_booking = _active_paid_bookings(request.user).exists()
-    if not paid_booking:
+    if not has_any_paid:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
             return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
@@ -142,8 +148,10 @@ def view_workout_plan(request, plan_id):
 @login_required
 # Client views a specific diet plan
 def view_diet_plan(request, plan_id):
+    has_any_paid = TrainerBooking.objects.filter(user=request.user, status='confirmed', payment_status='completed').exists()
+    # active booking needed to EDIT, but read access persists if ever paid
     paid_booking = _active_paid_bookings(request.user).exists()
-    if not paid_booking:
+    if not has_any_paid:
         unpaid_booking = get_unpaid_confirmed_booking(request.user)
         if unpaid_booking:
             return redirect_to_booking_checkout_with_alert(unpaid_booking.id)
@@ -178,12 +186,12 @@ def trainer_client_list(request):
         return redirect('/')
 
     # Get all paid + still valid bookings
-    today = timezone.now().date()
+    now = timezone.now()
     paid_bookings = TrainerBooking.objects.filter(
         trainer=registration,
         status='confirmed',
         payment_status='completed',
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('user').order_by('-updated_at')
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).select_related('user').order_by('-updated_at')
 
     clients_data = []
     for booking in paid_bookings:

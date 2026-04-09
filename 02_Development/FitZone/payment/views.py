@@ -247,7 +247,8 @@ def verify_payment(request, pidx):
                     if base_date < now:
                         base_date = now
 
-                    booking.valid_until = base_date + timedelta(minutes=10)
+                    # Grant 1 month of trainer access from the base date
+                    booking.valid_until = base_date + timedelta(days=1)
 
                     booking.save()
                     messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")

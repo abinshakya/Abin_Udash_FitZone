@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+﻿from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
-from django.utils.timesince import timesince as django_timesince
-from django.db.models import Q, Max, Count, Subquery, OuterRef
+from datetime import timedelta
+from django.db.models import Q, Max, Count
 from .models import ChatRoom, Message
 from trainer.models import TrainerRegistration, TrainerBooking
 from login_logout_register.models import UserProfile
@@ -18,10 +18,38 @@ def get_profile_picture_url(user):
         pass
     return ''
 
+def _has_chat_access(client_user, trainer_reg):
+    now = timezone.now()
+    two_days_ago = now - timedelta(days=2)
+    
+    base_qs = TrainerBooking.objects.filter(
+        user=client_user, trainer=trainer_reg, status='confirmed'
+    )
+    
+    has_free = base_qs.filter(payment_status='pending', created_at__gte=two_days_ago).exists()
+    has_paid = base_qs.filter(
+        payment_status='completed'
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).exists()
+
+    return has_free or has_paid
+
+def _handle_session_expiry(room):
+    if not _has_chat_access(room.client, room.trainer):
+        msg_text = "Your session has ended. Please book again to continue access."
+        has_ended_msg = room.messages.filter(message_type='system', content=msg_text).exists()
+        
+        if not has_ended_msg:
+            Message.objects.create(
+                room=room,
+                sender=room.trainer.user, 
+                content=msg_text,
+                message_type='system'
+            )
+            room.updated_at = timezone.now()
+            room.save(update_fields=['updated_at'])
 
 @login_required
 def trainer_chat(request):
-    """Chat page for trainers — shows all client conversations."""
     try:
         profile = UserProfile.objects.get(user=request.user)
         if profile.role != 'trainer':
@@ -33,7 +61,6 @@ def trainer_chat(request):
     if not registration:
         return redirect('trainer_dashboard')
 
-    # Get or create chat rooms for all confirmed clients (any payment status)
     active_bookings = TrainerBooking.objects.filter(
         trainer=registration,
         status='confirmed',
@@ -45,7 +72,6 @@ def trainer_chat(request):
             client=booking.user
         )
 
-    # Fetch ALL chat rooms (including past/cancelled) to preserve chat history
     chat_rooms = ChatRoom.objects.filter(trainer=registration).select_related(
         'client'
     ).annotate(
@@ -56,17 +82,11 @@ def trainer_chat(request):
         )
     ).order_by('-last_message_time')
 
-    # Determine which clients currently have an active, paid, and valid booking
-    today = timezone.now().date()
-    active_client_ids = set(
-        TrainerBooking.objects.filter(
-            trainer=registration,
-            status='confirmed',
-            payment_status='completed',
-        ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).values_list('user_id', flat=True)
-    )
+    active_client_ids = set()
+    for booking in active_bookings:
+        if _has_chat_access(booking.user, registration):
+            active_client_ids.add(booking.user_id)
 
-    # Active room
     room_id = request.GET.get('room')
     active_room = None
     messages_list = []
@@ -75,11 +95,10 @@ def trainer_chat(request):
         active_room = ChatRoom.objects.filter(id=room_id, trainer=registration).first()
 
     if active_room:
-        messages_list = active_room.messages.select_related('sender').all()
-        # Mark messages as read
+        _handle_session_expiry(active_room)
+        messages_list = active_room.messages.select_related('sender').order_by('created_at').all()
         active_room.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
 
-    # Check if active room's client has an active booking
     active_room_is_active = False
     if active_room and active_room.client_id in active_client_ids:
         active_room_is_active = True
@@ -101,32 +120,22 @@ def trainer_chat(request):
 
 @login_required
 def client_chat(request):
-    """Chat page for clients — shows all trainer conversations (including past)."""
-    # Get active trainer bookings for this user (any payment status) so that
-    # chat rooms exist even if the booking later expires.
     active_bookings = TrainerBooking.objects.filter(
         user=request.user,
         status='confirmed',
     ).select_related('trainer__user')
 
-    # Create chat rooms for each active booking
     for booking in active_bookings:
         ChatRoom.objects.get_or_create(
             trainer=booking.trainer,
             client=request.user
         )
 
-    # Determine which trainers currently have an active, paid, and valid booking
-    today = timezone.now().date()
-    active_trainer_ids = set(
-        TrainerBooking.objects.filter(
-            user=request.user,
-            status='confirmed',
-            payment_status='completed',
-        ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).values_list('trainer_id', flat=True)
-    )
+    active_trainer_ids = set()
+    for booking in active_bookings:
+        if _has_chat_access(request.user, booking.trainer):
+            active_trainer_ids.add(booking.trainer_id)
 
-    # Fetch ALL chat rooms (including past/cancelled) to preserve chat history
     chat_rooms = ChatRoom.objects.filter(client=request.user).select_related(
         'trainer__user'
     ).annotate(
@@ -137,7 +146,6 @@ def client_chat(request):
         )
     ).order_by('-last_message_time')
 
-    # Active room
     room_id = request.GET.get('room')
     active_room = None
     messages_list = []
@@ -146,10 +154,10 @@ def client_chat(request):
         active_room = ChatRoom.objects.filter(id=room_id, client=request.user).first()
 
     if active_room:
-        messages_list = active_room.messages.select_related('sender').all()
+        _handle_session_expiry(active_room)
+        messages_list = active_room.messages.select_related('sender').order_by('created_at').all()
         active_room.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
 
-    # Check if active room's trainer has an active booking
     active_room_is_active = False
     if active_room and active_room.trainer_id in active_trainer_ids:
         active_room_is_active = True
@@ -175,19 +183,11 @@ def send_message(request, room_id):
 
     room = get_object_or_404(ChatRoom, id=room_id)
 
-    # Verify user is part of this chat
     if request.user != room.client and request.user != room.trainer.user:
         return JsonResponse({'error': 'Access denied'}, status=403)
 
-    # Block messaging if no active, paid, and valid booking exists
-    today = timezone.now().date()
-    has_active = TrainerBooking.objects.filter(
-        trainer=room.trainer,
-        user=room.client,
-        status='confirmed',
-        payment_status='completed',
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).exists()
-    if not has_active:
+    if not _has_chat_access(room.client, room.trainer):
+        _handle_session_expiry(room)
         return JsonResponse({'error': 'Booking is no longer active. Book again to access this feature.'}, status=403)
 
     content = request.POST.get('content', '').strip()
@@ -196,12 +196,11 @@ def send_message(request, room_id):
     if not content and not image:
         return JsonResponse({'error': 'Empty message'}, status=400)
 
-    # Validate image if provided
     if image:
         allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
         if image.content_type not in allowed_types:
             return JsonResponse({'error': 'Only JPEG, PNG, GIF, and WebP images are allowed.'}, status=400)
-        if image.size > 5 * 1024 * 1024:  # 5 MB limit
+        if image.size > 5 * 1024 * 1024:
             return JsonResponse({'error': 'Image must be under 5 MB.'}, status=400)
 
     msg = Message.objects.create(
@@ -231,11 +230,12 @@ def send_message(request, room_id):
 
 @login_required
 def fetch_messages(request, room_id):
-    """Fetch new messages for polling (AJAX)."""
     room = get_object_or_404(ChatRoom, id=room_id)
 
     if request.user != room.client and request.user != room.trainer.user:
         return JsonResponse({'error': 'Access denied'}, status=403)
+        
+    _handle_session_expiry(room)
 
     after_id = request.GET.get('after', 0)
     try:
@@ -243,10 +243,11 @@ def fetch_messages(request, room_id):
     except (ValueError, TypeError):
         after_id = 0
 
-    new_messages = room.messages.filter(id__gt=after_id).select_related('sender')
+    new_messages = room.messages.filter(id__gt=after_id).select_related('sender').order_by('created_at')
 
-    # Mark received messages as read
-    new_messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+    new_messages_to_mark = new_messages.filter(is_read=False).exclude(sender=request.user)
+    if new_messages_to_mark.exists():
+        new_messages_to_mark.update(is_read=True)
 
     messages_data = []
     for msg in new_messages:
@@ -267,11 +268,6 @@ def fetch_messages(request, room_id):
 
 @login_required
 def delete_room(request, room_id):
-    """Delete a chat room and all its messages.
-
-    Only the trainer or client participating in the room may delete it.
-    Intended to be called via AJAX from the chat UI.
-    """
     if request.method != 'POST':
         return JsonResponse({'error': 'POST only'}, status=405)
 
@@ -279,26 +275,25 @@ def delete_room(request, room_id):
 
     is_trainer_user = hasattr(room.trainer, 'user') and room.trainer.user == request.user
     is_client_user = room.client == request.user
+
     if not (is_trainer_user or is_client_user):
         return JsonResponse({'error': 'Access denied'}, status=403)
 
     room.delete()
     return JsonResponse({'status': 'ok'})
-
-
 @login_required
 def start_chat_with_trainer(request, trainer_id):
-    """Start or open a chat with a specific trainer (from client dashboard)."""
+    """Start or open a chat with a specific trainer (from client dashboard).""" 
     trainer = get_object_or_404(TrainerRegistration, id=trainer_id)
 
-    # Check for any booking (active or past) - allow viewing past chat history
+    # Check for any booking (active or past) - allow viewing past chat history  
     has_any_booking = TrainerBooking.objects.filter(
         user=request.user,
         trainer=trainer,
     ).exists()
 
     if not has_any_booking:
-        return redirect('trainer_client_dashboard')
+        return redirect('trainer')
 
     room, _ = ChatRoom.objects.get_or_create(
         trainer=trainer,
@@ -307,6 +302,8 @@ def start_chat_with_trainer(request, trainer_id):
 
     return redirect(f'/chat/client/?room={room.id}')
 
+
+from django.utils.timesince import timesince as django_timesince
 
 def _smart_time_ago(dt):
     if dt is None:
@@ -323,15 +320,15 @@ def fetch_chat_list(request):
     user = request.user
 
     if role == 'trainer':
-        registration = TrainerRegistration.objects.filter(user=user).first()
+        registration = TrainerRegistration.objects.filter(user=user).first()    
         if not registration:
             return JsonResponse({'rooms': [], 'total_unread': 0})
 
-        chat_rooms = ChatRoom.objects.filter(trainer=registration).annotate(
+        chat_rooms = ChatRoom.objects.filter(trainer=registration).annotate(    
             last_message_time=Max('messages__created_at'),
             unread=Count(
                 'messages',
-                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)
+                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)   
             )
         ).order_by('-last_message_time')
     else:
@@ -339,13 +336,13 @@ def fetch_chat_list(request):
             last_message_time=Max('messages__created_at'),
             unread=Count(
                 'messages',
-                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)
+                filter=Q(messages__is_read=False) & ~Q(messages__sender=user)   
             )
         ).order_by('-last_message_time')
 
     rooms_data = []
     for room in chat_rooms:
-        last_msg = room.get_last_message()
+        last_msg = room.messages.order_by('-created_at').first()
         if last_msg:
             time_display = _smart_time_ago(last_msg.created_at)
             preview = last_msg.content[:35]
@@ -364,3 +361,5 @@ def fetch_chat_list(request):
 
     total_unread = sum(r['unread'] for r in rooms_data)
     return JsonResponse({'rooms': rooms_data, 'total_unread': total_unread})
+
+

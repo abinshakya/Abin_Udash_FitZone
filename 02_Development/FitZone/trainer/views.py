@@ -252,10 +252,25 @@ def trainer_client_bookings(request):
     unread_count = 0
 
     if registration:
+        now = timezone.now()
         notifications = registration.notifications.all()[:20]
         unread_count = registration.notifications.filter(is_read=False).count()
-        pending_requests = registration.bookings.select_related('user').filter(status='pending').order_by('-created_at')
-        active_clients = registration.bookings.select_related('user').filter(status='confirmed').order_by('-created_at')
+        all_bookings = registration.bookings.select_related('user')
+        
+        pending_requests = all_bookings.filter(
+            Q(status='pending') | Q(status='confirmed', payment_status='pending')
+        ).order_by('-created_at')
+        
+        active_clients = all_bookings.filter(
+            status='confirmed', 
+            payment_status='completed'
+        ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).order_by('-created_at')
+        
+        completed_clients = all_bookings.filter(
+            status='confirmed', 
+            payment_status='completed',
+            valid_until__lt=now
+        ).order_by('-created_at')
 
     context = {
         'registration': registration,
@@ -263,6 +278,7 @@ def trainer_client_bookings(request):
         'unread_count': unread_count,
         'pending_requests': pending_requests,
         'active_clients': active_clients,
+        'completed_clients': completed_clients,
         'all_bookings': registration.bookings.select_related('user').all(),
         'active_sidebar': 'client_bookings',
     }
