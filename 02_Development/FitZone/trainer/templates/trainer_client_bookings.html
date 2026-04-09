@@ -806,6 +806,53 @@
             {% endif %}
           </div>
         </div>
+
+        <!-- Completed Clients -->
+        <div class="card" id="completed-clients" style="margin-top: 25px;">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-user-check card-icon-orange"></i> Completed Clients</h2>
+          </div>
+          <div class="card-body card-body-flush">
+            {% if completed_clients %}
+              <div class="booking-list">
+                {% for booking in completed_clients %}
+                  <div class="booking-item">
+                    <div class="booking-avatar">
+                      {% if booking.user.userprofile.profile_picture %}
+                        <img src="{{ booking.user.userprofile.profile_picture.url }}" alt="{{ booking.user.username }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                      {% else %}
+                        {{ booking.user.username.0|upper }}
+                      {% endif %}
+                    </div>
+                    <div class="booking-info">
+                      <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                      <div class="booking-email">{{ booking.user.email }}</div> 
+                      <div class="booking-date">
+                        <i class="fa-regular fa-calendar"></i> Start: {{ booking.booking_date|date:"M d, Y" }}
+                        {% if booking.valid_until %}
+                          &nbsp;&bull;&nbsp; Ends: {{ booking.valid_until|date:"M d, Y" }}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <span class="status-badge" style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">Completed</span>
+                    <div class="booking-actions">
+                        <button type="button" class="action-btn view-details" title="View Client Details" onclick="showClientModal({{ booking.id }})">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fa-solid fa-history"></i></div>
+                <h3 class="empty-title">No Completed Clients</h3>
+                <p class="empty-text">Clients whose sessions have ended will appear here</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
 <br>
 <!-- Bookings Card -->
         <div class="card" id="active-clients">
