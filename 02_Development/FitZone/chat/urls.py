@@ -8,4 +8,5 @@ urlpatterns = [
     path('chat/fetch/<int:room_id>/', views.fetch_messages, name='fetch_messages'),
     path('chat/fetch-list/', views.fetch_chat_list, name='fetch_chat_list'),
     path('chat/start/<int:trainer_id>/', views.start_chat_with_trainer, name='start_chat_with_trainer'),
+    path('chat/delete-room/<int:room_id>/', views.delete_room, name='delete_chat_room'),
 ]

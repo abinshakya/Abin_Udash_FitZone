@@ -266,6 +266,27 @@ def fetch_messages(request, room_id):
 
 
 @login_required
+def delete_room(request, room_id):
+    """Delete a chat room and all its messages.
+
+    Only the trainer or client participating in the room may delete it.
+    Intended to be called via AJAX from the chat UI.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    room = get_object_or_404(ChatRoom, id=room_id)
+
+    is_trainer_user = hasattr(room.trainer, 'user') and room.trainer.user == request.user
+    is_client_user = room.client == request.user
+    if not (is_trainer_user or is_client_user):
+        return JsonResponse({'error': 'Access denied'}, status=403)
+
+    room.delete()
+    return JsonResponse({'status': 'ok'})
+
+
+@login_required
 def start_chat_with_trainer(request, trainer_id):
     """Start or open a chat with a specific trainer (from client dashboard)."""
     trainer = get_object_or_404(TrainerRegistration, id=trainer_id)

@@ -304,6 +304,11 @@ def edit_workout_plan(request, plan_id):
 
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(WorkoutPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
+
     days = plan.days.prefetch_related('exercises').all()
     day_form = WorkoutDayForm()
     exercise_form = ExerciseForm()
@@ -323,6 +328,10 @@ def edit_workout_plan(request, plan_id):
 def add_workout_day(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(WorkoutPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
 
     if request.method == 'POST':
         form = WorkoutDayForm(request.POST)
@@ -351,6 +360,10 @@ def add_workout_day(request, plan_id):
 def add_exercise(request, day_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     day = get_object_or_404(WorkoutDay, id=day_id, workout_plan__trainer=registration)
+    
+    if not has_paid_booking(day.workout_plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
 
     if request.method == 'POST':
         form = ExerciseForm(request.POST)
@@ -377,6 +390,10 @@ def add_exercise(request, day_id):
 def delete_exercise(request, exercise_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     exercise = get_object_or_404(Exercise, id=exercise_id, workout_day__workout_plan__trainer=registration)
+    
+    if not has_paid_booking(exercise.workout_day.workout_plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
     plan_id = exercise.workout_day.workout_plan.id
     client = exercise.workout_day.workout_plan.client
     plan_title = exercise.workout_day.workout_plan.title
@@ -397,6 +414,10 @@ def delete_exercise(request, exercise_id):
 def delete_workout_day(request, day_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     day = get_object_or_404(WorkoutDay, id=day_id, workout_plan__trainer=registration)
+    
+    if not has_paid_booking(day.workout_plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
     plan_id = day.workout_plan.id
     client = day.workout_plan.client
     plan_title = day.workout_plan.title
@@ -417,6 +438,10 @@ def delete_workout_day(request, day_id):
 def delete_workout_plan(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(WorkoutPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
     user_id = plan.client.id
     client = plan.client
     plan_title = plan.title
@@ -496,6 +521,11 @@ def edit_diet_plan(request, plan_id):
 
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(DietPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
+
     meals = plan.meals.all()
     meal_form = MealForm()
 
@@ -513,6 +543,10 @@ def edit_diet_plan(request, plan_id):
 def add_meal(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(DietPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
 
     if request.method == 'POST':
         form = MealForm(request.POST, request.FILES)
@@ -539,6 +573,10 @@ def add_meal(request, plan_id):
 def delete_meal(request, meal_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     meal = get_object_or_404(Meal, id=meal_id, diet_plan__trainer=registration)
+    
+    if not has_paid_booking(meal.diet_plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
     plan_id = meal.diet_plan.id
     client = meal.diet_plan.client
     plan_title = meal.diet_plan.title
@@ -559,6 +597,10 @@ def delete_meal(request, meal_id):
 def delete_diet_plan(request, plan_id):
     registration = TrainerRegistration.objects.filter(user=request.user).first()
     plan = get_object_or_404(DietPlan, id=plan_id, trainer=registration)
+    
+    if not has_paid_booking(plan.client, registration):
+        messages.error(request, "Cannot modify plan: booking period is over.")
+        return redirect('trainer_client_list')
     user_id = plan.client.id
     client = plan.client
     plan_title = plan.title

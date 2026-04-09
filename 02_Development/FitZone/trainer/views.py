@@ -201,11 +201,21 @@ def trainer_dashboard(request):
     unread_count = 0
     bookings = []
     active_clients = 0
+    booking_status_counts = {"pending": 0, "confirmed": 0, "completed": 0, "rejected": 0, "cancelled": 0}
+    earnings_total = 0
     if registration:
         notifications = registration.notifications.all()[:20]
         unread_count = registration.notifications.filter(is_read=False).count()
-        bookings = registration.bookings.select_related('user').all()[:20]
-        active_clients = registration.bookings.filter(status='confirmed').values('user').distinct().count()
+        all_bookings_qs = registration.bookings.select_related('user').all()
+        bookings = all_bookings_qs[:20]
+        active_clients = all_bookings_qs.filter(status='confirmed').values('user').distinct().count()
+
+        # Aggregate simple analytics
+        for b in all_bookings_qs:
+            if b.status in booking_status_counts:
+                booking_status_counts[b.status] += 1
+            if b.payment_status == 'completed' and b.amount:
+                earnings_total += float(b.amount)
     
     context = {
         'registration': registration,
@@ -215,6 +225,8 @@ def trainer_dashboard(request):
         'unread_count': unread_count,
         'bookings': bookings,
         'active_clients': active_clients,
+        'booking_status_counts': booking_status_counts,
+        'earnings_total': earnings_total,
         'all_bookings': registration.bookings.select_related('user').all(),
     }
     

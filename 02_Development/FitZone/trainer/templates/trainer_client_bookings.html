@@ -584,6 +584,13 @@
       justify-content: center; font-size: 2.2rem; font-weight: 800; margin: 0 auto 28px;
       box-shadow: 0 10px 20px rgba(249,115,22,0.3); border: 4px solid var(--white);
     }
+    .client-modal-av img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
     .client-modal-item {
       display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);
     }
@@ -883,7 +890,13 @@
             <button class="client-modal-close" onclick="closeClientModalToggle({{ booking.id }})"><i class="fas fa-times"></i></button>
           </div>
           <div class="client-modal-body">
-            <div class="client-modal-av">{{ booking.user.username.0|upper }}</div>
+            <div class="client-modal-av">
+              {% if booking.user.userprofile.profile_picture %}
+                <img src="{{ booking.user.userprofile.profile_picture.url }}" alt="{{ booking.user.get_full_name|default:booking.user.username }}">
+              {% else %}
+                {{ booking.user.username.0|upper }}
+              {% endif %}
+            </div>
             <div class="client-modal-item">
                 <span class="client-modal-label">Name</span>
                 <span>{{ booking.user.get_full_name|default:booking.user.username }}</span>

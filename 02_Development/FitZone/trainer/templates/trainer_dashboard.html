@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{% static 'notifications/notification.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
@@ -234,6 +235,14 @@
       border: 1px solid rgba(255,122,24,0.2);
     }
 
+    .booking-avatar-img{
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
     .booking-info{
       flex: 1;
     }
@@ -391,6 +400,12 @@
       margin: 0;
       color: rgba(0,0,0,0.4);
       font-size: 14px;
+    }
+
+    #analytics-card canvas{
+      background: #fff;
+      border-radius: 16px;
+      padding: 8px;
     }
 
     .booking-message{
@@ -698,7 +713,11 @@
                 {% for booking in bookings %}
                   <div class="booking-item">
                     <div class="booking-avatar">
-                      {{ booking.user.username.0|upper }}
+                      {% if booking.user.userprofile.profile_picture %}
+                        <img src="{{ booking.user.userprofile.profile_picture.url }}" alt="{{ booking.user.get_full_name|default:booking.user.username }}" class="booking-avatar-img">
+                      {% else %}
+                        {{ booking.user.username.0|upper }}
+                      {% endif %}
                     </div>
                     <div class="booking-info">
                       <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
@@ -754,6 +773,29 @@
           </div>
         </div>
 
+        <!-- Analytics Card -->
+        <div class="card" id="analytics-card">
+          <div class="card-head">
+            <h2><i class="fa-solid fa-chart-pie card-icon-orange"></i> Analytics</h2>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;align-items:flex-start;">
+              <div>
+                <h4 style="margin:0 0 8px;font-size:14px;color:rgba(0,0,0,0.65);font-weight:700;">Bookings by status (last {{ all_bookings|length }} bookings)</h4>
+                <canvas id="bookingStatusChart" height="180"></canvas>
+              </div>
+              <div>
+                <h4 style="margin:0 0 8px;font-size:14px;color:rgba(0,0,0,0.65);font-weight:700;">Revenue breakdown</h4>
+                <canvas id="revenuePieChart" height="180"></canvas>
+                <p style="margin-top:8px;font-size:13px;color:rgba(0,0,0,0.55);font-weight:600;">
+                  Total confirmed earnings: 
+                  {% if earnings_total %}₹{{ earnings_total|floatformat:2 }}{% else %}₹0.00{% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       {% else %}
         <div class="card">
           <div class="card-body" style="text-align: center; padding: 60px 20px;">
@@ -771,6 +813,60 @@
   </div>
 
   <script>
+      (function(){
+        if (!window.Chart) return;
+
+        const statusData = {
+          pending: {{ booking_status_counts.pending|default:0 }},
+          confirmed: {{ booking_status_counts.confirmed|default:0 }},
+          completed: {{ booking_status_counts.completed|default:0 }},
+          rejected: {{ booking_status_counts.rejected|default:0 }},
+          cancelled: {{ booking_status_counts.cancelled|default:0 }}
+        };
+
+        const ctxStatus = document.getElementById('bookingStatusChart');
+        if (ctxStatus) {
+          new Chart(ctxStatus, {
+            type: 'bar',
+            data: {
+              labels: ['Pending', 'Confirmed', 'Completed', 'Rejected', 'Cancelled'],
+              datasets: [{
+                label: 'Bookings',
+                data: [statusData.pending, statusData.confirmed, statusData.completed, statusData.rejected, statusData.cancelled],
+                backgroundColor: ['#fbbf24','#22c55e','#3b82f6','#f97316','#ef4444'],
+                borderRadius: 6,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { font: { family: 'Poppins' } } },
+                y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Poppins' } } }
+              }
+            }
+          });
+        }
+
+        const totalEarnings = {{ earnings_total|default:0 }};
+        const hasRevenue = totalEarnings > 0;
+        const ctxRevenue = document.getElementById('revenuePieChart');
+        if (ctxRevenue) {
+          new Chart(ctxRevenue, {
+            type: 'pie',
+            data: {
+              labels: hasRevenue ? ['Completed bookings','Unpaid / other'] : ['No revenue yet'],
+              datasets: [{
+                data: hasRevenue ? [totalEarnings, 0] : [1],
+                backgroundColor: hasRevenue ? ['#22c55e','#e5e7eb'] : ['#e5e7eb'],
+              }]
+            },
+            options: {
+              plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 } } } }
+            }
+          });
+        }
+      })();
   </script>
 
 </body>

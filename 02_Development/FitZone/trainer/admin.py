@@ -1,8 +1,12 @@
 from django.contrib import admin
+from django.contrib import messages
+from django import forms
+from django.utils import timezone
+import datetime
+
 from .models import TrainerRegistration, TrainerRegistrationDocument, TrainerBooking
 from notifications.models import TrainerNotification
 from login_logout_register.models import UserProfile
-from django.contrib import messages
 
 
 # Inline admin to display documents within the TrainerRegistration admin page
@@ -76,9 +80,27 @@ class TrainerRegistrationAdmin(admin.ModelAdmin):
 			super().save_model(request, obj, form, change)
 
 
+class TrainerBookingAdminForm(forms.ModelForm):
+	class Meta:
+		model = TrainerBooking
+		fields = "__all__"
+
+	def __init__(self, *args, **kwargs):
+		instance = kwargs.get("instance")
+		# Normalize legacy Date values for valid_until to timezone-aware datetimes
+		if instance is not None:
+			value = getattr(instance, "valid_until", None)
+			if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
+				instance.valid_until = timezone.make_aware(
+					datetime.datetime.combine(value, datetime.time.min)
+				)
+		super().__init__(*args, **kwargs)
+
+
 @admin.register(TrainerBooking)
 class TrainerBookingAdmin(admin.ModelAdmin):
 	list_display = ("user", "trainer", "booking_date", "status", "created_at")
 	list_filter = ("status", "created_at")
 	search_fields = ("user__username", "trainer__user__username")
 	readonly_fields = ("created_at", "updated_at")
+	form = TrainerBookingAdminForm
