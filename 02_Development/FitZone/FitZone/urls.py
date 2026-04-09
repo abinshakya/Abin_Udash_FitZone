@@ -27,6 +27,7 @@ urlpatterns = [
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
     path('ai_chat/', include('Ai_chatbot.urls')),
     path('my-trainer-dashboard/', views.trainer_client_dashboard, name='trainer_client_dashboard'),
+    path('my-trainers/', views.trainer_client_my_trainers, name='trainer_client_my_trainers'),
     path('', include('login_logout_register.urls')),
     path('', include('membership.urls')),
     path('', include('payment.urls')),

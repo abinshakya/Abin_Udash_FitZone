@@ -57,7 +57,6 @@ class TrainerRegistrationDocument(models.Model):
 
 
 class TrainerPhoto(models.Model):
-    """Photos uploaded by trainers for their public gallery"""
     trainer = models.ForeignKey(
         TrainerRegistration,
         related_name="photos",
@@ -104,7 +103,8 @@ class TrainerBooking(models.Model):
     # Access validity (per paid booking)
     # When payment is completed, this is typically set to 1 month from either
     # today or from the end of any existing active booking with the same trainer.
-    valid_until = models.DateField(blank=True, null=True, help_text="Training access valid until this date (inclusive)")
+    # Stored as DateTimeField to allow minute-level expiry.
+    valid_until = models.DateTimeField(blank=True, null=True, help_text="Training access valid until this date and time (inclusive)")
     
     # Cancellation
     cancellation_reason = models.TextField(blank=True, null=True, help_text="Reason for cancellation")
@@ -128,8 +128,14 @@ class TrainerBooking(models.Model):
         if not self.valid_until:
             return None
 
-        today = timezone.now().date()
-        return max((self.valid_until - today).days, 0)
+        now = timezone.now()
+
+        # If already expired, report 0 days left.
+        if self.valid_until <= now:
+            return 0
+
+        # Convert to dates for a user-friendly day count
+        return max((self.valid_until.date() - now.date()).days, 0)
 
 class TrainerReview(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='trainer_reviews')

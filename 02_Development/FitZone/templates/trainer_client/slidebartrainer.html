@@ -181,6 +181,10 @@
   <nav class="nav">
     <a href="{% url 'trainer_client_dashboard' %}" class="{% if active_sidebar == 'dashboard' %}active{% endif %}"><i class="fa-solid fa-house"></i> <span>Dashboard</span></a>
 
+    <a href="{% url 'trainer_client_my_trainers' %}" class="{% if active_sidebar == 'my_trainers' %}active{% endif %}">
+      <i class="fa-solid fa-dumbbell"></i> <span>My Trainers</span>
+    </a>
+
     <a href="{% url 'client_chat' %}" class="{% if active_sidebar == 'chat' %}active{% endif %}">
       <i class="fa-solid fa-comments"></i> <span>Chat</span>
       {% if chat_unread_count > 0 %}

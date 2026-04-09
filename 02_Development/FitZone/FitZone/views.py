@@ -167,12 +167,12 @@ def trainer_client_dashboard(request):
     ).select_related('trainer__user').order_by('payment_due_date')
     
     # Get active trainers (confirmed, paid, and still within validity)
-    today = timezone.now().date()
+    now = timezone.now()
     active_trainers = TrainerBooking.objects.filter(
         user=request.user,
         status='confirmed',
         payment_status='completed'
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=today)).select_related('trainer__user').prefetch_related('trainer__documents').order_by('-updated_at')
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).select_related('trainer__user').prefetch_related('trainer__documents').order_by('-updated_at')
 
     # Get notifications
     notifications = UserNotification.objects.filter(user=request.user).order_by('-created_at')[:20]
@@ -184,10 +184,46 @@ def trainer_client_dashboard(request):
         'active_trainers': active_trainers,
         'notifications': notifications,
         'unread_count': unread_count,
-        'today': today,
+        'today': now,
     }
     
     return render(request, 'trainer_client/dashboard.html', context)
+
+
+@login_required
+def trainer_client_my_trainers(request):
+    from trainer.models import TrainerBooking
+
+    bookings = TrainerBooking.objects.filter(user=request.user).select_related('trainer__user').order_by('-created_at')
+
+    if not bookings.exists():
+        messages.info(request, "You haven't booked any trainers yet. Browse our trainers to get started!")
+        return redirect('trainer')
+
+    now = timezone.now()
+
+    running_trainers = bookings.filter(
+        status='confirmed',
+        payment_status='completed'
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now))
+
+    pending_trainers = bookings.filter(
+        Q(status='pending') | Q(status='confirmed', payment_status='pending')
+    )
+
+    completed_trainers = bookings.filter(
+        status='confirmed',
+        payment_status='completed',
+        valid_until__lt=now
+    )
+
+    context = {
+        'running_trainers': running_trainers,
+        'pending_trainers': pending_trainers,
+        'completed_trainers': completed_trainers,
+    }
+
+    return render(request, 'trainer_client/my_trainers.html', context)
 
 def about(request):
     return render(request, 'about.html')

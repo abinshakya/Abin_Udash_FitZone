@@ -347,7 +347,6 @@ def update_profile_picture(request):
 
 @login_required
 def trainer_settings(request):
-    """Trainer settings page with profile picture, profile details, availability, photo gallery."""
     try:
         profile = request.user.userprofile
         if profile.role != 'trainer':
@@ -1007,12 +1006,17 @@ def user_review_trainer(request, booking_id):
 
     booking = get_object_or_404(TrainerBooking, id=booking_id, user=request.user)
 
-    # Allow rating only after the paid booking's validity has ended.
-    today = timezone.now().date()
+    # Allow rating only after the paid booking's validity has ended (DateTime based).
+    import datetime
+    now = timezone.now()
+    valid_until_dt = booking.valid_until
+    if isinstance(valid_until_dt, datetime.date) and not isinstance(valid_until_dt, datetime.datetime):
+        valid_until_dt = timezone.make_aware(datetime.datetime.combine(valid_until_dt, datetime.time.min))
+
     if not (
         booking.payment_status == 'completed'
-        and booking.valid_until is not None
-        and booking.valid_until < today
+        and valid_until_dt is not None
+        and valid_until_dt < now
     ):
         messages.error(request, 'You can rate this trainer after your booking validity has ended.')
         return redirect('trainer_client_dashboard')

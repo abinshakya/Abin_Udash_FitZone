@@ -15,7 +15,7 @@
                     <p class="lead">How was your experience with <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>?</p>
                     
                     <form method="post">
-                        {% csrf_field %}
+                        {% csrf_token %}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Rating</label>
                             {{ form.rating }}

@@ -12,9 +12,30 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from datetime import datetime, date, time
 from datetime import timedelta
 from decimal import Decimal
 from trainer.models import TrainerBooking, TrainerRegistration
+
+
+def _normalize_valid_until_to_datetime(value):
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return timezone.make_aware(value) if timezone.is_naive(value) else value
+    if isinstance(value, date):
+        return timezone.make_aware(datetime.combine(value, time.min))
+    return value
+
+
+def _normalize_valid_until_to_date(value):
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return timezone.localtime(value).date() if timezone.is_aware(value) else value.date()
+    if isinstance(value, date):
+        return value
+    return value
 
 
 @login_required
@@ -207,7 +228,7 @@ def verify_payment(request, pidx):
                     # Handle booking payment completion
                     booking = payment.booking
                     booking.payment_status = 'completed'
-                    today = timezone.now().date()
+                    now = timezone.now()
                     from trainer.models import TrainerBooking as TB
                     existing_qs = TB.objects.filter(
                         user=booking.user,
@@ -216,17 +237,17 @@ def verify_payment(request, pidx):
                         payment_status='completed',
                     ).exclude(id=booking.id).order_by('-valid_until', '-booking_date')
 
-                    base_date = today
+                    base_date = now
                     if existing_qs.exists():
                         latest = existing_qs.first()
-                        if latest.valid_until and latest.valid_until >= today:
-                            base_date = latest.valid_until
+                        latest_valid_until = _normalize_valid_until_to_datetime(latest.valid_until)
+                        if latest_valid_until and latest_valid_until >= now:
+                            base_date = latest_valid_until
 
-                    if base_date < today:
-                        base_date = today
+                    if base_date < now:
+                        base_date = now
 
-                    # One-month chunk (30 days) – can be adjusted later if needed
-                    booking.valid_until = base_date + timedelta(days=30)
+                    booking.valid_until = base_date + timedelta(minutes=1)
 
                     booking.save()
                     messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")
@@ -306,15 +327,16 @@ def booking_checkout(request, booking_id):
     ).exclude(id=booking.id)
 
     latest = existing_qs.order_by('-valid_until', '-booking_date').first()
+    latest_valid_until = _normalize_valid_until_to_date(latest.valid_until) if latest else None
 
     show_extend_alert = False
     current_valid_until = None
     extended_valid_until = None
 
-    if latest and (latest.valid_until is None or latest.valid_until >= today):
+    if latest and (latest_valid_until is None or latest_valid_until >= today):
         show_extend_alert = True
         current_valid_until = latest.valid_until
-        base_date = latest.valid_until or today
+        base_date = latest_valid_until or today
         if base_date < today:
             base_date = today
         extended_valid_until = base_date + timedelta(days=30)#Validity date

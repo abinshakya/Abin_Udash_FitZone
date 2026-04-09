@@ -1,0 +1,454 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Trainers - FitZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #f4f6f9;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --orange: #f97316;
+      --orange-hover: #ea580c;
+      --orange-light: #fff7ed;
+      --white: #ffffff;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      color: var(--text-dark);
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(28,100%,74%,0.1) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+    .dash { min-height: 100vh; }
+    .main {
+      margin-left: 220px;
+      padding: 40px 40px 80px;
+      max-width: 1400px;
+    }
+    
+    /* Topbar */
+    .topbar {
+      margin-bottom: 40px;
+    }
+    .hello h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-dark);
+    }
+    .hello p { 
+      margin: 8px 0 0; 
+      color: var(--text-muted); 
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+
+    /* Sections */
+    .status-section {
+      margin-bottom: 50px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-dark);
+    }
+    .section-header i {
+      color: var(--orange);
+      font-size: 1.3rem;
+    }
+    .badge-count {
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: var(--orange-light);
+      color: var(--orange);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(249, 115, 22, 0.2);
+    }
+
+    /* Grid & Cards */
+    .trainer-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      gap: 24px; 
+    }
+    
+    .trainer-card {
+      background: var(--white);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    .trainer-card:hover { 
+      transform: translateY(-8px); 
+      box-shadow: var(--shadow-hover); 
+    }
+    
+    /* Card Banner */
+    .card-banner {
+      height: 80px;
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+      position: relative;
+    }
+    
+    /* Avatar */
+    .trainer-profile-pic {
+      width: 90px; 
+      height: 90px; 
+      border-radius: 50%; 
+      object-fit: cover;
+      margin: -45px auto 16px; 
+      border: 4px solid var(--white);
+      background: var(--white);
+      position: relative;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* Info Center */
+    .trainer-info {
+      padding: 0 24px 24px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      text-align: center;
+    }
+    .trainer-name { 
+      margin: 0 0 6px; 
+      font-size: 1.15rem; 
+      font-weight: 700; 
+      color: var(--text-dark);
+    }
+    .trainer-spec { 
+      font-size: 0.85rem; 
+      color: var(--orange); 
+      font-weight: 600; 
+      margin-bottom: 20px; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Details List */
+    .trainer-details { 
+      background: var(--bg-main);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left; 
+      display: grid; 
+      gap: 12px; 
+      margin-bottom: 24px; 
+      font-size: 0.9rem; 
+      color: var(--text-muted); 
+    }
+    .trainer-detail-row { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      font-weight: 500;
+    }
+    .trainer-detail-row i { 
+      color: var(--text-muted); 
+      width: 16px; 
+      text-align: center;
+      font-size: 1rem;
+    }
+    
+    /* Action Buttons */
+    .trainer-actions { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+      margin-top: auto;
+    }
+    .trainer-btn {
+      padding: 10px 16px; 
+      border-radius: 12px; 
+      text-decoration: none; 
+      font-size: 0.9rem; 
+      font-weight: 600; 
+      display: inline-flex;
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
+      transition: all 0.2s;
+    }
+    .trainer-btn i { font-size: 0.95rem; }
+    
+    .trainer-btn-primary { 
+      background: var(--orange); 
+      color: var(--white); 
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    }
+    .trainer-btn-primary:hover { 
+      background: var(--orange-hover); 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35); 
+      color: var(--white);
+    }
+    
+    .trainer-btn-secondary { 
+      background: #f1f5f9; 
+      color: var(--text-dark);
+    }
+    .trainer-btn-secondary:hover { 
+      background: #e2e8f0; 
+      color: var(--text-dark);
+    }
+
+    .trainer-btn-outline {
+      background: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-dark);
+    }
+    .trainer-btn-outline:hover {
+      border-color: var(--text-muted);
+      background: #f8fafc;
+    }
+
+    .trainer-btn-disabled {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    /* Empty States */
+    .empty-state {
+      background: var(--white);
+      border: 1px dashed var(--border-color);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      color: var(--text-muted);
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+    }
+    .empty-state i {
+      font-size: 2.5rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  {% include 'trainer_client/slidebartrainer.html' with active_sidebar='my_trainers' %}
+  <div class="dash">
+    <main class="main">
+      <div class="topbar">
+        <div class="hello">
+          <h1>My Trainers</h1>
+          <p>Manage all your trainer bookings and history in one place.</p>
+        </div>
+      </div>
+
+      <!-- Running / Active Trainers -->
+      <div class="status-section">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-fire"></i> Running Trainers</h2>
+          <span class="badge-count">{{ running_trainers|length }} Active</span>
+        </div>
+        
+        {% if running_trainers %}
+        <div class="trainer-grid">
+          {% for booking in running_trainers %}
+          <div class="trainer-card">
+            <div class="card-banner"></div>
+            
+            {% if booking.trainer.get_profile_picture %}
+              <img src="{{ booking.trainer.get_profile_picture.file.url }}" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic" onerror="this.src='https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=f97316&color=fff&bold=true'">
+            {% else %}
+              <img src="https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=f97316&color=fff&bold=true" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic">
+            {% endif %}
+            
+            <div class="trainer-info">
+              <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+              <div class="trainer-spec">{{ booking.trainer.specialization|default:"Fitness Trainer" }}</div>
+              
+              <div class="trainer-details">
+                <div class="trainer-detail-row">
+                  <i class="fa-regular fa-calendar-check"></i>
+                  <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+                </div>
+                {% if booking.valid_until %}
+                  <div class="trainer-detail-row" style="color: #059669;">
+                    <i class="fa-solid fa-clock" style="color: #10b981;"></i>
+                    <span>Valid until: {{ booking.valid_until|date:"M d, Y" }}</span>
+                  </div>
+                {% endif %}
+                <div class="trainer-detail-row">
+                  <i class="fa-solid fa-award"></i>
+                  <span>{{ booking.trainer.experience }} years experience</span>
+                </div>
+              </div>
+              
+              <div class="trainer-actions">
+                <a href="{% url 'start_chat_with_trainer' booking.trainer.id %}" class="trainer-btn trainer-btn-primary">
+                  <i class="fa-solid fa-message"></i> Message
+                </a>
+                <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
+                  <i class="fa-solid fa-user"></i> Profile
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="fa-solid fa-dumbbell"></i>
+            <p>You have no active training sessions right now.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Pending Trainers -->
+      <div class="status-section">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-hourglass-half"></i> Pending Trainers</h2>
+          <span class="badge-count">{{ pending_trainers|length }} Pending</span>
+        </div>
+        
+        {% if pending_trainers %}
+        <div class="trainer-grid">
+          {% for booking in pending_trainers %}
+          <div class="trainer-card">
+            <div class="card-banner" style="background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);"></div>
+            
+            {% if booking.trainer.get_profile_picture %}
+              <img src="{{ booking.trainer.get_profile_picture.file.url }}" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic" onerror="this.src='https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=94a3b8&color=fff&bold=true'">
+            {% else %}
+              <img src="https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=94a3b8&color=fff&bold=true" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic">
+            {% endif %}
+
+            <div class="trainer-info">
+              <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+              <div class="trainer-spec" style="color: var(--text-muted);">{{ booking.trainer.specialization|default:"Fitness Trainer" }}</div>
+              
+              <div class="trainer-details">
+                <div class="trainer-detail-row">
+                  <i class="fa-regular fa-calendar-plus"></i>
+                  <span>Requested: {{ booking.booking_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="trainer-detail-row" style="color: #ea580c;">
+                  <i class="fa-solid fa-circle-exclamation" style="color: #f97316;"></i>
+                  <span>Status: {{ booking.get_status_display }}{% if booking.payment_status == 'pending' %} (Payment pending){% endif %}</span>
+                </div>
+              </div>
+              
+              <div class="trainer-actions">
+                <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
+                  <i class="fa-solid fa-user"></i> Profile
+                </a>
+                {% if booking.status == 'confirmed' %}
+                  <a href="{% url 'booking_checkout' booking.id %}" class="trainer-btn trainer-btn-outline">
+                    <i class="fa-solid fa-credit-card"></i> Pay Now
+                  </a>
+                {% else %}
+                  <span class="trainer-btn trainer-btn-disabled">
+                    <i class="fa-solid fa-hourglass-half"></i> Wait for trainer approval
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="fa-regular fa-clock"></i>
+            <p>You have no pending requests.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Completed Trainers -->
+      <div class="status-section">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-flag-checkered"></i> Completed Trainers</h2>
+          <span class="badge-count" style="background: #f1f5f9; color: var(--text-muted); border-color: var(--border-color);">{{ completed_trainers|length }} Completed</span>
+        </div>
+        
+        {% if completed_trainers %}
+        <div class="trainer-grid">
+          {% for booking in completed_trainers %}
+          <div class="trainer-card">
+            <div class="card-banner" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);"></div>
+            
+            {% if booking.trainer.get_profile_picture %}
+              <img src="{{ booking.trainer.get_profile_picture.file.url }}" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic" onerror="this.src='https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=10b981&color=fff&bold=true'">
+            {% else %}
+              <img src="https://ui-avatars.com/api/?name={{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}&size=200&background=10b981&color=fff&bold=true" alt="{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}" class="trainer-profile-pic">
+            {% endif %}
+
+            <div class="trainer-info">
+              <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
+              <div class="trainer-spec" style="color: #10b981;">{{ booking.trainer.specialization|default:"Fitness Trainer" }}</div>
+              
+              <div class="trainer-details">
+                <div class="trainer-detail-row">
+                  <i class="fa-regular fa-calendar"></i>
+                  <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+                </div>
+                {% if booking.valid_until %}
+                  <div class="trainer-detail-row">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    <span>Ended: {{ booking.valid_until|date:"M d, Y" }}</span>
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="trainer-actions">
+                <a href="{% url 'trainer_profile_detail' booking.trainer.id %}" class="trainer-btn trainer-btn-secondary">
+                  <i class="fa-solid fa-user"></i> Profile
+                </a>
+                <a href="{% url 'user_review_trainer' booking.id %}" class="trainer-btn trainer-btn-primary" style="background: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                  <i class="fa-solid fa-star"></i> Review
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+          <div class="empty-state">
+            <i class="fa-solid fa-medal"></i>
+            <p>You haven't completed any training sessions yet.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>
