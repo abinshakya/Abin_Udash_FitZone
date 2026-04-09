@@ -23,6 +23,7 @@ from FitZone import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('social-auth/', include('social_django.urls', namespace='social')),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
     path('ai_chat/', include('Ai_chatbot.urls')),
     path('my-trainer-dashboard/', views.trainer_client_dashboard, name='trainer_client_dashboard'),

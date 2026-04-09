@@ -3,6 +3,33 @@
 {% block content %}
 <style>
   .arrow-bold { font-weight: 900; }
+  .social-login {
+    text-align: center;
+    margin-top: 15px;
+  }
+  .social-login-text {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  .google-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  .google-btn:hover {
+    background-color: #f5f5f5;
+  }
+  .google-icon {
+    width: 20px;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
 </style>
 
 <div class="login-wrapper">
@@ -33,6 +60,14 @@
         Login <span class="arrow-bold">→</span>
       </button>
     </form>
+
+    <div class="social-login">
+      <p class="social-login-text">Or login with</p>
+      <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-btn">
+        <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" alt="Google" class="google-icon">
+        Sign in with Google
+      </a>
+    </div>
 
     <p class="forgot-text" style="margin: 12px 0 0; text-align: center; position: relative; z-index: 1;">
       <a href="{% url 'forgot_password' %}" style="color: var(--orange2); font-weight: 700; text-decoration: none; font-size: 0.9rem;">Forgot Username or Password?</a>

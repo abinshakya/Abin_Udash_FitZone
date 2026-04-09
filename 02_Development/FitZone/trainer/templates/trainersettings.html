@@ -210,10 +210,14 @@
     .visually-hidden{ display:none; }
 
     /* Buttons that had inline max-width/margins */
-    .btn-narrow{ max-width:220px; }
+    .btn-narrow{ 
+      max-width:220px; 
+      justify-content: center;
+      padding: 12px;
+    }
     .btn-spaced-top{ margin-top:10px; }
 
-    /* ---------- Profile Details ---------- */
+    /*  Profile Details  */
     .content-grid{
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -291,7 +295,7 @@
       margin: 0;
     }
 
-    /* ---------- Availability ---------- */
+    /*  Availability  */
     .availability-item{
       display: flex;
       align-items: center;
@@ -373,7 +377,7 @@
     }
     .cta-link:hover{ filter: brightness(1.02); }
 
-    /* ---------- Photo Gallery Upload Form Modern UI ---------- */
+    /*  Photo Gallery Upload Form Modern UI  */
     .photo-upload-container {
       padding: 0 24px 24px;
       border-bottom: 1px solid rgba(0,0,0,0.06);
@@ -537,7 +541,7 @@
       transform: scale(1.1);
     }
 
-    /* ---------- Toast Messages ---------- */
+    /*  Toast Messages  */
     .toast-container{
       position: fixed;
       top: 20px;
@@ -609,7 +613,7 @@
       to{ transform: translateX(100%); opacity: 0; }
     }
 
-    /* ---------- Responsive ---------- */
+    /*  Responsive  */
     @media (max-width: 900px) {
       .main{margin-left:64px}
     }
@@ -697,18 +701,14 @@
                 <h4>{{ request.user.get_full_name|default:request.user.username }}</h4>
                 <p>{{ request.user.email }}</p>
 
-                <form method="post" action="{% url 'update_profile_picture' %}" enctype="multipart/form-data" class="profile-pic-form">
+                <form method="post" action="{% url 'update_profile_picture' %}" enctype="multipart/form-data" class="profile-pic-form" id="updateProfilePicForm">
                   {% csrf_token %}
 
-                  <input type="file" name="profile_picture" accept="image/*" required id="profilePicInput" class="visually-hidden">
+                  <input type="file" name="profile_picture" accept="image/*" required id="profilePicInput" class="visually-hidden" onchange="document.getElementById('updateProfilePicForm').submit();">
 
-                  <button type="button" onclick="document.getElementById('profilePicInput').click()" class="custom-file-button btn-narrow">
+                  <button type="button" onclick="document.getElementById('profilePicInput').click()" class="btn-upload-modern btn-narrow">
                     <i class="fas fa-camera"></i>
-                    <span id="profilePicName">Choose Photo</span>
-                  </button>
-
-                  <button type="submit" class="upload-btn btn-narrow btn-spaced-top">
-                    <i class="fas fa-upload"></i> Update Picture
+                    <span id="profilePicName">{% if registration.get_profile_picture %}Change Photo{% else %}Upload Photo{% endif %}</span>
                   </button>
                 </form>
               </div>

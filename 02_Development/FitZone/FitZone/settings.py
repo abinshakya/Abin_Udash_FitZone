@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'formtools',
+    'social_django',
     'login_logout_register',
     'membership',
     'payment',
@@ -76,6 +77,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
                 'trainer.context_processors.notification_count',
             ],
         },
@@ -91,17 +94,25 @@ WSGI_APPLICATION = 'FitZone.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'FitZone',
-        'USER': 'FitZone',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME', 'FitZone'),
+        'USER': os.getenv('DB_USER', 'FitZone'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
                  
     }
 }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('google_key')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH_SECRET')
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
@@ -158,10 +169,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'abinudash12@gmail.com'
-EMAIL_HOST_PASSWORD = 'lgpp lesm zxnm ncmi'  
-DEFAULT_FROM_EMAIL = 'abinudash12@gmail.com'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 # Khalti Payment Gateway Configuration
 KHALTI_API_URL = 'https://a.khalti.com/api/v2' # Base URL for Khalti API
-KHALTI_PUBLIC_KEY = '77f76dcb11fe4cb9ab0690a78a87f30b'
-KHALTI_SECRET_KEY = 'a9ed876ef6c948a3818f0be195c001d0'  
+KHALTI_PUBLIC_KEY = os.getenv('KHALTI_PUBLIC_KEY')
+KHALTI_SECRET_KEY = os.getenv('KHALTI_SECRET_KEY')  
