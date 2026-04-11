@@ -252,7 +252,7 @@ def verify_payment(request, pidx):
 
                     booking.save()
                     messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")
-                    return render(request, 'payment_success.html', {'payment': payment})
+                    return render(request, 'payment_success_booking.html', {'payment': payment})
                 else:
                     # Handle membership payment completion
                     try:
@@ -278,7 +278,7 @@ def verify_payment(request, pidx):
                     except UserProfile.DoesNotExist:
                         messages.success(request, "Payment successful!")
                     
-                    return render(request, 'payment_success.html', {'payment': payment})
+                    return render(request, 'payment_success_membership.html', {'payment': payment})
             else:
                 messages.warning(request, f"Payment status: {payment.status}")
                 return render(request, 'payment_failed.html', {'payment': payment})

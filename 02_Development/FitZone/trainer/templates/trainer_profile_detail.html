@@ -539,6 +539,14 @@
             border-radius: 50%;
             margin: 0 auto 15px;
             border: 3px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .booking-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         .booking-modal-title {
             color: #ffffff;
@@ -970,7 +978,11 @@
                     <div class="booking-modal-hero">
                         <button type="button" class="btn-close booking-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                         <div class="booking-avatar">
-                            {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
+                            {% if trainer.get_profile_picture %}
+                                <img src="{{ trainer.get_profile_picture.file.url }}" alt="{{ trainer.user.get_full_name|default:trainer.user.username }}">
+                            {% else %}
+                                {{ trainer.user.get_full_name|default:trainer.user.username|make_list|first|upper }}
+                            {% endif %}
                         </div>
                         <h5 class="booking-modal-title">Book Training Session</h5>
                         <p class="booking-modal-subtitle">with <span style="font-weight:600;">{{ trainer.user.get_full_name|default:trainer.user.username }}</span></p>
