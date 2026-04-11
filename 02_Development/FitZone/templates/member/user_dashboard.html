@@ -146,6 +146,33 @@
         .greeting h1 { font-size: 1.75rem; font-weight: 800; margin: 0 0 0.5rem 0; color: #111; }
         .greeting p { margin: 0; color: #6b7280; font-size: 0.95rem; }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,122,24,0.25);
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .profile-avatar-fallback {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: var(--primary);
+            background: rgba(255,122,24,0.12);
+            border: 2px solid rgba(255,122,24,0.25);
+            font-size: 1rem;
+        }
+
         /* Stats Grid */
         .stats-row {
             display: grid;
@@ -414,7 +441,7 @@
             <a href="{% url 'food_recommendation_system:home' %}" class="nav-link">
                 <i class="fa-solid fa-utensils"></i> Food Recommender
             </a>
-             <a href="{% url 'membership' %}" class="nav-link">
+             <a href="{% url 'member_plans' %}" class="nav-link">
                 <i class="fa-solid fa-id-card"></i> My Plans
             </a>
             <a href="#" class="nav-link">
@@ -437,6 +464,13 @@
             </div>
             
             <div class="header-actions">
+                {% if request.user.userprofile.profile_picture %}
+                    <img src="{{ request.user.userprofile.profile_picture.url }}" alt="{{ request.user.username }}" class="profile-avatar">
+                {% else %}
+                    <div class="profile-avatar-fallback">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                {% endif %}
                  <!-- Notifications Component -->
                  {% url 'user_mark_all_notifications_read' as user_mark_all_url %}
                  {% include 'notifications/notification.html' with bell_button_class='notif-btn' bell_icon_class='fa-regular fa-bell' badge_class='notif-dot' unread_count=unread_count notification_items=notifications|slice:':5' mark_all_url=user_mark_all_url panel_title='Notifications' panel_title_icon='fa-solid fa-bell' list_class='notif-mini-list' item_class='notif-mini-item' icon_wrap_class='notif-mini-icon' content_class='notif-mini-content' title_class='notif-mini-title' text_class='notif-mini-text' time_class='notif-mini-time' empty_class='ud-empty-state' empty_text='No new notifications' foot_class='notif-panel-foot' view_all_url='#notifications-list' view_all_label='View all' view_all_arrow='fa-solid fa-arrow-right' compact_mode=1 panel_class='notif-panel' %}
@@ -581,7 +615,7 @@
                                 </div>
                             </a>
 
-                            <a href="#" class="action-btn">
+                            <a href="{% url 'food_recommendation_system:home' %}" class="action-btn">
                                 <div class="action-icon"><i class="fa-solid fa-utensils"></i></div>
                                 <div class="action-content">
                                     <h4>Diet Recommender</h4>

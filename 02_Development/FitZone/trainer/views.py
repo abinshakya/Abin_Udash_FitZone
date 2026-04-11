@@ -260,6 +260,15 @@ def trainer_client_bookings(request):
         pending_requests = all_bookings.filter(
             Q(status='pending') | Q(status='confirmed', payment_status='pending')
         ).order_by('-created_at')
+
+        # Flag renewals
+        for req in pending_requests:
+            req.is_renewal = all_bookings.filter(
+                user=req.user,
+                status__in=['confirmed', 'completed'],
+                payment_status='completed',
+                valid_until__gte=now
+            ).exclude(id=req.id).exists()
         
         active_clients = all_bookings.filter(
             status='confirmed', 
@@ -267,9 +276,8 @@ def trainer_client_bookings(request):
         ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).order_by('-created_at')
         
         completed_clients = all_bookings.filter(
-            status='confirmed', 
-            payment_status='completed',
-            valid_until__lt=now
+            Q(status='completed') | 
+            Q(status='confirmed', payment_status='completed', valid_until__lt=now)
         ).order_by('-created_at')
 
     context = {

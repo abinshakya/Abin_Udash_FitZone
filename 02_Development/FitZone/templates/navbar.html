@@ -124,7 +124,7 @@
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'my_plans' %}">
+                <a class="dropdown-item" href="{% if request.user.userprofile.role == 'member' %}{% url 'member_plans' %}{% else %}{% url 'my_plans' %}{% endif %}">
                   <i class="fas fa-clipboard-list me-2"></i>My Fitness Plans
                 </a>
               </li>

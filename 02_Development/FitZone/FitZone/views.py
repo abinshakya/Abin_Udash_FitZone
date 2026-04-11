@@ -168,11 +168,26 @@ def trainer_client_dashboard(request):
     
     # Get active trainers (confirmed, paid, and still within validity)
     now = timezone.now()
-    active_trainers = TrainerBooking.objects.filter(
+    active_trainers_qs = TrainerBooking.objects.filter(
         user=request.user,
         status='confirmed',
         payment_status='completed'
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).select_related('trainer__user').prefetch_related('trainer__documents').order_by('-updated_at')
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).select_related('trainer__user').prefetch_related('trainer__documents').order_by('-valid_until')
+
+    # Group by trainer to avoid duplicates on dashboard
+    active_trainers = []
+    seen_trainers = {} # trainer_id -> booking object
+    
+    # First pass: find the latest booking and earliest start for each trainer
+    for booking in active_trainers_qs:
+        if booking.trainer_id not in seen_trainers:
+            booking.earliest_start = booking.booking_date
+            seen_trainers[booking.trainer_id] = booking
+            active_trainers.append(booking)
+        else:
+            # Update the representative booking's earliest start if this one is earlier
+            if booking.booking_date < seen_trainers[booking.trainer_id].earliest_start:
+                seen_trainers[booking.trainer_id].earliest_start = booking.booking_date
 
     # Get notifications
     notifications = UserNotification.objects.filter(user=request.user).order_by('-created_at')[:20]
@@ -202,10 +217,21 @@ def trainer_client_my_trainers(request):
 
     now = timezone.now()
 
-    running_trainers = bookings.filter(
+    running_trainers_qs = bookings.filter(
         status='confirmed',
         payment_status='completed'
-    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now))
+    ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).order_by('-valid_until')
+
+    running_trainers = []
+    seen_running = {}
+    for b in running_trainers_qs:
+        if b.trainer_id not in seen_running:
+            b.earliest_start = b.booking_date
+            seen_running[b.trainer_id] = b
+            running_trainers.append(b)
+        else:
+            if b.booking_date < seen_running[b.trainer_id].earliest_start:
+                seen_running[b.trainer_id].earliest_start = b.booking_date
 
     pending_trainers = bookings.filter(
         Q(status='pending') | Q(status='confirmed', payment_status='pending')

@@ -521,6 +521,10 @@ body{
       {% endif %}
 
       {% if show_extend_alert %}
+      <div class="pill" style="margin-bottom: 20px; background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #2563eb;">
+        <i class="fa-solid fa-rotate"></i> RENEWAL BOOKING
+      </div>
+
       <div class="access-alert" style="margin-top:10px;background:rgba(59,130,246,0.06);border-color:rgba(59,130,246,0.35);">
         <i class="fa-solid fa-clock-rotate-left" style="color:#2563eb;"></i>
         <span>
@@ -551,30 +555,40 @@ body{
           <div class="card-body">
             <div class="trainer-top">
               <div class="trainer-avatar">
-                {% if booking.trainer.profile_picture %}
-                  <img src="{{ booking.trainer.profile_picture.url }}" alt="{{ booking.trainer.user.username }}">
-                {% else %}
-                  {{ booking.trainer.user.username.0|upper }}
-                {% endif %}
+                {% with profile_pic=booking.trainer.get_profile_picture %}
+                  {% if profile_pic %}
+                    <img src="{{ profile_pic.file.url }}" alt="{{ booking.trainer.user.username }}">
+                  {% else %}
+                    {{ booking.trainer.user.username.0|upper }}
+                  {% endif %}
+                {% endwith %}
               </div>
               <div>
                 <h3 class="trainer-name">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</h3>
                 <div class="trainer-specialty">
-                  {% if booking.trainer.specialty %}
-                    <span class="pill"><i class="fa-solid fa-dumbbell"></i> {{ booking.trainer.specialty }}</span>
+                  {% if booking.trainer.specialization %}
+                    <span class="pill"><i class="fa-solid fa-dumbbell"></i> {{ booking.trainer.specialization }}</span>
                   {% endif %}
                   {% if booking.trainer.experience %}
                     <span class="pill"><i class="fa-solid fa-award"></i> {{ booking.trainer.experience }} yrs exp</span>
                   {% endif %}
                 </div>
+                {% if booking.trainer.bio %}
+                  <p style="margin: 8px 0 0; font-size: 0.88rem; color: var(--muted); line-height: 1.4;">{{ booking.trainer.bio|truncatechars:100 }}</p>
+                {% endif %}
               </div>
             </div>
 
             <ul class="booking-details">
               <li>
                 <i class="fa-solid fa-calendar-day"></i>
-                Training Start Date
+                {% if show_extend_alert %}Extension Starts After{% else %}Training Start Date{% endif %}
                 <strong>{{ booking.booking_date|date:"M d, Y" }}</strong>
+              </li>
+              <li>
+                <i class="fa-solid fa-calendar-check"></i>
+                {% if show_extend_alert %}New Expiry Date{% else %}Training End Date{% endif %}
+                <strong>{{ booking_end_date|date:"M d, Y" }}</strong>
               </li>
               <li>
                 <i class="fa-solid fa-clipboard-check"></i>
@@ -616,7 +630,7 @@ body{
           <div class="card-body">
             <div class="summary-row">
               <span>Trainer</span>
-              <strong>{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>
+              <strong style="color: var(--orange);">{{ booking.trainer.user.get_full_name|default:booking.trainer.user.username }}</strong>
             </div>
 
             <div class="summary-row">
@@ -625,7 +639,7 @@ body{
             </div>
 
             <div class="summary-row">
-              <span>Training Fee</span>
+              <span>Training Fee (Monthly)</span>
               <strong>Rs {{ booking.amount }}</strong>
             </div>
 

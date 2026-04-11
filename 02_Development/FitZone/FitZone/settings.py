@@ -176,3 +176,6 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 KHALTI_API_URL = 'https://a.khalti.com/api/v2' # Base URL for Khalti API
 KHALTI_PUBLIC_KEY = os.getenv('KHALTI_PUBLIC_KEY')
 KHALTI_SECRET_KEY = os.getenv('KHALTI_SECRET_KEY')  
+
+# Site Configuration
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')

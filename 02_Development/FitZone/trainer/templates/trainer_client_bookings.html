@@ -738,7 +738,14 @@
                       {% endif %}
                     </div>
                     <div class="booking-info">
-                      <div class="booking-name">{{ booking.user.get_full_name|default:booking.user.username }}</div>
+                      <div class="booking-name">
+                        {{ booking.user.get_full_name|default:booking.user.username }}
+                        {% if booking.is_renewal %}
+                          <span class="status-badge" style="background: rgba(59,130,246,0.12); color: #2563eb; border-color: rgba(59,130,246,0.25); margin-left: 8px; vertical-align: middle;">
+                            RENEWAL
+                          </span>
+                        {% endif %}
+                      </div>
                       <div class="booking-email">{{ booking.user.email }}</div>
                       <div class="booking-date">
                         <i class="fa-regular fa-calendar"></i> Start: {{ booking.booking_date|date:"M d, Y" }}

@@ -1,0 +1,474 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Plans | FitZone</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #ff7a18;
+            --primary-dark: #e65100;
+            --primary-light: rgba(255, 122, 24, 0.12);
+            --bg-body: #fdfdfd;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --text-dark: #111827;
+            --text-muted: #6b7280;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-card: 0 10px 25px rgba(0,0,0,0.04);
+            --font-main: 'Poppins', sans-serif;
+            --sidebar-width: 220px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-main);
+            background: var(--bg-body);
+            color: var(--text-dark);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--white);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.04);
+            z-index: 50;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 20px 18px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff7a18, #ff9a3c);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .brand-text h2 { margin: 0; font-size: 17px; font-weight: 900; color: #1a1a1a; line-height: 1.2; }
+        .brand-text span { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0 10px;
+            flex: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: rgba(0,0,0,0.55);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .nav-link.active {
+            background: rgba(255,122,24,0.1);
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            width: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: inherit;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px;
+            color: rgba(0,0,0,0.35);
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: auto;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            transition: color 0.2s;
+        }
+
+        .logout-link:hover { color: #ef4444; }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem 2.5rem;
+            max-width: 1400px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-card);
+            padding: 1.75rem;
+        }
+
+        .plan-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-title {
+            margin: 0.8rem 0 0.4rem 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .plan-desc {
+            margin: 0;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 1.25rem 0 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #374151;
+        }
+
+        .feature-list i { color: var(--primary); margin-top: 3px; }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .stat-box {
+            padding: 1rem 1.1rem;
+            border-radius: 12px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-100);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .progress-wrap {
+            margin-top: 1.25rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #eef2f7;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px rgba(255,122,24,0.4);
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            text-decoration: none;
+            color: var(--text-dark);
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: white;
+            border-color: rgba(255,122,24,0.2);
+            box-shadow: 0 4px 12px rgba(255,122,24,0.08);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255,122,24,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .action-content h4 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .action-content p { margin: 2px 0 0; font-size: 0.75rem; color: #6b7280; }
+
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 0.6rem 0;
+            font-size: 1.2rem;
+        }
+
+        .empty-state p {
+            margin: 0 0 1.2rem 0;
+            color: var(--text-muted);
+        }
+
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7rem 1.4rem;
+            border-radius: 999px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .grid { grid-template-columns: 1fr; }
+            .main-content { margin-left: 0; padding: 1.5rem; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand-box">
+            <div class="brand-logo">FZ</div>
+            <div class="brand-text">
+                <h2>FitZone</h2>
+                <span>Member Panel</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="{% url 'user_dashboard' %}" class="nav-link">
+                <i class="fa-solid fa-layer-group"></i> Dashboard
+            </a>
+            <a href="/" class="nav-link">
+                <i class="fa-solid fa-house"></i> Home Page
+            </a>
+            <a href="{% url 'Ai_chatbot:ai_chat' %}" class="nav-link">
+                <i class="fa-solid fa-robot"></i> Chat with AI Trainer
+            </a>
+            <a href="{% url 'food_recommendation_system:home' %}" class="nav-link">
+                <i class="fa-solid fa-utensils"></i> Food Recommender
+            </a>
+            <a href="{% url 'member_plans' %}" class="nav-link active">
+                <i class="fa-solid fa-id-card"></i> My Plans
+            </a>
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i> Settings
+            </a>
+        </nav>
+
+        <a href="{% url 'logout' %}" class="logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>My Membership Plan</h1>
+                <p>Review your plan features and membership days.</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <section class="card">
+                {% if membership and plan %}
+                    <span class="plan-badge"><i class="fa-solid fa-crown"></i> Active Plan</span>
+                    <h2 class="plan-title">{{ plan.name }}</h2>
+                    <p class="plan-desc">{{ plan.description|default:"AI-powered fitness plan tailored to your goals." }}</p>
+
+                    <ul class="feature-list">
+                        <li><i class="fa-solid fa-check"></i> {{ plan.feature_1 }}</li>
+                        <li><i class="fa-solid fa-check"></i> {{ plan.feature_2 }}</li>
+                        {% if plan.feature_3 %}
+                            <li><i class="fa-solid fa-check"></i> {{ plan.feature_3 }}</li>
+                        {% endif %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No active membership</h3>
+                        <p>Choose a plan to unlock AI trainer access and diet tools.</p>
+                        <a href="{% url 'membership' %}" class="primary-btn">
+                            Browse Plans <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <h3 style="margin:0 0 0.6rem 0; font-size:1.1rem;">Membership Days</h3>
+                {% if membership %}
+                    <div class="days-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">Start Date</div>
+                            <div class="stat-value">{{ membership.start_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">End Date</div>
+                            <div class="stat-value">{{ membership.end_date|date:"M d, Y" }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Days</div>
+                            <div class="stat-value">{{ membership.total_days }}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Days Left</div>
+                            <div class="stat-value">{{ membership.days_left }}</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-wrap">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ membership.progress_percentage|floatformat:0 }}%;"></div>
+                        </div>
+                        <div class="progress-text">{{ membership.progress_percentage|floatformat:0 }}% used</div>
+                    </div>
+                {% else %}
+                    <div class="empty-state" style="padding:1.5rem 0;">
+                        <p style="margin:0;">Membership days will appear once you join a plan.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="card" style="grid-column: 1 / -1;">
+                <h3 style="margin:0 0 1rem 0; font-size:1.1rem;">Quick Access</h3>
+                <div class="action-list">
+                    <a href="{% url 'Ai_chatbot:ai_chat' %}" class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-robot"></i></div>
+                        <div class="action-content">
+                            <h4>AI Trainer Chat</h4>
+                            <p>Get workout advice</p>
+                        </div>
+                    </a>
+                    <a href="{% url 'food_recommendation_system:home' %}" class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-utensils"></i></div>
+                        <div class="action-content">
+                            <h4>Diet Recommender</h4>
+                            <p>Meal plans for you</p>
+                        </div>
+                    </a>
+                    <a href="{% url 'membership' %}" class="action-btn">
+                        <div class="action-icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                        <div class="action-content">
+                            <h4>Upgrade Plan</h4>
+                            <p>Get more features</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

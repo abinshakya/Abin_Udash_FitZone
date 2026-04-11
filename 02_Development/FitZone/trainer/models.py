@@ -112,6 +112,10 @@ class TrainerBooking(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Email tracking
+    expiry_warning_sent = models.BooleanField(default=False, help_text="Track if 3-day expiry warning email has been sent")
+    completion_email_sent = models.BooleanField(default=False, help_text="Track if thank you/review email has been sent after expiry")
 
     class Meta:
         ordering = ['-created_at']

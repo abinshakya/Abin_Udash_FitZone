@@ -1022,7 +1022,7 @@
                   <div class="trainer-details">
                     <div class="trainer-detail-row">
                       <i class="fas fa-calendar-check"></i>
-                      <span>Started: {{ booking.booking_date|date:"M d, Y" }}</span>
+                      <span>Started: {{ booking.earliest_start|default:booking.booking_date|date:"M d, Y" }}</span>
                     </div>
                     {% if booking.valid_until %}
                     <div class="trainer-detail-row">

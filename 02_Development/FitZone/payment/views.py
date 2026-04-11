@@ -248,7 +248,7 @@ def verify_payment(request, pidx):
                         base_date = now
 
                     # Grant 1 month of trainer access from the base date
-                    booking.valid_until = base_date + timedelta(days=1)
+                    booking.valid_until = base_date + timedelta(days=30)
 
                     booking.save()
                     messages.success(request, "Payment successful! Your trainer booking has been confirmed and paid.")
@@ -342,6 +342,12 @@ def booking_checkout(request, booking_id):
             base_date = today
         extended_valid_until = base_date + timedelta(days=30)#Validity date
 
+    # Calculate end date for display
+    if show_extend_alert:
+        booking_end_date = extended_valid_until
+    else:
+        booking_end_date = booking.booking_date + timedelta(days=30)
+
     context = {
         'booking': booking,
         'user': request.user,
@@ -349,6 +355,7 @@ def booking_checkout(request, booking_id):
         'show_extend_alert': show_extend_alert,
         'current_valid_until': current_valid_until,
         'extended_valid_until': extended_valid_until,
+        'booking_end_date': booking_end_date,
     }
     return render(request, 'booking_checkout.html', context)
 
