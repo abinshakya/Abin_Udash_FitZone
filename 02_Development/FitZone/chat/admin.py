@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message, ChatReport
 
 
 class MessageInline(admin.TabularInline):
@@ -25,3 +25,10 @@ class MessageAdmin(admin.ModelAdmin):
     def content_short(self, obj):
         return obj.content[:50]
     content_short.short_description = 'Content'
+
+
+@admin.register(ChatReport)
+class ChatReportAdmin(admin.ModelAdmin):
+    list_display = ('room', 'reporter', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('message', 'reporter__username', 'room__trainer__user__username', 'room__client__username')

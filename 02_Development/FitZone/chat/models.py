@@ -60,3 +60,26 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender.username}: {self.content[:40]}"
+
+
+class ChatReport(models.Model):
+    """A user-submitted report about a specific chat room."""
+
+    room = models.ForeignKey(
+        ChatRoom,
+        on_delete=models.CASCADE,
+        related_name='reports',
+    )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='chat_reports',
+    )
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f"Report by {self.reporter.username} on room {self.room_id}"

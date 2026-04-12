@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q, Max, Count
-from .models import ChatRoom, Message
+from .models import ChatRoom, Message, ChatReport
 from trainer.models import TrainerRegistration, TrainerBooking
 from login_logout_register.models import UserProfile
 
@@ -281,6 +281,33 @@ def delete_room(request, room_id):
 
     room.delete()
     return JsonResponse({'status': 'ok'})
+
+
+@login_required
+def report_room(request, room_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    room = get_object_or_404(ChatRoom, id=room_id)
+
+    is_trainer_user = hasattr(room.trainer, 'user') and room.trainer.user == request.user
+    is_client_user = room.client == request.user
+
+    if not (is_trainer_user or is_client_user):
+        return JsonResponse({'error': 'Access denied'}, status=403)
+
+    message = request.POST.get('message', '').strip()
+    if not message:
+        return JsonResponse({'error': 'Please enter a message for the report.'}, status=400)
+
+    ChatReport.objects.create(
+        room=room,
+        reporter=request.user,
+        message=message,
+    )
+
+    return JsonResponse({'status': 'ok'})
+
 @login_required
 def start_chat_with_trainer(request, trainer_id):
     """Start or open a chat with a specific trainer (from client dashboard).""" 

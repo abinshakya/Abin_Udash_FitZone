@@ -318,6 +318,82 @@
       font-weight: 600
     }
 
+    .chat-header-actions {
+      margin-left: auto;
+      position: relative;
+    }
+
+    .chat-more-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: none;
+      background: var(--surface2);
+      color: var(--text2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, color .2s;
+    }
+
+    .chat-more-btn:hover {
+      background: var(--surface3);
+      color: var(--orange)
+    }
+
+    .chat-more-menu {
+      position: absolute;
+      top: 38px;
+      right: 0;
+      min-width: 190px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 16px 45px rgba(15, 23, 42, 0.18);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 6px 0;
+      display: none;
+      z-index: 30;
+    }
+
+    .chat-more-menu.open {
+      display: block
+    }
+
+    .chat-more-item {
+      width: 100%;
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text2);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background .15s, color .15s;
+    }
+
+    .chat-more-item i {
+      font-size: 13px;
+      color: var(--text3)
+    }
+
+    .chat-more-item:hover {
+      background: rgba(248, 250, 252, 0.9);
+      color: var(--text)
+    }
+
+    .chat-more-item.danger {
+      color: #b91c1c
+    }
+
+    .chat-more-item.danger i {
+      color: #ef4444
+    }
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -935,6 +1011,26 @@
           <h3>{{ active_room.trainer.user.get_full_name|default:active_room.trainer.user.username }}</h3>
           <p>Trainer &bull; {{ active_room.trainer.specialization|truncatechars:40 }}</p>
         </div>
+
+        <div class="chat-header-actions">
+          <button type="button" class="chat-more-btn" onclick="toggleChatMoreMenu(event)">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </button>
+          <div class="chat-more-menu" id="chatMoreMenu">
+            <button type="button" class="chat-more-item" onclick="openImagesModal()">
+              <i class="fa-regular fa-image"></i>
+              <span>View images</span>
+            </button>
+            <button type="button" class="chat-more-item" onclick="openReportModal()">
+              <i class="fa-regular fa-flag"></i>
+              <span>Report</span>
+            </button>
+            <button type="button" class="chat-more-item danger" onclick="confirmDeleteRoom()">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>Delete chat</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="chat-messages" id="chatMessages">
@@ -1047,6 +1143,60 @@
     <img id="lightboxImg" src="" alt="Full size">
   </div>
 
+  <!-- Shared Images Modal -->
+  <div class="chat-lightbox" id="chatImagesModal" onclick="closeImagesModal()" style="background:rgba(15,23,42,0.75);">
+    <div
+      style="background:#fff;border-radius:16px;padding:16px 18px 18px;max-width:720px;width:92%;max-height:80vh;overflow:hidden;box-shadow:0 24px 60px rgba(15,23,42,0.45);cursor:auto;"
+      onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3
+          style="margin:0;font-size:15px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <i class="fa-regular fa-image" style="color:var(--orange);"></i> Shared Images
+        </h3>
+        <button type="button" onclick="closeImagesModal()"
+          style="border:none;background:transparent;color:#6b7280;font-size:18px;cursor:pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="chatImagesGrid"
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;overflow-y:auto;max-height:60vh;padding-right:4px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div class="chat-lightbox" id="chatReportModal" onclick="closeReportModal()" style="background:rgba(15,23,42,0.75);">
+    <div
+      style="background:#fff;border-radius:16px;padding:16px 18px 18px;max-width:520px;width:92%;max-height:80vh;overflow:hidden;box-shadow:0 24px 60px rgba(15,23,42,0.45);cursor:auto;"
+      onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <i class="fa-regular fa-flag" style="color:#f97316;"></i> Report chat
+        </h3>
+        <button type="button" onclick="closeReportModal()"
+          style="border:none;background:transparent;color:#6b7280;font-size:18px;cursor:pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p style="margin:0 0 8px;font-size:13px;color:#4b5563;">
+        Describe the issue you want to report. Our team will review this conversation.
+      </p>
+      <textarea id="chatReportMessage"
+        style="width:100%;min-height:100px;border-radius:10px;border:1px solid #e5e7eb;padding:8px 10px;font-size:13px;font-family:inherit;resize:vertical;outline:none;"
+        placeholder="Type your report message here..."></textarea>
+      <div style="margin-top:10px;display:flex;justify-content:flex-end;gap:8px;">
+        <button type="button" onclick="closeReportModal()"
+          style="border-radius:999px;border:1px solid #e5e7eb;background:#fff;color:#4b5563;font-size:13px;padding:6px 14px;cursor:pointer;">
+          Cancel
+        </button>
+        <button type="button" onclick="submitChatReport()"
+          style="border-radius:999px;border:none;background:#f97316;color:#fff;font-size:13px;padding:6px 16px;font-weight:600;cursor:pointer;">
+          Submit report
+        </button>
+      </div>
+    </div>
+  </div>
+
   {% if active_room %}
   <script>
     var roomId = {{ active_room.id }};
@@ -1067,6 +1217,119 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     scrollToBottom();
+
+    // View all shared images
+    function openImagesModal() {
+      var grid = document.getElementById('chatImagesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      var imgs = document.querySelectorAll('#chatMessages .msg-image');
+      if (imgs.length === 0) {
+        grid.innerHTML = '<p style="font-size:13px;color:rgba(55,65,81,0.9);">No images have been shared in this chat yet.</p>';
+      } else {
+        imgs.forEach(function (img) {
+          var thumb = img.cloneNode();
+          thumb.onclick = function () { openLightbox(img.src); };
+          thumb.style.cursor = 'pointer';
+          thumb.style.width = '100%';
+          thumb.style.height = '120px';
+          thumb.style.objectFit = 'cover';
+          grid.appendChild(thumb);
+        });
+      }
+      var modal = document.getElementById('chatImagesModal');
+      if (modal) { modal.classList.add('active'); }
+      var menu = document.getElementById('chatMoreMenu');
+      if (menu) { menu.classList.remove('open'); }
+    }
+
+    function closeImagesModal() {
+      var modal = document.getElementById('chatImagesModal');
+      if (modal) { modal.classList.remove('active'); }
+    }
+
+    // Delete chat room
+    function confirmDeleteRoom() {
+      if (!confirm('Delete this chat and all messages? This cannot be undone.')) {
+        var menu = document.getElementById('chatMoreMenu');
+        if (menu) { menu.classList.remove('open'); }
+        return;
+      }
+      fetch('/chat/delete-room/' + roomId + '/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Accept': 'application/json'
+        }
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.status === 'ok') {
+            window.location.href = '/chat/client/';
+          } else if (data.error) {
+            alert(data.error);
+          }
+        })
+        .catch(function () { alert('Failed to delete chat. Please try again.'); });
+    }
+
+    // Header more menu
+    function toggleChatMoreMenu(event) {
+      var menu = document.getElementById('chatMoreMenu');
+      if (!menu) return;
+      menu.classList.toggle('open');
+      if (event) { event.stopPropagation(); }
+    }
+    document.addEventListener('click', function (e) {
+      var menu = document.getElementById('chatMoreMenu');
+      if (!menu) return;
+      if (!menu.contains(e.target)) {
+        menu.classList.remove('open');
+      }
+    });
+
+    // Report modal helpers
+    function openReportModal() {
+      var modal = document.getElementById('chatReportModal');
+      if (modal) { modal.classList.add('active'); }
+      var menu = document.getElementById('chatMoreMenu');
+      if (menu) { menu.classList.remove('open'); }
+    }
+
+    function closeReportModal() {
+      var modal = document.getElementById('chatReportModal');
+      if (modal) { modal.classList.remove('active'); }
+    }
+
+    function submitChatReport() {
+      var textarea = document.getElementById('chatReportMessage');
+      if (!textarea) return;
+      var message = textarea.value.trim();
+      if (!message) {
+        alert('Please enter a message describing the issue.');
+        return;
+      }
+      fetch('/chat/report/' + roomId + '/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'message=' + encodeURIComponent(message)
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.status === 'ok') {
+            alert('Thank you. Your report has been submitted.');
+            textarea.value = '';
+            closeReportModal();
+          } else if (data.error) {
+            alert(data.error);
+          }
+        })
+        .catch(function () { alert('Failed to submit report. Please try again.'); });
+    }
 
     // Send message
     function sendMessage(e) {

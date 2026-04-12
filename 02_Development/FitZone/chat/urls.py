@@ -9,4 +9,5 @@ urlpatterns = [
     path('chat/fetch-list/', views.fetch_chat_list, name='fetch_chat_list'),
     path('chat/start/<int:trainer_id>/', views.start_chat_with_trainer, name='start_chat_with_trainer'),
     path('chat/delete-room/<int:room_id>/', views.delete_room, name='delete_chat_room'),
+    path('chat/report/<int:room_id>/', views.report_room, name='report_chat_room'),
 ]
