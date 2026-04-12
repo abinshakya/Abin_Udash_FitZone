@@ -19,11 +19,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from FitZone import views
+from login_logout_register import views as login_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('social-auth/', include('social_django.urls', namespace='social')),
+    path('google/profile-complete/', login_views.google_profile_wizard_entry, name='google_profile_complete_entry'),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
     path('member/settings/', views.member_settings, name='member_settings'),
     path('ai_chat/', include('Ai_chatbot.urls')),

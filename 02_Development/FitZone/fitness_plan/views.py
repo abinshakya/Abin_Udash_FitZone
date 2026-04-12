@@ -193,14 +193,22 @@ def trainer_client_list(request):
         payment_status='completed',
     ).filter(Q(valid_until__isnull=True) | Q(valid_until__gte=now)).select_related('user').order_by('-updated_at')
 
+    # Build a unique client list so the same user does not appear
+    # multiple times when they have more than one paid booking.
     clients_data = []
+    seen_user_ids = set()
     for booking in paid_bookings:
-        fp = ClientFitnessProfile.objects.filter(user=booking.user).first()
-        workout_count = WorkoutPlan.objects.filter(trainer=registration, client=booking.user, is_active=True).count()
-        diet_count = DietPlan.objects.filter(trainer=registration, client=booking.user, is_active=True).count()
+        user = booking.user
+        if user.id in seen_user_ids:
+            continue
+        seen_user_ids.add(user.id)
+
+        fp = ClientFitnessProfile.objects.filter(user=user).first()
+        workout_count = WorkoutPlan.objects.filter(trainer=registration, client=user, is_active=True).count()
+        diet_count = DietPlan.objects.filter(trainer=registration, client=user, is_active=True).count()
         clients_data.append({
             'booking': booking,
-            'user': booking.user,
+            'user': user,
             'fitness_profile': fp,
             'workout_count': workout_count,
             'diet_count': diet_count,

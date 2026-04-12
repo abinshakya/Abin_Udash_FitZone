@@ -8,6 +8,9 @@ from datetime import datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from formtools.wizard.views import SessionWizardView
+from django import forms
+from django.core.files.storage import default_storage
 import random
 import string
 import os
@@ -484,3 +487,135 @@ def change_password(request):
         return render(request, 'change_password.html', context)
         
     return render(request, 'change_password.html', context)
+
+
+class GoogleAccountForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exclude(pk=self.initial.get('user_id')).exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user is not None:
+            self.initial.setdefault('user_id', user.pk)
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        if len(password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        return password
+
+
+class GoogleProfileForm(forms.Form):
+    age = forms.IntegerField(required=True, min_value=1)
+    phone = forms.CharField(max_length=20, required=True)
+    gender = forms.ChoiceField(
+        required=True,
+        choices=(
+            ('male', 'Male'),
+            ('female', 'Female'),
+            ('other', 'Other'),
+        ),
+    )
+    profile_picture = forms.ImageField(required=False)
+
+
+GOOGLE_PROFILE_FORMS = [
+    ('account', GoogleAccountForm),
+    ('profile', GoogleProfileForm),
+]
+
+
+class GoogleProfileWizard(SessionWizardView):
+    template_name = 'google_profile_wizard.html'
+    file_storage = default_storage
+
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+        if step == 'account':
+            kwargs['user'] = self.request.user
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_initial(self, step):
+        initial = super().get_form_initial(step)
+        user = self.request.user
+        profile = UserProfile.objects.filter(user=user).first()
+        if step == 'account':
+            initial.update({
+                'username': user.username,
+            })
+        elif step == 'profile' and profile is not None:
+            if profile.age is not None:
+                initial['age'] = profile.age
+            if profile.phone:
+                initial['phone'] = profile.phone
+            if profile.gender:
+                initial['gender'] = profile.gender
+        return initial
+
+    def done(self, form_list, **kwargs):
+        user = self.request.user
+        profile = UserProfile.objects.filter(user=user).first()
+        cleaned = {}
+        for form in form_list:
+            cleaned.update(form.cleaned_data)
+
+        username = cleaned.get('username') or user.username
+        password = cleaned.get('password')
+
+        if username and username != user.username:
+            user.username = username
+        if password:
+            user.set_password(password)
+        user.save()
+
+        if profile is not None:
+            if cleaned.get('age') is not None:
+                profile.age = cleaned.get('age')
+            if cleaned.get('phone'):
+                profile.phone = cleaned.get('phone')
+            if cleaned.get('gender'):
+                profile.gender = cleaned.get('gender')
+            if cleaned.get('profile_picture'):
+                profile.profile_picture = cleaned.get('profile_picture')
+            profile.email_verified = True
+            if not profile.role:
+                profile.role = 'member'
+            profile.save()
+
+        # Keep the user logged in if password changed
+        update_session_auth_hash(self.request, user)
+
+        # After completing profile, send to member dashboard
+        return redirect('user_dashboard')
+
+
+def google_profile_wizard_entry(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    # If profile already appears complete, skip the wizard
+    profile = UserProfile.objects.filter(user=request.user).first()
+    if profile and profile.phone and profile.age and profile.gender:
+        # Redirect based on role similar to user_login
+        if profile.role == 'trainer':
+            return redirect('trainer_dashboard')
+        elif profile.role == 'member':
+            return redirect('user_dashboard')
+        elif profile.role == 'admin':
+            return redirect('/admin/')
+        return redirect('home')
+
+    view = GoogleProfileWizard.as_view(GOOGLE_PROFILE_FORMS)
+    return view(request)

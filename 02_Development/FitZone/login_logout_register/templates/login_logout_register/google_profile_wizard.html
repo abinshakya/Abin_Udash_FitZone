@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Complete Your Profile - FitZone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+    <style>
+        body {
+            background: #f4f5fb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .wizard-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .wizard-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+            max-width: 520px;
+            width: 100%;
+            padding: 2.25rem 2.5rem;
+        }
+        .wizard-header {
+            margin-bottom: 1.75rem;
+            text-align: center;
+        }
+        .wizard-header h1 {
+            font-size: 1.6rem;
+            margin: 0 0 0.5rem;
+            color: #111827;
+        }
+        .wizard-header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+        .wizard-step {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+        .wizard-step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            border: 2px solid #d1d5db;
+        }
+        .wizard-step.active .wizard-step-dot {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        .wizard-step.active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        label {
+            font-size: 0.9rem;
+            color: #374151;
+            font-weight: 600;
+        }
+        input, select {
+            padding: 0.65rem 0.75rem;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        input:focus, select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+        }
+        .errorlist {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+            color: #b91c1c;
+            font-size: 0.8rem;
+        }
+        .wizard-footer {
+            margin-top: 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.6rem;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #2563eb, #4f46e5);
+            color: white;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #6b7280;
+        }
+        .btn[disabled] {
+            opacity: 0.65;
+            cursor: default;
+        }
+        .step-label {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-bottom: 0.35rem;
+        }
+        @media (max-width: 640px) {
+            .wizard-card {
+                padding: 1.75rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wizard-wrapper">
+    <div class="wizard-card">
+        <div class="wizard-header">
+            <h1>Complete Your Profile</h1>
+            <p>Just a few more details to finish setting up your FitZone account.</p>
+        </div>
+
+        <div class="wizard-steps">
+            <div class="wizard-step {% if wizard.steps.current == 'account' %}active{% endif %}">
+                <div class="wizard-step-dot"></div>
+                <span>Account</span>
+            </div>
+            <div class="wizard-step {% if wizard.steps.current == 'profile' %}active{% endif %}">
+                <div class="wizard-step-dot"></div>
+                <span>Profile</span>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ wizard.management_form }}
+
+            {% if wizard.form.non_field_errors %}
+                <ul class="errorlist">{{ wizard.form.non_field_errors }}</ul>
+            {% endif %}
+
+            {% for field in wizard.form.visible_fields %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="errorlist">{{ field.errors }}</ul>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <small style="color:#9ca3af;font-size:0.8rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="wizard-footer">
+                <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn btn-secondary" {% if not wizard.steps.prev %}disabled{% endif %}>
+                    Back
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    {% if wizard.steps.last %}
+                        Finish
+                    {% else %}
+                        Continue
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
