@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q
+from datetime import datetime, date
+import os
 
 def cancel_overdue_bookings(user):
     from notifications.models import UserNotification, TrainerNotification
@@ -141,6 +143,84 @@ def user_dashboard(request):
     }
     
     return render(request, 'member/user_dashboard.html', context)
+
+
+@login_required
+def member_settings(request):
+    """Member settings page inside the member panel (profile & security)."""
+
+    # Ensure user is a member with an active membership (same rules as dashboard)
+    try:
+        profile_obj = request.user.userprofile
+        if profile_obj.role != 'member':
+            messages.warning(request, "You need to be a member to access settings. Please join our membership!")
+            return redirect('/membership/')
+    except Exception:
+        messages.warning(request, "You need to be a member to access settings. Please join our membership!")
+        return redirect('/membership/')
+
+    from membership.models import UserMembership
+    membership = UserMembership.objects.filter(
+        user=request.user,
+        is_active=True
+    ).select_related('membership_plan').first()
+
+    if not membership:
+        messages.warning(request, "You don't have an active membership plan. Please purchase a membership to access settings.")
+        return redirect('/membership/')
+
+    # Notifications for header bell
+    from notifications.models import UserNotification
+    notifications = UserNotification.objects.filter(user=request.user)[:20]
+    unread_count = UserNotification.objects.filter(user=request.user, is_read=False).count()
+
+    # Load or create profile
+    from login_logout_register.models import UserProfile
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=request.user)
+
+    if request.method == "POST":
+        # Basic user info
+        request.user.first_name = request.POST.get('name', request.user.first_name)
+        request.user.email = request.POST.get('email', request.user.email)
+        request.user.save()
+
+        # Handle profile picture upload
+        if 'profile_picture' in request.FILES:
+            if profile.profile_picture:
+                old_path = profile.profile_picture.path
+                if os.path.isfile(old_path):
+                    os.remove(old_path)
+            profile.profile_picture = request.FILES['profile_picture']
+
+        # Other profile fields
+        profile.phone = request.POST.get('phone', profile.phone)
+        profile.gender = request.POST.get('gender', profile.gender)
+        age_val = request.POST.get('age')
+        if age_val:
+            try:
+                age_int = int(age_val)
+                profile.age = age_int
+                current_year = datetime.now().year
+                birth_year = current_year - age_int
+                profile.dob = date(birth_year, 1, 1)
+            except ValueError:
+                pass
+
+        profile.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect('member_settings')
+
+    context = {
+        'membership': membership,
+        'notifications': notifications,
+        'unread_count': unread_count,
+        'profile': profile,
+    }
+
+    return render(request, 'member/settings.html', context)
 
 # Dashboard for users who have booked trainers
 @login_required

@@ -25,6 +25,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('social-auth/', include('social_django.urls', namespace='social')),
     path('member/user_dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('member/settings/', views.member_settings, name='member_settings'),
     path('ai_chat/', include('Ai_chatbot.urls')),
     path('my-trainer-dashboard/', views.trainer_client_dashboard, name='trainer_client_dashboard'),
     path('my-trainers/', views.trainer_client_my_trainers, name='trainer_client_my_trainers'),
