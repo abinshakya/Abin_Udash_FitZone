@@ -1,0 +1,147 @@
+{% load i18n static %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+<title>{% block title %}{% endblock %}</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block extrastyle %}{% endblock %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/rtl.css" %}">{% endif %}
+{% block extrahead %}{% endblock %}
+{% block responsive %}
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
+
+<div id="container">
+    {% if not is_popup %}
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            {% block branding %}{% endblock %}
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin:index' %}" class="nav-item {% if request.path == '/admin/' %}active{% endif %}">
+                <i class="fas fa-th-large"></i> <span>{% trans 'Dashboard' %}</span>
+            </a>
+            
+            {% if request.user.is_superuser or request.user.is_staff %}
+            <div style="padding: 10px 20px 5px 20px; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">
+                {% trans 'Apps' %}
+            </div>
+            {% for app in available_apps %}
+            <div class="sidebar-group">
+                <div class="nav-item group-title">
+                    <span style="display: flex; align-items: center; gap: 15px;">
+                        {% if app.app_label == 'auth' %}<i class="fas fa-users-cog"></i>
+                        {% elif app.app_label == 'payment' %}<i class="fas fa-credit-card"></i>
+                        {% elif app.app_label == 'trainer' %}<i class="fas fa-dumbbell"></i>
+                        {% elif app.app_label == 'membership' %}<i class="fas fa-id-card"></i>
+                        {% elif app.app_label == 'chat' %}<i class="fas fa-comments"></i>
+                        {% elif app.app_label == 'fitness_plan' %}<i class="fas fa-calendar-alt"></i>
+                        {% elif app.app_label == 'Ai_chatbot' %}<i class="fas fa-robot"></i>
+                        {% else %}<i class="fas fa-box"></i>{% endif %}
+                        <span>{{ app.name }}</span>
+                    </span>
+                    <i class="fas fa-chevron-right group-arrow"></i>
+                </div>
+                <div class="group-items">
+                    {% for model in app.models %}
+                    <a href="{{ model.admin_url }}" class="nav-item {% if model.admin_url in request.path %}active{% endif %} model-link">
+                        <span>{{ model.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div style="padding: 10px 20px; font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;">
+                {% trans 'Quick Links' %}
+            </div>
+            
+            <a href="/" class="nav-item">
+                <i class="fas fa-external-link-alt"></i> <span>{% trans 'View Site' %}</span>
+            </a>
+            
+            <a href="{% url 'admin:password_change' %}" class="nav-item">
+                <i class="fas fa-key"></i> <span>{% trans 'Change Password' %}</span>
+            </a>
+
+            <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="margin-top: auto;">
+                {% csrf_token %}
+                <button type="submit" class="nav-item" style="background: none; border: none; width: 100%; cursor: pointer; text-align: left;">
+                    <i class="fas fa-sign-out-alt"></i> <span>{% trans 'Log out' %}</span>
+                </button>
+            </form>
+        </nav>
+    </aside>
+
+    <!-- Main Content wrapper -->
+    <main id="main-content">
+        <!-- Top Navigation -->
+        <header id="header">
+            <div class="header-left">
+                <button id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="{% trans 'Search anything...' %}">
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        {{ user.get_username|slice:":1"|upper }}
+                    </div>
+                    <span style="font-weight: 600;">{% firstof user.get_full_name user.get_username %}</span>
+                </div>
+            </div>
+        </header>
+
+        {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+            {% if title %} &rsaquo; {{ title }}{% endif %}
+        </div>
+        {% endblock %}
+
+        {% if messages %}
+        <ul class="messagelist" style="list-style: none; padding: 0 24px; margin: 10px 0;">
+            {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; background-color: {% if message.tags == 'success' %}#dcfce7; color: #166534;{% else %}#fee2e2; color: #991b1b;{% endif %}">
+                {{ message|capfirst }}
+              </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endif %}
+
+        <!-- Content -->
+        <div id="content" class="{% block coltype %}colM{% endblock %}">
+            {% block pretitle %}{% endblock %}
+            {% block content_title %}{% if title %}<h2 style="padding: 0 24px; font-size: 1.5rem; font-weight: 700;">{{ title }}</h2>{% endif %}{% endblock %}
+            {% block content_subtitle %}{% if subtitle %}<h3 style="padding: 0 24px;">{{ subtitle }}</h3>{% endif %}{% endblock %}
+            {% block content %}
+                {{ content }}
+            {% endblock %}
+            {% block sidebar %}{% endblock %}
+            <br class="clear">
+        </div>
+        <!-- END Content -->
+
+    {% if not is_popup %}
+        {% block footer %}<div id="footer"></div>{% endblock %}
+    </main>
+    {% endif %}
+</div>
+<!-- END Container -->
+
+</body>
+</html>

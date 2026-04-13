@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'change' object_id|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; {% trans 'Delete' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="delete-confirmation">
+    <form method="post">{% csrf_token %}
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px;">{% trans 'Are you sure?' %}</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                {% blocktrans with str=object %}Are you sure you want to delete the {{ opts.verbose_name }} "{{ str }}"? All of the following related items will be deleted:{% endblocktrans %}
+            </p>
+            
+            <div style="background: #fff5f5; border: 1px solid #feb2b2; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <h2 style="font-size: 1rem; color: #c53030; margin-bottom: 15px;">{% trans 'Summary' %}</h2>
+                {{ deleted_objects|unordered_list }}
+            </div>
+
+            <div class="submit-row" style="background: none; border: none; padding: 0; margin: 0; display: flex; gap: 15px; justify-content: flex-start;">
+                <input type="submit" value="{% trans "Yes, I'm sure" %}" class="default" style="background-color: #ef4444 !important;">
+                <a href="#" onclick="window.history.back(); return false;" class="button" style="display: flex; align-items: center; justify-content: center; height: 38px;">
+                    {% trans "No, take me back" %}
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

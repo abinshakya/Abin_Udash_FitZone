@@ -80,6 +80,7 @@ TEMPLATES = [
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
                 'trainer.context_processors.notification_count',
+                'FitZone.admin_context.admin_stats',
             ],
         },
     },

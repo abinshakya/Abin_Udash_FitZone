@@ -1,0 +1,166 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 0 24px 20px 24px;">
+        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 45px; height: 45px; background: #fff7ed; color: #f97316; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.875rem; color: #64748b;">Total Users</div>
+                <div style="font-size: 1.25rem; font-weight: 700;">{{ user_count|default:"---" }}</div>
+            </div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 45px; height: 45px; background: #f0fdf4; color: #16a34a; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.875rem; color: #64748b;">Active Subs</div>
+                <div style="font-size: 1.25rem; font-weight: 700;">{{ active_subs|default:"---" }}</div>
+            </div>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
+            <div style="width: 45px; height: 45px; background: #fef2f2; color: #dc2626; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.875rem; color: #64748b;">Pending Tasks</div>
+                <div style="font-size: 1.25rem; font-weight: 700;">{{ pending_tasks|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Charts -->
+    <div class="dashboard-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; padding: 0 24px 24px 24px;">
+        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">User Registration Growth</h3>
+            <div id="userGrowthChart" 
+                 data-labels='{{ user_growth_labels|safe }}' 
+                 data-series='{{ user_growth_data|safe }}'>
+            </div>
+        </div>
+        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Revenue Insights (Rs.)</h3>
+            <div id="revenueChart"
+                 data-labels='{{ revenue_labels|safe }}' 
+                 data-series='{{ revenue_data|safe }}'>
+            </div>
+        </div>
+        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Membership Distribution</h3>
+            <div id="membershipChart"
+                 data-labels='{{ membership_labels|safe }}' 
+                 data-series='{{ membership_data|safe }}'>
+            </div>
+        </div>
+        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Booking Breakdown</h3>
+            <div id="bookingChart"
+                 data-labels='{{ booking_labels|safe }}' 
+                 data-series='{{ booking_data|safe }}'>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Cards Grid -->
+    {% if app_list %}
+        <div class="dashboard-grid">
+        {% for app in app_list %}
+            <div class="app-card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ app.name }}</h3>
+                    <div class="card-icon">
+                        {% if app.app_label == 'auth' %}
+                            <i class="fas fa-users-cog"></i>
+                        {% elif app.app_label == 'payment' %}
+                            <i class="fas fa-credit-card"></i>
+                        {% elif app.app_label == 'trainer' %}
+                            <i class="fas fa-dumbbell"></i>
+                        {% elif app.app_label == 'membership' %}
+                            <i class="fas fa-id-card"></i>
+                        {% elif app.app_label == 'chat' %}
+                            <i class="fas fa-comments"></i>
+                        {% elif app.app_label == 'fitness_plan' %}
+                            <i class="fas fa-calendar-alt"></i>
+                        {% elif app.app_label == 'Ai_chatbot' %}
+                            <i class="fas fa-robot"></i>
+                        {% else %}
+                            <i class="fas fa-box"></i>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <ul class="model-list">
+                {% for model in app.models %}
+                    <li class="model-item">
+                        {% if model.admin_url %}
+                            <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                        {% else %}
+                            {{ model.name }}
+                        {% endif %}
+
+                        <div style="display: flex; gap: 10px;">
+                            {% if model.add_url %}
+                                <a href="{{ model.add_url }}" class="action-btn add-btn" title="{% trans 'Add' %}">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            {% endif %}
+                            {% if model.admin_url %}
+                                <a href="{{ model.admin_url }}" class="action-btn change-btn" title="{% trans 'Change' %}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div style="padding: 24px;">
+            <p>{% trans "You don't have permission to view or edit anything." %}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related" style="padding: 24px; background: white; margin: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+    <div class="module" id="recent-actions-module">
+        <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 15px;">{% trans 'Recent actions' %}</h2>
+        <h3 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 20px;">{% trans 'My actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+            <p>{% trans 'None available' %}</p>
+        {% else %}
+            <ul class="actionlist" style="list-style: none; padding: 0;">
+            {% for entry in admin_log %}
+                <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% else %}deletelink{% endif %}" style="padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.875rem;">
+                    {% if entry.is_deletion or not entry.get_admin_url %}
+                        {{ entry.object_repr }}
+                    {% else %}
+                        <a href="{{ entry.get_admin_url }}" style="color: var(--primary-color); text-decoration: none;">{{ entry.object_repr }}</a>
+                    {% endif %}
+                    <br>
+                    {% if entry.content_type %}
+                        <span class="mini quiet">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
+                    {% else %}
+                        <span class="mini quiet">{% trans 'Unknown content type' %}</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
