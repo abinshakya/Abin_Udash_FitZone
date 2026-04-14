@@ -57,11 +57,8 @@
         margin-bottom: 0;
       }
       .brand-logo {
-        width: 40px; height: 40px; border-radius: 12px;
-        background: linear-gradient(135deg, #ff7a18, #ff9a3c);
-        color: white;
-        display: grid; place-items: center;
-        font-weight: 800; font-size: 1.1rem;
+        width: auto; height: 38px;
+        object-fit: contain;
       }
       .brand-text h2 { margin: 0; font-size: 17px; font-weight: 900; color: #1a1a1a; line-height: 1.2; }
       .brand-text span { font-size: 10px; color: rgba(0,0,0,0.55); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: block; }
@@ -193,7 +190,7 @@
   <!-- Mobile Header -->
   <div class="mobile-header-bar">
     <div class="brand-box" style="margin:0;">
-      <div class="brand-logo" style="width:32px;height:32px;font-size:0.9rem;">FZ</div>
+      <img src="{% static 'assets/images/logo/fitzone_logo.png' %}" alt="FitZone" style="height: 32px; width: auto;">
       <div class="brand-text"><h2>FitZone</h2></div>
     </div>
     <button class="mobile-toggle" style="background:none;border:none;font-size:1.2rem;" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
@@ -202,11 +199,7 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="brand-box">
-      <div class="brand-logo">FZ</div>
-      <div class="brand-text">
-        <h2>FitZone</h2>
-        <span>Member Panel</span>
-      </div>
+      <img src="{% static 'assets/images/logo/fitzone_logo.png' %}" alt="FitZone Logo" class="brand-logo">
     </div>
     <nav class="nav-menu">
       <a href="{% url 'user_dashboard' %}" class="nav-link">

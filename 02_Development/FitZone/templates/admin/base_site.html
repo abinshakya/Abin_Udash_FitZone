@@ -20,9 +20,8 @@
 
 {% block branding %}
 <h1 id="site-name">
-    <a href="{% url 'admin:index' %}" style="color: #f97316; font-weight: 800; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-dumbbell"></i>
-        FitZone <span style="color: #ffffff; font-weight: 400;">Admin</span>
+    <a href="{% url 'admin:index' %}" style="display: flex; align-items: center; gap: 10px;">
+        <img src="{% static 'assets/images/logo/fitzone_logo.png' %}" alt="FitZone Admin" style="height: 44px; width: auto; filter: brightness(1.1) contrast(1.1);">
     </a>
 </h1>
 {% endblock %}

@@ -21,15 +21,26 @@
 /* Brand */
 .fz-navbar .navbar-brand{
   color: var(--text-light) !important;
-  font-size: 1.35rem;
-  letter-spacing: 0.2px;
   margin-right: 18px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
-.fz-navbar .navbar-brand i{
-  color: var(--primary-orange);
-  font-size: 1.25rem;
+.fz-navbar-logo {
+  height: 40px;
+  width: auto;
+  margin: -5px 0; /* Offset white space if any */
+  transition: transform 0.3s ease;
 }
+.fz-navbar-logo:hover {
+  transform: scale(1.02);
+}
+@media (max-width: 991.98px) {
+  .fz-navbar-logo {
+    height: 32px;
+  }
+}
+
 
 /* Links */
 .fz-navbar .nav-link{
