@@ -42,8 +42,9 @@ class TrainerRegistrationDocumentInline(admin.StackedInline):
 		return format_html(
 			'<div class="admin-doc-icon">'
 			'	<i class="fas fa-file-pdf"></i>'
-			'	<span>Non-image document (PDF/Other)</span>'
-			'</div>'
+			'	<span>{}</span>'
+			'</div>',
+			"Non-image document (PDF/Other)"
 		)
 	preview.short_description = "Preview"
 

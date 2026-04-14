@@ -6,7 +6,7 @@ MAX_FILE_MB = 5
 MAX_FILE_SIZE = MAX_FILE_MB * 1024 * 1024
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/jpg"}
-ALLOWED_DOC_TYPES = ALLOWED_IMAGE_TYPES | {"application/pdf"}
+ALLOWED_DOC_TYPES = ALLOWED_IMAGE_TYPES
 
 
 def validate_file_size(file):
@@ -175,7 +175,7 @@ class Step2CertificationForm(forms.Form):
         required=True,
         max_files=5,
         widget=MultipleFileInput(attrs={
-            'accept': 'image/*,application/pdf',
+            'accept': 'image/*',
             'class': 'file-input'
         })
     )
@@ -198,7 +198,7 @@ class Step3DocumentsForm(forms.Form):
         required=True,
         max_files=5,
         widget=MultipleFileInput(attrs={
-            'accept': 'image/*,application/pdf',
+            'accept': 'image/*',
             'class': 'file-input'
         })
     )
@@ -209,7 +209,7 @@ class Step3DocumentsForm(forms.Form):
         required=True,
         max_files=5,
         widget=MultipleFileInput(attrs={
-            'accept': 'image/*,application/pdf',
+            'accept': 'image/*',
             'class': 'file-input'
         })
     )
