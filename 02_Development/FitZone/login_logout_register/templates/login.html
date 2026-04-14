@@ -1,81 +1,79 @@
 {% extends 'base1.html' %}
 
 {% block content %}
-<style>
-  .arrow-bold { font-weight: 900; }
-  .social-login {
-    text-align: center;
-    margin-top: 15px;
-  }
-  .social-login-text {
-    margin-bottom: 10px;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  .google-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-  }
-  .google-btn:hover {
-    background-color: #f5f5f5;
-  }
-  .google-icon {
-    width: 20px;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-</style>
+<section class="login-wrapper">
+  <div class="login-shell">
+    <div class="login-hero">
+      <span class="login-kicker">FitZone Access</span>
+      <h1>Train smarter, not harder.</h1>
+      <p>Login to manage your trainers, plans, and memberships in one place.</p>
 
-<div class="login-wrapper">
-  <div class="login-container">
-    <h2>Login</h2>
-    <p class="subtext">Welcome back! Enter your username and password to continue.</p>
-
-    {% if messages %}
-      {% for message in messages %}
-        <p class="message {{ message.tags }}">{{ message }}</p>
-      {% endfor %}
-    {% endif %}
-
-    <form method="post">
-      {% csrf_token %}
-
-      <div class="input-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter username" required>
+      <div class="login-hero-pills">
+        <span class="pill">Verified Trainers</span>
+        <span class="pill">AI Nutrition</span>
+        <span class="pill">Membership Plans</span>
       </div>
 
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter password" required>
+      <div class="login-hero-stats">
+        <div>
+          <strong>200+</strong>
+          <span>Active Plans</span>
+        </div>
+        <div>
+          <strong>24/7</strong>
+          <span>Support</span>
+        </div>
       </div>
-
-      <button type="submit" class="login-btn">
-        Login <span class="arrow-bold">→</span>
-      </button>
-    </form>
-
-    <div class="social-login">
-      <p class="social-login-text">Or login with</p>
-      <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-btn">
-        <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" alt="Google" class="google-icon">
-        Sign in with Google
-      </a>
     </div>
 
-    <p class="forgot-text" style="margin: 12px 0 0; text-align: center; position: relative; z-index: 1;">
-      <a href="{% url 'forgot_password' %}" style="color: var(--orange2); font-weight: 700; text-decoration: none; font-size: 0.9rem;">Forgot Username or Password?</a>
-    </p>
+    <div class="login-card">
+      <div class="login-card-header">
+        <h2>Login</h2>
+        <p class="subtext">Welcome back. Enter your username and password to continue.</p>
+      </div>
 
-    <p class="register-text">
-      Don't have an account? <a href="{% url 'register' %}">Register</a>
-    </p>
+      {% if messages %}
+        <div class="login-messages">
+          {% for message in messages %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" class="login-form">
+        {% csrf_token %}
+
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter username" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required>
+        </div>
+
+        <button type="submit" class="login-btn">
+          Login <span class="arrow-bold">→</span>
+        </button>
+      </form>
+
+      <div class="social-login">
+        <p class="social-login-text">Or login with</p>
+        <a href="{% url 'social:begin' 'google-oauth2' %}" class="google-btn">
+          <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" alt="Google" class="google-icon">
+          Sign in with Google
+        </a>
+      </div>
+
+      <p class="forgot-text">
+        <a href="{% url 'forgot_password' %}">Forgot Username or Password?</a>
+      </p>
+
+      <p class="register-text">
+        Don't have an account? <a href="{% url 'register' %}">Register</a>
+      </p>
+    </div>
   </div>
-</div>
+</section>
 {% endblock content %}

@@ -203,6 +203,42 @@
     {% endif %}
   </div>
 
+  {% if page_obj.has_other_pages %}
+    <nav class="d-flex justify-content-center mt-4 trainer-pagination" aria-label="Trainer pagination">
+      <ul class="pagination trainer-pagination-list">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+          {% if page_obj.has_previous %}
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          {% else %}
+            <span class="page-link" aria-label="Previous" aria-disabled="true">
+              <span aria-hidden="true">&laquo;</span>
+            </span>
+          {% endif %}
+        </li>
+
+        {% for num in page_obj.paginator.page_range %}
+          <li class="page-item page-number {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
+          </li>
+        {% endfor %}
+
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+          {% if page_obj.has_next %}
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          {% else %}
+            <span class="page-link" aria-label="Next" aria-disabled="true">
+              <span aria-hidden="true">&raquo;</span>
+            </span>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+
 </div>
 
 {% endblock content %}

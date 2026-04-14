@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.contrib import messages
 from django import forms
 from django.utils import timezone
+from django.utils.html import format_html
 import datetime
+import os
 
 from .models import TrainerRegistration, TrainerRegistrationDocument, TrainerBooking
 from notifications.models import TrainerNotification
@@ -10,11 +12,51 @@ from login_logout_register.models import UserProfile
 
 
 # Inline admin to display documents within the TrainerRegistration admin page
-class TrainerRegistrationDocumentInline(admin.TabularInline):
+class TrainerRegistrationDocumentInline(admin.StackedInline):
 	model = TrainerRegistrationDocument
 	extra = 0
-	readonly_fields = ("doc_type", "file", "uploaded_at")
+	readonly_fields = ("doc_type", "preview", "file_link", "original_filename", "uploaded_at")
+	fields = ("doc_type", "preview", "file_link", "original_filename", "uploaded_at")
 	can_delete = False
+	verbose_name = "Document"
+	verbose_name_plural = "Trainer documents"
+
+	def preview(self, obj):
+		if not obj.file:
+			return "-"
+		name = obj.original_filename or os.path.basename(obj.file.name)
+		url = obj.file.url
+		ext = os.path.splitext(obj.file.name)[1].lower()
+		if ext in {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}:
+			return format_html(
+				'<div class="admin-doc-preview">'
+				'	<a href="{}" target="_blank" rel="noopener">'
+				'		<img src="{}" alt="{}" class="preview-img">'
+				'		<div class="preview-overlay"><i class="fas fa-search-plus"></i> View Full Size</div>'
+				'	</a>'
+				'</div>',
+				url,
+				url,
+				name,
+			)
+		return format_html(
+			'<div class="admin-doc-icon">'
+			'	<i class="fas fa-file-pdf"></i>'
+			'	<span>Non-image document (PDF/Other)</span>'
+			'</div>'
+		)
+	preview.short_description = "Preview"
+
+	def file_link(self, obj):
+		if not obj.file:
+			return "-"
+		return format_html(
+			'<a href="{}" target="_blank" rel="noopener" class="admin-doc-btn">'
+			'	<i class="fas fa-external-link-alt"></i> View Full Document'
+			'</a>',
+			obj.file.url
+		)
+	file_link.short_description = "File"
 	
 	def has_add_permission(self, request, obj=None):
 		return False

@@ -8,6 +8,7 @@ from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import Q
 import os
 from django.shortcuts import get_object_or_404, redirect
@@ -60,6 +61,10 @@ def trainer(request):
         sort = 'newest'
         trainers_qs = trainers_qs.order_by('-submitted_at')
 
+    paginator = Paginator(trainers_qs, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     # Build specialization filter options from verified trainer data
     specialization_options = sorted(
         {
@@ -85,8 +90,12 @@ def trainer(request):
             TrainerBooking.objects.filter(user=request.user, status='pending').values_list('trainer_id', flat=True)
         )
 
+    params = request.GET.copy()
+    params.pop('page', None)
+    querystring = params.urlencode()
+
     context = {
-        'trainers': trainers_qs,
+        'trainers': page_obj.object_list,
         'today': timezone.now().date().isoformat(),
         'user_is_email_verified': user_is_email_verified,
         'pending_booking_trainer_ids': pending_booking_trainer_ids,
@@ -99,6 +108,8 @@ def trainer(request):
         },
         'result_count': trainers_qs.count(),
         'has_active_filters': bool(query or specialization or min_experience),
+        'page_obj': page_obj,
+        'querystring': querystring,
     }
     return render(request, 'trainer.html', context)
 

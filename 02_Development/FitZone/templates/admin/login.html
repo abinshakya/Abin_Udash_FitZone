@@ -6,30 +6,146 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    #container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-        min-height: 100vh;
-    }
-    #sidebar, #header, .breadcrumbs { display: none !important; }
-    #main-content { padding: 0 !important; width: 100%; display: flex; align-items: center; justify-content: center; background: transparent; }
-    #content { margin: 0; padding: 0; width: 100%; max-width: 400px; }
-    .login #content-main { margin: 0; }
-    .login .module {
-        background: white;
-        padding: 40px;
-        border-radius: 16px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        border: none;
-    }
-    .login .form-row { padding: 0; margin-bottom: 20px; border: none; }
-    .login label { color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500; }
-    .login .submit-row { padding: 10px 0 0 0; text-align: center; }
-    .login .submit-row input { width: 100%; padding: 12px; font-size: 1rem; }
-    #site-name { text-align: center; margin-bottom: 30px; }
-    #site-name a { justify-content: center; }
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --admin-bg0: #fff7f1;
+    --admin-bg1: #f6f8fb;
+    --admin-text: #141414;
+    --admin-muted: rgba(0, 0, 0, 0.6);
+    --admin-border: rgba(0, 0, 0, 0.08);
+    --admin-orange: #ff7a18;
+    --admin-orange2: #ff9a3c;
+    --admin-shadow: 0 24px 50px rgba(0, 0, 0, 0.12);
+  }
+
+  #container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background:
+      radial-gradient(900px 420px at 10% -10%, rgba(255, 122, 24, 0.18), transparent 60%),
+      radial-gradient(800px 420px at 90% 0%, rgba(255, 154, 60, 0.14), transparent 60%),
+      linear-gradient(135deg, var(--admin-bg0), var(--admin-bg1));
+    font-family: "Outfit", system-ui, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #container::before {
+    content: "";
+    position: absolute;
+    inset: auto -10% -30% -10%;
+    height: 55%;
+    background: radial-gradient(circle at 15% 25%, rgba(255, 122, 24, 0.12), transparent 65%);
+    z-index: 0;
+  }
+
+  #sidebar, #header, .breadcrumbs { display: none !important; }
+  #main-content { padding: 0 !important; width: 100%; display: flex; align-items: center; justify-content: center; background: transparent; }
+  #content { margin: 0; padding: 0; width: 100%; max-width: 430px; position: relative; z-index: 1; }
+  .login #content-main { margin: 0; }
+
+  .login .module {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 249, 250, 0.98));
+    padding: 36px;
+    border-radius: 22px;
+    box-shadow: var(--admin-shadow);
+    border: 1px solid var(--admin-border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login .module::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 122, 24, 0.2), rgba(0, 0, 0, 0.05), rgba(255, 154, 60, 0.18));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .login .form-row { padding: 0; margin-bottom: 16px; border: none; }
+  .login label {
+    color: var(--admin-muted);
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+  }
+
+  .login .form-row input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .login .form-row input:focus {
+    border-color: rgba(255, 122, 24, 0.7);
+    box-shadow: 0 0 0 4px rgba(255, 122, 24, 0.14);
+    outline: none;
+  }
+
+  .login .submit-row { padding: 8px 0 0 0; text-align: center; }
+  .login .submit-row input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--admin-orange), var(--admin-orange2));
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    box-shadow: 0 16px 30px rgba(255, 122, 24, 0.28);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+
+  .login .submit-row input:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 22px 40px rgba(255, 122, 24, 0.35);
+  }
+
+  #site-name { text-align: center; margin-bottom: 20px; }
+  #site-name a { justify-content: center; color: var(--admin-orange); font-weight: 900; font-size: 1.9rem; text-decoration: none; }
+
+  .login-title {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 6px 0 18px;
+    color: var(--admin-text);
+  }
+
+  .login-subtext {
+    text-align: center;
+    color: var(--admin-muted);
+    font-size: 0.92rem;
+    margin: 0 0 20px;
+  }
+
+  .password-reset-link a {
+    color: var(--admin-orange);
+    font-weight: 700;
+  }
+
+  .errornote {
+    border-radius: 12px;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+  }
 </style>
 {% endblock %}
 
@@ -51,11 +167,12 @@
 <div id="content-main">
     <div class="module">
         <div id="site-name">
-            <a href="{% url 'admin:index' %}" style="color: #f97316; font-weight: 800; font-size: 2rem; display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                <i class="fas fa-dumbbell"></i>
-                FitZone
-            </a>
+      <a href="{% url 'admin:index' %}">
+        FitZone
+      </a>
         </div>
+    <div class="login-title">Admin Access</div>
+    <p class="login-subtext">Sign in to manage members, trainers, and site content.</p>
         
         <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
           <div class="form-row">

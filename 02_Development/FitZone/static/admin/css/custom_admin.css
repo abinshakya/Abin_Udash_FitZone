@@ -676,3 +676,110 @@ fieldset.module h2 {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-secondary);
 }
+/* Administrative Document Previews */
+.admin-doc-preview {
+    position: relative;
+    max-width: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.admin-doc-preview:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.preview-img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    display: block;
+    object-fit: contain;
+    background: #ffffff;
+}
+
+.preview-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.admin-doc-preview:hover .preview-overlay {
+    opacity: 1;
+}
+
+.admin-doc-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+}
+
+.admin-doc-icon i {
+    font-size: 2rem;
+    color: #ef4444;
+}
+
+.admin-doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--secondary-color) !important;
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.admin-doc-btn:hover {
+    background-color: #333333 !important;
+    transform: translateY(-1px);
+}
+
+/* Ensure Stacked Inlines look like cards */
+.inline-group .inline-related {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.inline-group .inline-related h3 {
+    background: #f8fafc !important;
+    color: var(--secondary-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px 20px !important;
+    font-size: 0.875rem !important;
+}
+
+.inline-group .inline-related fieldset {
+    border: none !important;
+    padding: 20px !important;
+    margin: 0 !important;
+}
