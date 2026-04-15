@@ -21,13 +21,13 @@
 {% block coltype %}{% endblock %}
 
 {% block content %}
-  <div id="content-main" style="padding: 0 24px;">
-    <div class="changelist-top-bar" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+  <div id="content-main" class="admin-page-content">
+    <div class="changelist-top-bar">
         <div class="header-content">
-            <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0;">{{ opts.verbose_name_plural|capfirst }}</h2>
+            <h2 class="page-title">{{ opts.verbose_name_plural|capfirst }}</h2>
         </div>
         {% block object-tools %}
-            <ul class="object-tools" style="list-style: none; display: flex; gap: 10px; padding: 0; margin: 0;">
+            <ul class="object-tools admin-object-tools">
               {% block object-tools-items %}
                 {% change_list_object_tools %}
               {% endblock %}
@@ -36,10 +36,10 @@
     </div>
 
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
-      <div class="changelist-tools" style="padding: 20px; border-bottom: 1px solid var(--border-color); background: white; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;">
+      <div class="changelist-tools">
         {% block search %}{% search_form cl %}{% endblock %}
         
-        <div class="actions-wrapper" style="flex: 1; display: flex; justify-content: flex-end;">
+        <div class="actions-wrapper">
           {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
         </div>
       </div>
@@ -63,7 +63,7 @@
       {% block filters %}
         {% if cl.has_filters %}
           <div id="changelist-filter">
-            <h2 style="font-size: 1rem; font-weight: 700; margin-bottom: 15px;">{% trans 'Filter' %}</h2>
+            <h2>{% trans 'Filter' %}</h2>
             {% if cl.has_active_filters %}<h3 id="changelist-filter-clear">
               <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% trans "Clear all filters" %}</a>
             </h3>{% endif %}

@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.views.decorators.cache import cache_control
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Q
@@ -84,6 +85,7 @@ def cancel_overdue_bookings(user):
         except Exception:
             pass
 
+@cache_control(public=True, max_age=3600)
 def home(request):
     from .models import HomeBanner, PremiumService
     banners = HomeBanner.objects.filter(is_active=True)
@@ -331,6 +333,7 @@ def trainer_client_my_trainers(request):
 
     return render(request, 'trainer_client/my_trainers.html', context)
 
+@cache_control(public=True, max_age=3600)
 def about(request):
     return render(request, 'about.html')
 

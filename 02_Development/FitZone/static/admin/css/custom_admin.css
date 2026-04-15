@@ -357,6 +357,56 @@ legend {
     margin: 24px;
 }
 
+.admin-page-content {
+    padding: 0 24px;
+}
+
+.changelist-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.admin-object-tools {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+}
+
+.changelist-tools {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: white;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 260px;
+}
+
+.changelist-form-container {
+    overflow-x: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -390,6 +440,30 @@ tbody td {
     padding: 14px 20px;
     color: var(--text-primary);
     font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+#changelist a {
+    color: #1f3a8a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#changelist a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+#result_list thead th a,
+#result_list thead th .text a {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+#result_list thead th a:hover,
+#result_list thead th .text a:hover {
+    text-decoration: underline;
 }
 
 /* Buttons */
@@ -456,6 +530,7 @@ tbody td {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .actions select {
@@ -552,6 +627,10 @@ input[type="checkbox"]:checked::after {
     border-top: 1px solid var(--border-color);
     font-size: 0.875rem;
     color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .paginator a, .paginator span.this-page {
@@ -586,6 +665,27 @@ input[type="checkbox"]:checked::after {
     }
     #main-content {
         margin-left: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-page-content {
+        padding: 0 14px;
+    }
+
+    .changelist-top-bar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .actions-wrapper {
+        justify-content: flex-start;
+    }
+
+    thead th,
+    tbody td {
+        padding: 10px 12px;
+        font-size: 0.82rem;
     }
 }
 
