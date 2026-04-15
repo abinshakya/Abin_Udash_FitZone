@@ -116,6 +116,7 @@ def trainer(request):
 
 def trainer_profile_detail(request, trainer_id):
     from django.shortcuts import get_object_or_404
+    from django.db.models import Q
     
     trainer = get_object_or_404(
         TrainerRegistration.objects.select_related('user').prefetch_related('documents', 'photos'),
@@ -135,6 +136,15 @@ def trainer_profile_detail(request, trainer_id):
     specializations = []
     if trainer.specialization:
         specializations = [s.strip() for s in trainer.specialization.split(',')]
+    
+    # Get count of active clients (confirmed bookings that are still valid)
+    active_clients_count = TrainerBooking.objects.filter(
+        trainer=trainer,
+        status='confirmed',
+        valid_until__isnull=False
+    ).filter(
+        Q(valid_until__gte=timezone.now()) | Q(valid_until__isnull=True)
+    ).values('user').distinct().count()
     
     # Check if logged-in user already has a pending booking
     has_pending_booking = False
@@ -157,7 +167,10 @@ def trainer_profile_detail(request, trainer_id):
         'photos': photos,
         'has_pending_booking': has_pending_booking,
         'user_is_email_verified': user_is_email_verified,
-        'today': timezone.now().date().isoformat(), 'reviews': trainer.reviews.all(), 'avg_rating': round(sum(r.rating for r in trainer.reviews.all()) / max(trainer.reviews.count(), 1), 1) if trainer.reviews.exists() else 0.0,
+        'today': timezone.now().date().isoformat(),
+        'active_clients_count': active_clients_count,
+        'reviews': trainer.reviews.all(),
+        'avg_rating': round(sum(r.rating for r in trainer.reviews.all()) / max(trainer.reviews.count(), 1), 1) if trainer.reviews.exists() else 0.0,
     }
     
     return render(request, 'trainer_profile_detail.html', context)

@@ -760,7 +760,7 @@
                         </div>
                         <div class="stat-item" title="Clients">
                             <i class="fas fa-users"></i>
-                            Active Clients
+                            {{ active_clients_count }} Active Clients
                         </div>
                     </div>
                 </div>
@@ -1027,9 +1027,12 @@
                         </div>
                         {% endif %}
                         {% if user.is_authenticated and not user_is_email_verified %}
-                        <div class="booking-warning danger">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Please verify your email before booking.</span>
+                        <div class="booking-warning danger" style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Please verify your email before booking.</span>
+                            </div>
+                            <a href="{% url 'send_verification_otp' %}" class="btn btn-sm" style="background-color: #ef4444; color: white; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;">Verify Now</a>
                         </div>
                         {% endif %}
                     </div>
