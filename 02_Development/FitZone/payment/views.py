@@ -60,6 +60,14 @@ def checkout(request, plan_id):
 
 @login_required
 def initiate_khalti_payment(request, plan_id):
+    if request.method != 'POST':
+        messages.error(request, "Invalid request method.")
+        return redirect('checkout', plan_id=plan_id)
+
+    if request.POST.get('terms_agree') != 'on':
+        messages.error(request, "Please accept the Terms and Conditions before proceeding.")
+        return redirect('checkout', plan_id=plan_id)
+
     try:
         profile = UserProfile.objects.get(user=request.user)
         if not profile.email_verified:

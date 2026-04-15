@@ -365,6 +365,206 @@ body {
   background: var(--primary-hover);
 }
 
+.btn-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.terms-box {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #fffaf5;
+  display: grid;
+  gap: 10px;
+}
+
+.terms-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.terms-check input {
+  margin-top: 2px;
+  accent-color: var(--primary);
+}
+
+.terms-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.terms-open {
+  border: 1px solid #fdba74;
+  background: #fff;
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.terms-open:hover {
+  background: #fff7ed;
+}
+
+.terms-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.terms-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.terms-modal.show {
+  display: flex;
+}
+
+.terms-modal-card {
+  width: min(860px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+.terms-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: #fff7ed;
+}
+
+.terms-modal-head h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.terms-close {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.terms-modal-body {
+  padding: 20px;
+  display: grid;
+  gap: 18px;
+}
+
+.terms-ref-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.terms-ref-card {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.terms-ref-thumb {
+  height: 128px;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.terms-ref-caption {
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.terms-section {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  background: #fcfcfc;
+}
+
+.terms-section h5 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.terms-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #4b5563;
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.terms-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.terms-accept {
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.terms-accept:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.terms-read-hint {
+  margin: 0 20px 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.terms-cancel {
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .note {
   margin-top: 16px;
   color: var(--text-muted);
@@ -381,6 +581,7 @@ body {
 
 @media (max-width: 520px) {
   .plan-top { flex-direction: column; align-items: flex-start; }
+  .terms-ref-grid { grid-template-columns: 1fr; }
 }
 
   </style>
@@ -483,7 +684,8 @@ body {
               Payment Method
             </div>
 
-            <form action="{% url 'initiate_payment' plan.id %}" method="get">   
+            <form action="{% url 'initiate_payment' plan.id %}" method="post">   
+              {% csrf_token %}
               <label class="pm-option">
                 <input type="radio" name="payment_method" value="khalti" checked>
                 <div class="pm-left">
@@ -495,8 +697,21 @@ body {
                 </div>
               </label>
 
-              <button type="submit" class="btn-pay">
-                Pay Rs {{ plan.price }} <i class="fa-solid fa-lock"></i>
+              <div class="terms-box">
+                <label class="terms-check" for="termsAgree">
+                  <input type="checkbox" id="termsAgree" name="terms_agree" required>
+                  <span>I agree to the Terms and Conditions for AI Chatbot and Food Recommendation System services.</span>
+                </label>
+                <div class="terms-actions">
+                  <button type="button" class="terms-open" id="openTermsModal">
+                    <i class="fa-regular fa-file-lines"></i> Tick Terms & Conditions
+                  </button>
+                  <span class="terms-hint">You must accept terms before payment.</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-pay" id="payNowBtn" disabled>
+                Pay Rs {{ plan.price }}
               </button>
             </form>
 
@@ -512,5 +727,151 @@ body {
       {% endif %}
     </div>
   </main>
+
+  <div class="terms-modal" id="termsModal" aria-hidden="true">
+    <div class="terms-modal-card" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+      <div class="terms-modal-head">
+        <h4 id="termsModalTitle">Terms & Conditions</h4>
+        <button type="button" class="terms-close" id="closeTermsModal" aria-label="Close">&times;</button>
+      </div>
+      <div class="terms-modal-body">
+        <div class="terms-ref-grid">
+          <div class="terms-ref-card">
+            <div class="terms-ref-thumb">Reference 1: AI Chatbot</div>
+            <div class="terms-ref-caption">Usage guidelines and limitations for AI-generated fitness and nutrition suggestions.</div>
+          </div>
+          <div class="terms-ref-card">
+            <div class="terms-ref-thumb">Reference 2: Food Recommendation</div>
+            <div class="terms-ref-caption">Guidelines for meal recommendations, allergen awareness, and personal responsibility.</div>
+          </div>
+        </div>
+
+        <div class="terms-section">
+          <h5>AI Chatbot Terms</h5>
+          <ol class="terms-list">
+            <li>The AI Chatbot provides general fitness and wellness guidance and is not a substitute for professional medical diagnosis or treatment.</li>
+            <li>You agree not to submit harmful, illegal, abusive, or misleading content while using chatbot features.</li>
+            <li>AI responses may contain inaccuracies; you must verify important health decisions with a certified professional.</li>
+            <li>In emergencies, immediately contact a licensed medical provider instead of relying on chatbot responses.</li>
+          </ol>
+        </div>
+
+        <div class="terms-section">
+          <h5>Food Recommendation System Terms</h5>
+          <ol class="terms-list">
+            <li>Food recommendations are generated from available profile information and may not reflect all allergies, intolerances, or medical conditions.</li>
+            <li>You are responsible for checking ingredients, nutritional values, and suitability before consumption.</li>
+            <li>The platform does not guarantee specific weight-loss, performance, or health outcomes.</li>
+            <li>Consult a nutritionist or doctor for personalized medical nutrition therapy when required.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="terms-modal-foot">
+        <button type="button" class="terms-cancel" id="cancelTermsModal">Close</button>
+        <button type="button" class="terms-accept" id="acceptTermsBtn">I Understand & Accept</button>
+      </div>
+      <p class="terms-read-hint" id="termsReadHint">Please scroll and read the full terms to enable acceptance.</p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const termsModal = document.getElementById('termsModal');
+      const openTermsBtn = document.getElementById('openTermsModal');
+      const closeTermsBtn = document.getElementById('closeTermsModal');
+      const cancelTermsBtn = document.getElementById('cancelTermsModal');
+      const acceptTermsBtn = document.getElementById('acceptTermsBtn');
+      const termsAgree = document.getElementById('termsAgree');
+      const termsLabel = document.querySelector('label.terms-check');
+      const payNowBtn = document.getElementById('payNowBtn');
+      const termsBody = document.querySelector('.terms-modal-body');
+      const termsScrollContainer = document.querySelector('.terms-modal-card');
+      const termsReadHint = document.getElementById('termsReadHint');
+
+      let hasReadTerms = false;
+
+      function updatePayState() {
+        payNowBtn.disabled = !termsAgree.checked;
+      }
+
+      function openModal() {
+        termsModal.classList.add('show');
+        termsModal.setAttribute('aria-hidden', 'false');
+        if (!hasReadTerms) {
+          markTermsReadIfScrolled();
+          if (!hasReadTerms) {
+            acceptTermsBtn.disabled = true;
+            termsReadHint.textContent = 'Please scroll and read the full terms to enable acceptance.';
+          }
+        }
+      }
+
+      function closeModal() {
+        termsModal.classList.remove('show');
+        termsModal.setAttribute('aria-hidden', 'true');
+      }
+
+      function markTermsReadIfScrolled() {
+        if (hasReadTerms || !termsScrollContainer) return;
+        const threshold = 8;
+        const noScrollNeeded = termsScrollContainer.scrollHeight <= termsScrollContainer.clientHeight + threshold;
+        const reachedBottom = termsScrollContainer.scrollTop + termsScrollContainer.clientHeight >= termsScrollContainer.scrollHeight - threshold;
+        if (reachedBottom) {
+          hasReadTerms = true;
+          acceptTermsBtn.disabled = false;
+          termsReadHint.textContent = 'Great. You can now accept the terms.';
+        } else if (noScrollNeeded) {
+          hasReadTerms = true;
+          acceptTermsBtn.disabled = false;
+          termsReadHint.textContent = 'Great. You can now accept the terms.';
+        }
+      }
+
+      openTermsBtn.addEventListener('click', function () {
+        termsAgree.checked = true;
+        updatePayState();
+        openModal();
+      });
+      closeTermsBtn.addEventListener('click', closeModal);
+      cancelTermsBtn.addEventListener('click', closeModal);
+
+      termsAgree.addEventListener('click', function (event) {
+        // Must read terms before checking this box.
+        if (!hasReadTerms || !termsAgree.checked) {
+          event.preventDefault();
+          openModal();
+        }
+      });
+
+      termsLabel.addEventListener('click', function (event) {
+        // Clicking text should also force read-before-accept flow.
+        if (!hasReadTerms || !termsAgree.checked) {
+          event.preventDefault();
+          openModal();
+        }
+      });
+
+      acceptTermsBtn.addEventListener('click', function () {
+        if (!hasReadTerms) {
+          return;
+        }
+        termsAgree.checked = true;
+        updatePayState();
+        closeModal();
+      });
+
+      termsScrollContainer.addEventListener('scroll', markTermsReadIfScrolled);
+
+      termsModal.addEventListener('click', function (event) {
+        if (event.target === termsModal) {
+          closeModal();
+        }
+      });
+
+      termsAgree.addEventListener('change', updatePayState);
+      acceptTermsBtn.disabled = true;
+      updatePayState();
+    })();
+  </script>
 </body>
 </html>
