@@ -40,6 +40,7 @@ urlpatterns = [
     path('', include('fitness_plan.urls')),
     path('food-recommendation/', include('food_recommendation_system.urls')),
     path('about/', views.about, name='about'),
+    path('contact-us/', views.contact_us, name='contact_us'),
 ]
 
 if settings.DEBUG:

@@ -152,6 +152,7 @@ class TrainerReview(models.Model):
     booking = models.OneToOneField(TrainerBooking, on_delete=models.SET_NULL, null=True, blank=True, related_name='review')
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], help_text="Rating out of 5")
     comment = models.TextField(blank=True, null=True, help_text="Review comment")
+    show_on_homepage = models.BooleanField(default=False, help_text="Enable to show this review in landing page testimonials")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -88,11 +88,37 @@ def cancel_overdue_bookings(user):
 @cache_control(public=True, max_age=3600)
 def home(request):
     from .models import HomeBanner, PremiumService
+    from trainer.models import TrainerReview
+
     banners = HomeBanner.objects.filter(is_active=True)
     services = PremiumService.objects.filter(is_active=True)
+
+    goal_label_map = {
+        'weight_loss': 'Weight Loss',
+        'muscle_gain': 'Muscle Gain',
+        'maintain': 'Maintain Fitness',
+        'endurance': 'Improve Endurance',
+        'flexibility': 'Improve Flexibility',
+        'general': 'General Fitness',
+    }
+
+    testimonials = []
+    real_reviews = TrainerReview.objects.filter(show_on_homepage=True).select_related('user').order_by('-created_at')[:6]
+    for review in real_reviews:
+        goal_key = getattr(getattr(review.user, 'fitness_profile', None), 'fitness_goal', 'general')
+        testimonials.append({
+            'name': review.user.get_full_name() or review.user.username,
+            'goal': goal_label_map.get(goal_key, 'Consistency'),
+            'quote': review.comment or 'Great coaching and steady progress every week.',
+            'rating': review.rating,
+            'stars': '★' * int(review.rating),
+            'is_beta': False,
+        })
+
     return render(request, 'index.html', {
         'banners': banners,
-        'services': services
+        'services': services,
+        'testimonials': testimonials,
     })
 
 @login_required
@@ -336,6 +362,52 @@ def trainer_client_my_trainers(request):
 @cache_control(public=True, max_age=3600)
 def about(request):
     return render(request, 'about.html')
+
+
+def contact_us(request):
+    from .models import ContactUsSubmission
+
+    if request.method != 'POST':
+        return redirect('home')
+
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    subject = request.POST.get('subject', '').strip()
+    message_body = request.POST.get('message', '').strip()
+
+    if not name or not email or not subject or not message_body:
+        messages.error(request, 'Please fill out all contact form fields.')
+        return redirect('home')
+
+    ContactUsSubmission.objects.create(
+        name=name,
+        email=email,
+        subject=subject,
+        message=message_body,
+    )
+
+    full_subject = f"Landing Contact: {subject}"
+    full_message = (
+        f"Name: {name}\n"
+        f"Email: {email}\n\n"
+        f"Message:\n{message_body}"
+    )
+
+    recipient_email = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+
+    try:
+        send_mail(
+            subject=full_subject,
+            message=full_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient_email],
+            fail_silently=False,
+        )
+        messages.success(request, 'Thank you for contacting us. We will get back to you soon!')
+    except Exception:
+        messages.error(request, 'Unable to send your message right now. Please try again later.')
+
+    return redirect('home')
 
 @login_required
 def ai_chat(request):

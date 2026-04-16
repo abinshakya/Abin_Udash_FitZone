@@ -6,7 +6,7 @@ from django.utils.html import format_html
 import datetime
 import os
 
-from .models import TrainerRegistration, TrainerRegistrationDocument, TrainerBooking
+from .models import TrainerRegistration, TrainerRegistrationDocument, TrainerBooking, TrainerReview
 from notifications.models import TrainerNotification
 from login_logout_register.models import UserProfile
 
@@ -147,3 +147,11 @@ class TrainerBookingAdmin(admin.ModelAdmin):
 	search_fields = ("user__username", "trainer__user__username")
 	readonly_fields = ("created_at", "updated_at")
 	form = TrainerBookingAdminForm
+
+
+@admin.register(TrainerReview)
+class TrainerReviewAdmin(admin.ModelAdmin):
+	list_display = ("user", "trainer", "rating", "show_on_homepage", "created_at")
+	list_filter = ("rating", "show_on_homepage", "created_at")
+	search_fields = ("user__username", "trainer__user__username", "comment")
+	list_editable = ("show_on_homepage",)
