@@ -1,156 +1,294 @@
-document.addEventListener('DOMContentLoaded', function() {
+/* ============================================================
+   FitZone Admin — Dark Theme JS
+   Sidebar, Charts (ApexCharts), Animated Counters, Clock
+   ============================================================ */
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ---- Sidebar Toggle ---- */
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
-    const mainContent = document.getElementById('main-content');
+    const backdrop = document.getElementById('sidebar-backdrop');
 
-    // Sidebar Toggle
     if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
+        sidebarToggle.addEventListener('click', function () {
             if (window.innerWidth > 1024) {
                 sidebar.classList.toggle('collapsed');
             } else {
                 sidebar.classList.toggle('active');
+                if (backdrop) backdrop.classList.toggle('active');
             }
         });
     }
 
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(event) {
+    // Close sidebar on backdrop click (mobile)
+    if (backdrop) {
+        backdrop.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+    }
+
+    // Close sidebar clicking outside (mobile)
+    document.addEventListener('click', function (event) {
         if (window.innerWidth <= 1024) {
-            if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && sidebar.classList.contains('active')) {
+            if (sidebar && sidebarToggle && !sidebar.contains(event.target) &&
+                !sidebarToggle.contains(event.target) && sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
+                if (backdrop) backdrop.classList.remove('active');
             }
         }
     });
 
-    // Add icons to dashboard cards (if not already handled by templates)
-    const appIcons = {
-        'auth': 'fa-users-cog',
-        'login_logout_register': 'fa-user-plus',
-        'membership': 'fa-id-card',
-        'payment': 'fa-credit-card',
-        'trainer': 'fa-dumbbell',
-        'notifications': 'fa-bell',
-        'chat': 'fa-comments',
-        'fitness_plan': 'fa-calendar-alt',
-        'Ai_chatbot': 'fa-robot',
-        'food_recommendation_system': 'fa-utensils',
-    };
-
-    // Sidebar Group Toggle (Apps/Models)
+    /* ---- Sidebar Accordion (smooth height transitions) ---- */
     const groupTitles = document.querySelectorAll('.group-title');
-    groupTitles.forEach(title => {
-        title.addEventListener('click', function() {
+    groupTitles.forEach(function (title) {
+        title.addEventListener('click', function () {
             const group = this.parentElement;
             const items = group.querySelector('.group-items');
-            const icon = this.querySelector('.group-arrow');
-            
-            if (items.style.display === 'none' || items.style.display === '') {
-                // Close other groups first (accordion style)
-                document.querySelectorAll('.group-items').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.group-arrow').forEach(el => el.style.transform = 'rotate(0deg)');
-                
-                items.style.display = 'block';
-                if (icon) icon.style.transform = 'rotate(90deg)';
+            const arrow = this.querySelector('.group-arrow');
+
+            const isOpen = items.classList.contains('open');
+
+            // Close all groups (accordion)
+            document.querySelectorAll('.group-items').forEach(function (el) {
+                el.style.maxHeight = null;
+                el.classList.remove('open');
+            });
+            document.querySelectorAll('.group-arrow').forEach(function (el) {
+                el.style.transform = 'rotate(0deg)';
+            });
+            document.querySelectorAll('.group-title').forEach(function (el) {
+                el.classList.remove('active');
+            });
+
+            if (!isOpen) {
+                items.classList.add('open');
+                items.style.maxHeight = items.scrollHeight + 'px';
+                if (arrow) arrow.style.transform = 'rotate(90deg)';
                 this.classList.add('active');
-            } else {
-                items.style.display = 'none';
-                if (icon) icon.style.transform = 'rotate(0deg)';
-                this.classList.remove('active');
             }
         });
     });
 
     // Auto-open group if a model inside it is active
-    document.querySelectorAll('.group-items a.active').forEach(activeLink => {
+    document.querySelectorAll('.group-items a.active').forEach(function (activeLink) {
         const group = activeLink.closest('.sidebar-group');
         if (group) {
             const items = group.querySelector('.group-items');
             const title = group.querySelector('.group-title');
-            const icon = title.querySelector('.group-arrow');
-            items.style.display = 'block';
-            if (icon) icon.style.transform = 'rotate(90deg)';
-            title.classList.add('active');
+            const arrow = title ? title.querySelector('.group-arrow') : null;
+            items.classList.add('open');
+            items.style.maxHeight = items.scrollHeight + 'px';
+            if (arrow) arrow.style.transform = 'rotate(90deg)';
+            if (title) title.classList.add('active');
         }
     });
 
-    // Dashboard Analytics Charts
-    function initDashboardCharts() {
-        if (typeof ApexCharts === 'undefined') {
-            console.error('ApexCharts library not loaded.');
-            return;
+    /* ---- Animated Counter (count-up) ---- */
+    function animateCounter(el) {
+        const target = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10);
+        if (isNaN(target) || target === 0) return;
+
+        const duration = 1200;
+        const startTime = performance.now();
+
+        function step(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.floor(eased * target).toLocaleString();
+            if (progress < 1) requestAnimationFrame(step);
         }
 
-        const primaryColor = '#f97316';
-        const secondaryColor = '#000000';
-        const chartColors = ['#f97316', '#000000', '#64748b', '#94a3b8', '#cbd5e1'];
+        requestAnimationFrame(step);
+    }
+
+    document.querySelectorAll('.dashboard-stat-value').forEach(function (el) {
+        if (el.textContent.trim() !== '---') {
+            animateCounter(el);
+        }
+    });
+
+    /* ---- Header Clock ---- */
+    const clockEl = document.getElementById('header-clock');
+    if (clockEl) {
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            clockEl.textContent = h + ':' + m + ':' + s;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+    }
+
+    /* ---- Dashboard ApexCharts (Dark Theme) ---- */
+    function initDashboardCharts() {
+        if (typeof ApexCharts === 'undefined') return;
+
+        const accent = '#f97316';
+        const accentLight = '#fb923c';
+        const chartColors = ['#f97316', '#8b5cf6', '#06b6d4', '#22c55e', '#eab308'];
+
+        const darkChartTheme = {
+            chart: {
+                foreColor: '#8b8ba3',
+                background: 'transparent',
+                toolbar: { show: false }
+            },
+            grid: {
+                borderColor: 'rgba(255,255,255,0.05)',
+                strokeDashArray: 4
+            },
+            tooltip: {
+                theme: 'dark',
+                style: { fontSize: '13px' },
+                y: { formatter: function (val) { return val.toLocaleString(); } }
+            },
+            xaxis: {
+                labels: { style: { colors: '#8b8ba3', fontSize: '12px' } },
+                axisBorder: { color: 'rgba(255,255,255,0.06)' },
+                axisTicks: { color: 'rgba(255,255,255,0.06)' }
+            },
+            yaxis: {
+                labels: { style: { colors: '#8b8ba3', fontSize: '12px' } }
+            }
+        };
 
         function safeRender(selector, options) {
             try {
                 const el = document.getElementById(selector);
                 if (!el) return;
-                
+
                 const labels = JSON.parse(el.dataset.labels || '[]');
                 const series = JSON.parse(el.dataset.series || '[]');
-                
+
                 if (series.length === 0 || (Array.isArray(series[0]) && series[0].length === 0)) {
-                    el.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8;">No data available yet</div>';
+                    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:260px;color:#5d5d78;font-size:0.9rem;">No data available yet</div>';
                     return;
                 }
 
-                // Inject data into options
+                // Merge dark theme defaults
+                options.chart = Object.assign({}, darkChartTheme.chart, options.chart);
+                options.grid = options.grid || darkChartTheme.grid;
+                options.tooltip = options.tooltip || darkChartTheme.tooltip;
+                options.xaxis = Object.assign({}, darkChartTheme.xaxis, options.xaxis || {});
+                options.yaxis = options.yaxis || darkChartTheme.yaxis;
+
+                // Inject data
                 if (options.chart.type === 'pie' || options.chart.type === 'donut') {
                     options.series = series;
                     options.labels = labels;
                 } else {
                     options.series[0].data = series;
-                    options.xaxis = options.xaxis || {};
                     options.xaxis.categories = labels;
                 }
 
                 new ApexCharts(el, options).render();
             } catch (err) {
-                console.error('Error rendering chart ' + selector + ':', err);
+                console.error('Chart error (' + selector + '):', err);
             }
         }
 
-        // 1. User Growth Chart (Bar)
+        // 1. User Growth — Bar Chart
         safeRender('userGrowthChart', {
-            chart: { type: 'bar', height: 300, toolbar: { show: false } },
+            chart: { type: 'bar', height: 280 },
             series: [{ name: 'New Users', data: [] }],
-            colors: [primaryColor],
-            plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-            dataLabels: { enabled: false }
-        });
-
-        // 2. Revenue Chart (Area)
-        safeRender('revenueChart', {
-            chart: { type: 'area', height: 300, toolbar: { show: false } },
-            series: [{ name: 'Revenue', data: [] }],
-            colors: [primaryColor],
-            stroke: { curve: 'smooth', width: 2 },
+            colors: [accent],
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    columnWidth: '50%',
+                    distributed: false
+                }
+            },
+            dataLabels: { enabled: false },
             fill: {
                 type: 'gradient',
-                gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1, stops: [0, 90, 100] }
+                gradient: {
+                    shade: 'dark',
+                    type: 'vertical',
+                    shadeIntensity: 0.3,
+                    opacityFrom: 1,
+                    opacityTo: 0.8,
+                    stops: [0, 100]
+                }
+            }
+        });
+
+        // 2. Revenue — Area Chart
+        safeRender('revenueChart', {
+            chart: { type: 'area', height: 280 },
+            series: [{ name: 'Revenue (Rs.)', data: [] }],
+            colors: [accent],
+            stroke: { curve: 'smooth', width: 2.5 },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.35,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100]
+                }
             },
             dataLabels: { enabled: false }
         });
 
-        // 3. Membership Chart (Donut)
+        // 3. Membership — Donut Chart
         safeRender('membershipChart', {
             chart: { type: 'donut', height: 300 },
             colors: chartColors,
-            legend: { position: 'bottom' },
-            plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Plans' } } } } }
+            legend: {
+                position: 'bottom',
+                labels: { colors: '#8b8ba3' }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '72%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Plans',
+                                color: '#8b8ba3',
+                                fontSize: '14px'
+                            },
+                            value: {
+                                color: '#eaeaf0',
+                                fontSize: '22px',
+                                fontWeight: 700
+                            }
+                        }
+                    }
+                }
+            },
+            stroke: { show: true, width: 2, colors: ['#16161f'] }
         });
 
-        // 4. Booking Chart (Pie)
+        // 4. Booking — Pie Chart
         safeRender('bookingChart', {
             chart: { type: 'pie', height: 300 },
             colors: chartColors,
-            legend: { position: 'bottom' }
+            legend: {
+                position: 'bottom',
+                labels: { colors: '#8b8ba3' }
+            },
+            stroke: { show: true, width: 2, colors: ['#16161f'] }
         });
     }
 
     initDashboardCharts();
+
+    /* ---- Stagger animations for app cards ---- */
+    document.querySelectorAll('.app-card').forEach(function (card, i) {
+        card.style.animationDelay = (0.05 + i * 0.06) + 's';
+    });
+
+    document.querySelectorAll('.chart-card').forEach(function (card, i) {
+        card.style.animationDelay = (0.08 + i * 0.08) + 's';
+    });
 });

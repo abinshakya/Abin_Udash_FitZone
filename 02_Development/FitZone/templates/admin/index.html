@@ -7,62 +7,68 @@
 
 {% block content %}
 <div id="content-main">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <h2>👋 Welcome back, {{ user.get_short_name|default:user.get_username }}!</h2>
+        <p>Here's what's happening in your FitZone platform today.</p>
+    </div>
+
     <!-- Quick Stats -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 0 24px 20px 24px;">
-        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
-            <div style="width: 45px; height: 45px; background: #fff7ed; color: #f97316; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+    <div class="dashboard-stats-grid">
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon users">
                 <i class="fas fa-users"></i>
             </div>
             <div>
-                <div style="font-size: 0.875rem; color: #64748b;">Total Users</div>
-                <div style="font-size: 1.25rem; font-weight: 700;">{{ user_count|default:"---" }}</div>
+                <div class="dashboard-stat-label">Total Users</div>
+                <div class="dashboard-stat-value">{{ user_count|default:"---" }}</div>
             </div>
         </div>
-        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
-            <div style="width: 45px; height: 45px; background: #f0fdf4; color: #16a34a; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon subs">
                 <i class="fas fa-chart-line"></i>
             </div>
             <div>
-                <div style="font-size: 0.875rem; color: #64748b;">Active Subs</div>
-                <div style="font-size: 1.25rem; font-weight: 700;">{{ active_subs|default:"---" }}</div>
+                <div class="dashboard-stat-label">Active Subs</div>
+                <div class="dashboard-stat-value">{{ active_subs|default:"---" }}</div>
             </div>
         </div>
-        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
-            <div style="width: 45px; height: 45px; background: #fef2f2; color: #dc2626; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon tasks">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div>
-                <div style="font-size: 0.875rem; color: #64748b;">Pending Tasks</div>
-                <div style="font-size: 1.25rem; font-weight: 700;">{{ pending_tasks|default:"0" }}</div>
+                <div class="dashboard-stat-label">Pending Tasks</div>
+                <div class="dashboard-stat-value">{{ pending_tasks|default:"0" }}</div>
             </div>
         </div>
     </div>
 
     <!-- Analytics Charts -->
-    <div class="dashboard-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; padding: 0 24px 24px 24px;">
-        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
-            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">User Registration Growth</h3>
+    <div class="dashboard-charts-grid">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-bar" style="color:var(--accent);margin-right:8px;font-size:0.95rem;"></i>User Registration Growth</h3>
             <div id="userGrowthChart" 
                  data-labels='{{ user_growth_labels|safe }}' 
                  data-series='{{ user_growth_data|safe }}'>
             </div>
         </div>
-        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
-            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Revenue Insights (Rs.)</h3>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-rupee-sign" style="color:var(--accent);margin-right:8px;font-size:0.95rem;"></i>Revenue Insights (Rs.)</h3>
             <div id="revenueChart"
                  data-labels='{{ revenue_labels|safe }}' 
                  data-series='{{ revenue_data|safe }}'>
             </div>
         </div>
-        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
-            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Membership Distribution</h3>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-pie" style="color:var(--accent);margin-right:8px;font-size:0.95rem;"></i>Membership Distribution</h3>
             <div id="membershipChart"
                  data-labels='{{ membership_labels|safe }}' 
                  data-series='{{ membership_data|safe }}'>
             </div>
         </div>
-        <div class="chart-card" style="background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
-            <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; color: var(--secondary-color);">Booking Breakdown</h3>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-calendar-check" style="color:var(--accent);margin-right:8px;font-size:0.95rem;"></i>Booking Breakdown</h3>
             <div id="bookingChart"
                  data-labels='{{ booking_labels|safe }}' 
                  data-series='{{ booking_data|safe }}'>
@@ -107,7 +113,7 @@
                             {{ model.name }}
                         {% endif %}
 
-                        <div style="display: flex; gap: 10px;">
+                        <div class="model-actions">
                             {% if model.add_url %}
                                 <a href="{{ model.add_url }}" class="action-btn add-btn" title="{% trans 'Add' %}">
                                     <i class="fas fa-plus"></i>
@@ -126,7 +132,7 @@
         {% endfor %}
         </div>
     {% else %}
-        <div style="padding: 24px;">
+        <div class="dashboard-empty-state">
             <p>{% trans "You don't have permission to view or edit anything." %}</p>
         </div>
     {% endif %}
@@ -134,22 +140,22 @@
 {% endblock %}
 
 {% block sidebar %}
-<div id="content-related" style="padding: 24px; background: white; margin: 24px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+<div id="content-related" class="dashboard-recent-actions">
     <div class="module" id="recent-actions-module">
-        <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 15px;">{% trans 'Recent actions' %}</h2>
-        <h3 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 20px;">{% trans 'My actions' %}</h3>
+        <h2 class="recent-actions-title">{% trans 'Recent actions' %}</h2>
+        <h3 class="recent-actions-subtitle">{% trans 'My actions' %}</h3>
         {% load log %}
         {% get_admin_log 10 as admin_log for_user user %}
         {% if not admin_log %}
-            <p>{% trans 'None available' %}</p>
+            <p style="color:var(--text-muted);">{% trans 'None available' %}</p>
         {% else %}
-            <ul class="actionlist" style="list-style: none; padding: 0;">
+            <ul class="actionlist dashboard-action-list">
             {% for entry in admin_log %}
-                <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% else %}deletelink{% endif %}" style="padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 0.875rem;">
+                <li class="dashboard-action-item {% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% else %}deletelink{% endif %}">
                     {% if entry.is_deletion or not entry.get_admin_url %}
                         {{ entry.object_repr }}
                     {% else %}
-                        <a href="{{ entry.get_admin_url }}" style="color: var(--primary-color); text-decoration: none;">{{ entry.object_repr }}</a>
+                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
                     {% endif %}
                     <br>
                     {% if entry.content_type %}

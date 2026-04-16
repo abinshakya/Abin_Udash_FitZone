@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo;
+    {% for app in app_list %}
+        {{ app.name }}
+    {% endfor %}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<div id="content-main">
+    {% if app_list %}
+        <div class="dashboard-grid">
+        {% for app in app_list %}
+            {% for model in app.models %}
+            <div class="app-card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ model.name }}</h3>
+                    <div class="card-icon">
+                        {% if model.perms.change %}<i class="fas fa-edit"></i>
+                        {% elif model.perms.add %}<i class="fas fa-plus"></i>
+                        {% else %}<i class="fas fa-eye"></i>{% endif %}
+                    </div>
+                </div>
+                <ul class="model-list">
+                    <li class="model-item">
+                        {% if model.admin_url %}
+                            <a href="{{ model.admin_url }}">{% trans 'View all' %}</a>
+                        {% endif %}
+                        <div class="model-actions">
+                            {% if model.add_url %}
+                                <a href="{{ model.add_url }}" class="action-btn add-btn" title="{% trans 'Add' %}">
+                                    <i class="fas fa-plus"></i> {% trans 'Add' %}
+                                </a>
+                            {% endif %}
+                            {% if model.admin_url %}
+                                <a href="{{ model.admin_url }}" class="action-btn change-btn" title="{% trans 'Change' %}">
+                                    <i class="fas fa-list"></i> {% trans 'List' %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            {% endfor %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="dashboard-empty-state">
+            <p>{% trans "You don't have permission to view or edit anything." %}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

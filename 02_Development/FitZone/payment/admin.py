@@ -9,13 +9,13 @@ class KhaltiPaymentAdmin(admin.ModelAdmin):
         'purchase_order_id',
         'user',
         'payment_type',
-        'membership_plan',
-        'booking',
         'amount_display',
         'status_badge',
-        'transaction_id',
         'created_at'
     ]
+
+    list_per_page = 10
+    list_select_related = ('user', 'membership_plan', 'booking')
     
     list_filter = [
         'status',

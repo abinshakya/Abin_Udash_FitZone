@@ -482,6 +482,40 @@
             line-height: 1.6;
         }
 
+        .review-pagination {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .review-pagination .page-link {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-dark);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0 10px;
+        }
+
+        .review-pagination .page-link:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .review-pagination .page-link.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #fff;
+        }
+
         /* Layout Utilities */
         .mb-4 { margin-bottom: 1.5rem; }
         .back-link {
@@ -875,9 +909,9 @@
                 {% endif %}
 
                 <!-- Client Reviews -->
-                <div class="content-card">
+                <div class="content-card" id="reviews-section">
                     <h2 class="section-title">
-                        <i class="fas fa-comments"></i> Client Reviews ({{ reviews|length }})
+                        <i class="fas fa-comments"></i> Client Reviews ({{ reviews_total_count }})
                     </h2>
                     {% if reviews %}
                         <div class="row">
@@ -900,6 +934,17 @@
                             </div>
                         {% endfor %}
                         </div>
+
+                        {% if review_page_obj.paginator.num_pages > 1 %}
+                        <div class="review-pagination" aria-label="Review pagination">
+                            {% for page_num in review_page_obj.paginator.page_range %}
+                                <a href="?review_page={{ page_num }}{% if request.GET.book == 'true' %}&book=true{% endif %}#reviews-section"
+                                   class="page-link {% if review_page_obj.number == page_num %}active{% endif %}">
+                                    {{ page_num }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     {% else %}
                         <div class="text-center py-4 text-muted">
                             <i class="fas fa-comment-slash fs-3 mb-3" style="opacity:0.3;"></i>

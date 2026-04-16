@@ -16,20 +16,23 @@
 {% block content %}
 <div id="content-main" class="delete-confirmation">
     <form method="post">{% csrf_token %}
-        <div>
-            <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px;">{% trans 'Are you sure?' %}</h1>
-            <p style="color: var(--text-secondary); margin-bottom: 30px;">
+        <div class="delete-card">
+            <h1 class="delete-title">
+                <i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i>
+                {% trans 'Are you sure?' %}
+            </h1>
+            <p class="delete-message">
                 {% blocktrans with str=object %}Are you sure you want to delete the {{ opts.verbose_name }} "{{ str }}"? All of the following related items will be deleted:{% endblocktrans %}
             </p>
             
-            <div style="background: #fff5f5; border: 1px solid #feb2b2; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-                <h2 style="font-size: 1rem; color: #c53030; margin-bottom: 15px;">{% trans 'Summary' %}</h2>
+            <div class="delete-summary-box">
+                <h2 class="delete-summary-title"><i class="fas fa-list" style="margin-right:6px;"></i>{% trans 'Summary' %}</h2>
                 {{ deleted_objects|unordered_list }}
             </div>
 
-            <div class="submit-row" style="background: none; border: none; padding: 0; margin: 0; display: flex; gap: 15px; justify-content: flex-start;">
-                <input type="submit" value="{% trans "Yes, I'm sure" %}" class="default" style="background-color: #ef4444 !important;">
-                <a href="#" onclick="window.history.back(); return false;" class="button" style="display: flex; align-items: center; justify-content: center; height: 38px;">
+            <div class="submit-row delete-actions-row">
+                <input type="submit" value="{% trans "Yes, I'm sure" %}" class="default delete-confirm-btn">
+                <a href="#" onclick="window.history.back(); return false;" class="button delete-cancel-btn">
                     {% trans "No, take me back" %}
                 </a>
             </div>

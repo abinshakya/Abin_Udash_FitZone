@@ -7,21 +7,22 @@
     {{ block.super }}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'admin/css/custom_admin.css' %}?v=20260416e">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 {% endblock %}
 
 {% block extrahead %}
     {{ block.super }}
-    <script src="{% static 'admin/js/custom_admin.js' %}" defer></script>
+    <script src="{% static 'admin/js/custom_admin.js' %}?v=20260416d" defer></script>
 {% endblock %}
 
 {% block branding %}
 <h1 id="site-name">
-    <a href="{% url 'admin:index' %}" style="display: flex; align-items: center; gap: 10px;">
-        <img src="{% static 'assets/images/logo/fitzone_logo.png' %}" alt="FitZone Admin" style="height: 44px; width: auto; filter: brightness(1.1) contrast(1.1);">
+    <a href="{% url 'admin:index' %}" class="brand-link">
+        <img src="{% static 'assets/images/logo/fitzone_logo.png' %}" alt="FitZone Admin" class="brand-logo-img">
     </a>
 </h1>
 {% endblock %}

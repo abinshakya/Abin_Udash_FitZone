@@ -136,6 +136,12 @@ def trainer_profile_detail(request, trainer_id):
     specializations = []
     if trainer.specialization:
         specializations = [s.strip() for s in trainer.specialization.split(',')]
+
+    # Paginate reviews (5 per page)
+    reviews_qs = trainer.reviews.select_related('user').all().order_by('-created_at')
+    review_paginator = Paginator(reviews_qs, 5)
+    review_page_number = request.GET.get('review_page')
+    review_page_obj = review_paginator.get_page(review_page_number)
     
     # Get count of active clients (confirmed bookings that are still valid)
     active_clients_count = TrainerBooking.objects.filter(
@@ -169,8 +175,10 @@ def trainer_profile_detail(request, trainer_id):
         'user_is_email_verified': user_is_email_verified,
         'today': timezone.now().date().isoformat(),
         'active_clients_count': active_clients_count,
-        'reviews': trainer.reviews.all(),
-        'avg_rating': round(sum(r.rating for r in trainer.reviews.all()) / max(trainer.reviews.count(), 1), 1) if trainer.reviews.exists() else 0.0,
+        'reviews': review_page_obj.object_list,
+        'review_page_obj': review_page_obj,
+        'reviews_total_count': reviews_qs.count(),
+        'avg_rating': round(sum(r.rating for r in reviews_qs) / max(reviews_qs.count(), 1), 1) if reviews_qs.exists() else 0.0,
     }
     
     return render(request, 'trainer_profile_detail.html', context)

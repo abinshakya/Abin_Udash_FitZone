@@ -15,7 +15,7 @@ try:
         scaler_original = models_data['scaler']
         cosine_sim = models_data['cosine_sim']
         df_clean = models_data['df_clean']
-except FileNotFoundError:
+except Exception:
     dt_model = None
     scaler_original = None
     cosine_sim = None
