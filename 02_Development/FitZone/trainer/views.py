@@ -683,6 +683,28 @@ class TrainerRegistrationWizard(SessionWizardView):
                 pass
         save_docs(id_files, "identity_proof")
         save_docs(exp_files, "experience_verification")
+
+        admin_recipient = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+        if admin_recipient:
+            user_full_name = self.request.user.get_full_name() or self.request.user.username
+            try:
+                send_mail(
+                    subject=f'FitZone: New Trainer Registration Submitted - {user_full_name}',
+                    message=(
+                        f'A new trainer registration has been submitted on FitZone.\n\n'
+                        f'Name: {user_full_name}\n'
+                        f'Username: {self.request.user.username}\n'
+                        f'Email: {self.request.user.email or "Not provided"}\n'
+                        f'Experience: {registration.experience}\n'
+                        f'Specialization: {registration.specialization}\n\n'
+                        f'Please review the application in the admin dashboard.'
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[admin_recipient],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
         
         messages.success(self.request, "✅ Trainer registration successfully submitted! We will verify your application soon.")
         return redirect('trainer_registration_status')
@@ -1099,6 +1121,28 @@ def user_review_trainer(request, booking_id):
             new_review.trainer = booking.trainer
             new_review.booking = booking
             new_review.save()
+
+            trainer_email = booking.trainer.user.email
+            if trainer_email:
+                reviewer_name = request.user.get_full_name() or request.user.username
+                trainer_name = booking.trainer.user.get_full_name() or booking.trainer.user.username
+                comment_text = (new_review.comment or '').strip() or 'No comment provided.'
+                try:
+                    send_mail(
+                        subject=f'FitZone: New Review from {reviewer_name}',
+                        message=(
+                            f'Hi {trainer_name},\n\n'
+                            f'{reviewer_name} has submitted a review for your training service.\n\n'
+                            f'Rating: {new_review.rating}/5\n'
+                            f'Comment: {comment_text}\n\n'
+                            f'You can review the feedback from your FitZone dashboard.'
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[trainer_email],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
             messages.success(request, 'Thank you for reviewing the trainer!')
             return redirect('trainer_client_dashboard')
     else:

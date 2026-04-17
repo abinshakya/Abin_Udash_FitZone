@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from membership.models import MembershipPlan, UserMembership
 from django.contrib import messages
+from django.core.mail import send_mail
 from login_logout_register.models import UserProfile
 from .models import KhaltiPayment, TrainerPaymentRequest
 from .forms import TrainerPaymentRequestForm
@@ -283,6 +284,29 @@ def verify_payment(request, pidx):
                             messages.success(request, "Payment successful! Your membership has been activated. You are now a member!")
                         else:
                             messages.success(request, "Payment successful! Your membership has been renewed.")
+
+                        admin_recipient = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+                        if admin_recipient:
+                            user_full_name = request.user.get_full_name() or request.user.username
+                            plan_name = payment.membership_plan.name if payment.membership_plan else 'Membership'
+                            try:
+                                send_mail(
+                                    subject=f'FitZone: Membership Purchased - {user_full_name}',
+                                    message=(
+                                        f'A membership payment has been completed on FitZone.\n\n'
+                                        f'User: {user_full_name}\n'
+                                        f'Username: {request.user.username}\n'
+                                        f'Email: {request.user.email or "Not provided"}\n'
+                                        f'Plan: {plan_name}\n'
+                                        f'Status: {payment.status}\n\n'
+                                        f'Please review the payment record in the admin dashboard.'
+                                    ),
+                                    from_email=settings.DEFAULT_FROM_EMAIL,
+                                    recipient_list=[admin_recipient],
+                                    fail_silently=True,
+                                )
+                            except Exception:
+                                pass
                     except UserProfile.DoesNotExist:
                         messages.success(request, "Payment successful!")
                     
