@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jxp!14yxa4byqt2#1c0y$yh$o#wg)0lsuz#uvj&dffqa8n_vx2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Add localhost for local testing, and your domain for production
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
