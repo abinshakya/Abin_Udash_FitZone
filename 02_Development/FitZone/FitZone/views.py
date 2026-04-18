@@ -412,3 +412,55 @@ def contact_us(request):
 @login_required
 def ai_chat(request):
     return render(request, 'member/ai_chat.html')
+
+def handler404(request, exception=None):
+    """
+    Custom 404 Page Not Found handler.
+    
+    This view is triggered when a requested page does not exist.
+    Returns a friendly error page with navigation options.
+    
+    Args:
+        request: The HTTP request object
+        exception: The exception that was raised (optional)
+    
+    Returns:
+        HttpResponse: Rendered 404.html template
+    """
+    return render(request, '404.html', status=404)
+
+
+def handler500(request):
+    """
+    Custom 500 Internal Server Error handler.
+    
+    This view is triggered when an unhandled exception occurs on the server.
+    Returns a friendly error page informing users about the issue.
+    
+    Note: Django only shows this page when DEBUG = False in production.
+    In development (DEBUG = True), the full error traceback is displayed.
+    
+    Args:
+        request: The HTTP request object
+    
+    Returns:
+        HttpResponse: Rendered 500.html template
+    """
+    return render(request, '500.html', status=500)
+
+
+def handler403(request, exception=None):
+    """
+    Custom 403 Forbidden handler.
+    
+    This view is triggered when a user tries to access a resource they don't have permission for.
+    Returns a friendly error page explaining access restrictions.
+    
+    Args:
+        request: The HTTP request object
+        exception: The exception that was raised (optional)
+    
+    Returns:
+        HttpResponse: Rendered 403.html template
+    """
+    return render(request, '403.html', status=403)

@@ -43,6 +43,15 @@ urlpatterns = [
     path('contact-us/', views.contact_us, name='contact_us'),
 ]
 
+# 404 - Page Not Found
+handler404 = 'FitZone.views.handler404'
+
+# 500 - Internal Server Error
+handler500 = 'FitZone.views.handler500'
+
+# 403 - Forbidden/Permission Denied
+handler403 = 'FitZone.views.handler403'
+
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
