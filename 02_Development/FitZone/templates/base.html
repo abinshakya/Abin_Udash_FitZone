@@ -15,33 +15,52 @@
         <link rel="stylesheet" href="{% static 'trainer/trainer.css'%}">
         <link rel="stylesheet" href="{% static 'index.css'%}">
     <style>
-        .base-messages-wrap {
+        .base-messages-toast-wrap {
             position: fixed;
-            top: 20px;
+            top: 88px;
             right: 20px;
-            z-index: 9999;
-            max-width: 400px;
+            z-index: 1060;
+            width: min(500px, calc(100% - 24px));
         }
-        .base-alert-msg {
-            color: #1a1a1a !important;
-            border: none;
-            border-radius: 12px;
+
+        .base-alert-toast {
+            border-radius: 10px;
             backdrop-filter: blur(10px);
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin-bottom: 10px;
+            font-weight: 600;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+            border: 1px solid transparent;
+            color: #0f172a;
+            min-height: 62px;
         }
-        .base-alert-msg i {
-            color: #1a1a1a !important;
+
+        .base-alert-toast {
+            background: #5d8fe6;
+            border-color: #4f7dd0;
         }
-        .base-alert-msg .btn-close {
+
+        .base-alert-toast.msg-success {
+            background: #cde3da;
+            border-color: #b7d8cc;
+            color: #1f6c56;
+        }
+
+        .base-alert-toast.msg-warning {
+            background: #fbbf24;
+            border-color: #f59e0b;
+        }
+
+        .base-alert-toast.msg-danger,
+        .base-alert-toast.msg-error {
+            background: #f87171;
+            border-color: #ef4444;
+        }
+
+        .base-alert-toast .btn-close {
             filter: none;
             opacity: 0.8;
+            margin-left: auto;
         }
-        .base-alert-msg.msg-success { background: rgba(34,197,94,0.9); }
-        .base-alert-msg.msg-error,
-        .base-alert-msg.msg-danger { background: rgba(239,68,68,0.9); }
-        .base-alert-msg.msg-warning { background: rgba(251,191,36,0.9); }
-        .base-alert-msg.msg-info { background: rgba(59,130,246,0.9); }
     </style>
 
 </head>
@@ -50,18 +69,19 @@
 
     <!-- Messages Container -->
     {% if messages %}
-    <div class="base-messages-wrap">
+    <div class="base-messages-toast-wrap">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show base-alert-msg {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' or message.tags == 'danger' %}msg-danger{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}" role="alert">
+        <div class="alert alert-dismissible fade show base-alert-toast base-auto-close {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' or message.tags == 'danger' %}msg-danger{% elif message.tags == 'warning' %}msg-warning{% else %}msg-info{% endif %}" role="alert">
             <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         {% endfor %}
     </div>
+
     <script>
         setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(function(alert) {
+            document.querySelectorAll('.base-auto-close').forEach(function(alert) {
                 var bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             });

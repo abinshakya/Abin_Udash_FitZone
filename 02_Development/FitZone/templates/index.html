@@ -417,9 +417,50 @@
             transform: translateY(-1px);
         }
 
-        .alert-wrap {
-            max-width: 980px;
-            margin: 18px auto 0;
+        .home-msg-toast-wrap {
+            position: fixed;
+            top: 88px;
+            right: 20px;
+            z-index: 1060;
+            width: min(500px, calc(100% - 24px));
+        }
+
+        .home-msg-toast {
+            border-radius: 10px;
+            border: 1px solid transparent;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+            margin-bottom: 10px;
+            font-weight: 600;
+            min-height: 62px;
+        }
+
+        .home-msg-toast {
+            background: #5d8fe6;
+            border-color: #4f7dd0;
+            color: #0f172a;
+        }
+
+        .home-msg-toast.msg-success {
+            border-color: #b7d8cc;
+            background: #cde3da;
+            color: #1f6c56;
+        }
+
+        .home-msg-toast.msg-warning {
+            background: #fbbf24;
+            border-color: #f59e0b;
+        }
+
+        .home-msg-toast.msg-danger,
+        .home-msg-toast.msg-error {
+            background: #f87171;
+            border-color: #ef4444;
+        }
+
+        .home-msg-toast .btn-close {
+            margin-left: auto;
+            opacity: 0.8;
         }
 
         @media (max-width: 768px) {
@@ -514,9 +555,10 @@
     {% include 'navbar.html' %}
 
         {% if messages %}
-        <div class="alert-wrap">
+        <div class="home-msg-toast-wrap">
             {% for message in messages %}
-                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show mt-3" role="alert">
+                <div class="alert alert-dismissible fade show home-msg-toast home-msg-auto-close {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' or message.tags == 'danger' %}msg-danger{% elif message.tags == 'warning' %}msg-warning{% endif %}" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -696,6 +738,13 @@
             pagination: { el: ".swiper-pagination", clickable: true },
             navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
         });
+
+        setTimeout(function () {
+            document.querySelectorAll('.home-msg-auto-close').forEach(function (alertEl) {
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            });
+        }, 5000);
     </script>
 </body>
 </html>

@@ -3,6 +3,8 @@ from django.contrib import messages
 from django import forms
 from django.utils import timezone
 from django.utils.html import format_html
+from django.core.mail import send_mail
+from django.conf import settings
 import datetime
 import os
 
@@ -99,6 +101,25 @@ class TrainerRegistrationAdmin(admin.ModelAdmin):
 						message=f'Congratulations! Your trainer registration has been approved. You can now start accepting bookings from members.'
 					)
 					messages.success(request, f'Approval notification sent to {obj.user.username}')
+
+					# Send approval email to trainer
+					if obj.user.email:
+						trainer_name = obj.user.get_full_name() or obj.user.username
+						try:
+							send_mail(
+								subject='FitZone: Your Trainer Registration Has Been Approved',
+								message=(
+									f'Hello {trainer_name},\n\n'
+									'Great news! Your trainer registration has been approved.\n'
+									'You can now log in and start accepting bookings from members.\n\n'
+									'Thank you for joining FitZone.\n'
+								),
+								from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
+								recipient_list=[obj.user.email],
+								fail_silently=True,
+							)
+						except Exception:
+							pass
 					
 					# Set user role to trainer
 					try:

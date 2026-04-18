@@ -8,6 +8,7 @@ from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Q
 import os
@@ -684,8 +685,27 @@ class TrainerRegistrationWizard(SessionWizardView):
         save_docs(id_files, "identity_proof")
         save_docs(exp_files, "experience_verification")
 
-        admin_recipient = settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
-        if admin_recipient:
+        admin_recipients = []
+
+        for admin_entry in getattr(settings, 'ADMINS', []):
+            if isinstance(admin_entry, (tuple, list)) and len(admin_entry) > 1 and admin_entry[1]:
+                admin_recipients.append(admin_entry[1])
+
+        if not admin_recipients:
+            UserModel = get_user_model()
+            admin_recipients = list(
+                UserModel.objects.filter(is_superuser=True)
+                .exclude(email__isnull=True)
+                .exclude(email='')
+                .values_list('email', flat=True)
+            )
+
+        if not admin_recipients and getattr(settings, 'EMAIL_HOST_USER', None):
+            admin_recipients = [settings.EMAIL_HOST_USER]
+
+        admin_recipients = list(dict.fromkeys(admin_recipients))
+
+        if admin_recipients:
             user_full_name = self.request.user.get_full_name() or self.request.user.username
             try:
                 send_mail(
@@ -699,8 +719,8 @@ class TrainerRegistrationWizard(SessionWizardView):
                         f'Specialization: {registration.specialization}\n\n'
                         f'Please review the application in the admin dashboard.'
                     ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[admin_recipient],
+                    from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
+                    recipient_list=admin_recipients,
                     fail_silently=True,
                 )
             except Exception:
