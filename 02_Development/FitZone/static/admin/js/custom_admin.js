@@ -5,6 +5,57 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    /* ---- Theme Toggle (dark/light with persistence) ---- */
+    const THEME_STORAGE_KEY = 'fitzone_admin_theme';
+    const themeToggle = document.getElementById('theme-toggle');
+
+    function getPreferredTheme() {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+            return savedTheme;
+        }
+
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            return 'light';
+        }
+
+        return 'dark';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+        if (!themeToggle) return;
+
+        const icon = themeToggle.querySelector('i');
+        const label = themeToggle.querySelector('.theme-toggle-label');
+        const isDark = theme === 'dark';
+
+        themeToggle.setAttribute('aria-pressed', String(!isDark));
+        themeToggle.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDark);
+            icon.classList.toggle('fa-moon', !isDark);
+        }
+
+        if (label) {
+            label.textContent = isDark ? 'Light' : 'Dark';
+        }
+    }
+
+    applyTheme(getPreferredTheme());
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            initDashboardCharts();
+        });
+    }
+
     /* ---- Sidebar Toggle ---- */
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -129,32 +180,43 @@ document.addEventListener('DOMContentLoaded', function () {
     function initDashboardCharts() {
         if (typeof ApexCharts === 'undefined') return;
 
-        const accent = '#f97316';
-        const accentLight = '#fb923c';
-        const chartColors = ['#f97316', '#8b5cf6', '#06b6d4', '#22c55e', '#eab308'];
+        const isLight = (document.documentElement.getAttribute('data-theme') || 'dark') === 'light';
+        const css = getComputedStyle(document.documentElement);
+        const accent = css.getPropertyValue('--accent').trim() || '#f97316';
+        const textSecondary = css.getPropertyValue('--text-secondary').trim() || '#8b8ba3';
+        const chartGrid = isLight ? 'rgba(15,23,42,0.12)' : 'rgba(255,255,255,0.05)';
+        const chartStroke = isLight ? '#ffffff' : '#16161f';
+        const chartColors = [accent, '#8b5cf6', '#06b6d4', '#22c55e', '#eab308'];
 
-        const darkChartTheme = {
+        ['userGrowthChart', 'revenueChart', 'membershipChart', 'bookingChart'].forEach(function (id) {
+            const container = document.getElementById(id);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const chartTheme = {
             chart: {
-                foreColor: '#8b8ba3',
+                foreColor: textSecondary,
                 background: 'transparent',
                 toolbar: { show: false }
             },
             grid: {
-                borderColor: 'rgba(255,255,255,0.05)',
+                borderColor: chartGrid,
                 strokeDashArray: 4
             },
             tooltip: {
-                theme: 'dark',
+                theme: isLight ? 'light' : 'dark',
                 style: { fontSize: '13px' },
                 y: { formatter: function (val) { return val.toLocaleString(); } }
             },
             xaxis: {
-                labels: { style: { colors: '#8b8ba3', fontSize: '12px' } },
-                axisBorder: { color: 'rgba(255,255,255,0.06)' },
-                axisTicks: { color: 'rgba(255,255,255,0.06)' }
+                labels: { style: { colors: textSecondary, fontSize: '12px' } },
+                axisBorder: { color: chartGrid },
+                axisTicks: { color: chartGrid }
             },
             yaxis: {
-                labels: { style: { colors: '#8b8ba3', fontSize: '12px' } }
+                labels: { style: { colors: textSecondary, fontSize: '12px' } }
             }
         };
 
@@ -172,11 +234,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Merge dark theme defaults
-                options.chart = Object.assign({}, darkChartTheme.chart, options.chart);
-                options.grid = options.grid || darkChartTheme.grid;
-                options.tooltip = options.tooltip || darkChartTheme.tooltip;
-                options.xaxis = Object.assign({}, darkChartTheme.xaxis, options.xaxis || {});
-                options.yaxis = options.yaxis || darkChartTheme.yaxis;
+                options.chart = Object.assign({}, chartTheme.chart, options.chart);
+                options.grid = options.grid || chartTheme.grid;
+                options.tooltip = options.tooltip || chartTheme.tooltip;
+                options.xaxis = Object.assign({}, chartTheme.xaxis, options.xaxis || {});
+                options.yaxis = options.yaxis || chartTheme.yaxis;
 
                 // Inject data
                 if (options.chart.type === 'pie' || options.chart.type === 'donut') {
@@ -254,11 +316,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             total: {
                                 show: true,
                                 label: 'Plans',
-                                color: '#8b8ba3',
+                                color: textSecondary,
                                 fontSize: '14px'
                             },
                             value: {
-                                color: '#eaeaf0',
+                                color: css.getPropertyValue('--text-primary').trim() || '#eaeaf0',
                                 fontSize: '22px',
                                 fontWeight: 700
                             }
@@ -266,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             },
-            stroke: { show: true, width: 2, colors: ['#16161f'] }
+            stroke: { show: true, width: 2, colors: [chartStroke] }
         });
 
         // 4. Booking — Pie Chart
@@ -275,9 +337,9 @@ document.addEventListener('DOMContentLoaded', function () {
             colors: chartColors,
             legend: {
                 position: 'bottom',
-                labels: { colors: '#8b8ba3' }
+                labels: { colors: textSecondary }
             },
-            stroke: { show: true, width: 2, colors: ['#16161f'] }
+            stroke: { show: true, width: 2, colors: [chartStroke] }
         });
     }
 

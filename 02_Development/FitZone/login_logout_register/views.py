@@ -14,78 +14,57 @@ from django.core.files.storage import default_storage
 import random
 import string
 import os
+from .forms import RegistrationForm
 
 def register(request):
+    form = RegistrationForm(request.POST or None)
+
     if request.method == "POST":
-        name = request.POST.get('name')
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        age = request.POST.get('age')
-        gender = request.POST.get('gender')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            phone = form.cleaned_data['phone']
+            age = form.cleaned_data['age']
+            gender = form.cleaned_data['gender']
+            password = form.cleaned_data['password']
 
+            try:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=name
+                )
 
-        # Validate required fields
-        if not phone or not phone.strip():
-            messages.error(request, "Registration failed: Phone number is required")
-            return render(request, 'register.html')
-
-        # Validate password length
-        if len(password) < 8:
-            messages.error(request, "Registration failed: Password must be at least 8 characters long")
-            return render(request, 'register.html')
-
-        # Check password match
-        if password != confirm_password:
-            messages.error(request, "Registration failed: Passwords do not match")
-            return render(request, 'register.html')
-
-        # Check if username exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Registration failed: Username already exists")
-            return render(request, 'register.html')
-        
-        # Check if email exists
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Registration failed: Email already exists")
-            return render(request, 'register.html')
-
-        try:
-            # Create user
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                first_name=name
-            )
-
-            # Calculate DOB from age
-            dob = None
-            if age:
                 current_year = datetime.now().year
                 birth_year = current_year - int(age)
                 dob = datetime(birth_year, 1, 1).date()
 
-            # Create profile (do not pass username, only valid fields)
-            UserProfile.objects.create(
-                user=user,
-                phone=phone,
-                age=int(age) if age else None,
-                dob=dob,
-                gender=gender,
-                email_verified=False  
-            )
-            messages.success(request, "Registration successful! Please login and verify your email.")
-            return redirect('login')
+                UserProfile.objects.create(
+                    user=user,
+                    phone=phone,
+                    age=age,
+                    dob=dob,
+                    gender=gender,
+                    email_verified=False
+                )
+                messages.success(request, "Registration successful! Please login and verify your email.")
+                return redirect('login')
 
-        except Exception as e:
-            print("Registration error:", e) 
-            messages.error(request, f"Registration failed: {e}")
-            return render(request, 'register.html')
+            except Exception as e:
+                print("Registration error:", e)
+                messages.error(request, f"Registration failed: {e}")
+        else:
+            for field_name, errors in form.errors.items():
+                for error in errors:
+                    if field_name == '__all__':
+                        messages.error(request, f"Registration failed: {error}")
+                    else:
+                        label = form.fields[field_name].label or field_name.replace('_', ' ').title()
+                        messages.error(request, f"Registration failed ({label}): {error}")
 
-    return render(request, 'register.html')
+    return render(request, 'register.html', {'form': form})
 
 def user_login(request):
     if request.method == "POST":

@@ -43,47 +43,47 @@
         <div class="grid-2">
           <div class="input-group">
             <label for="name">Full Name</label>
-            <input class="input" type="text" id="name" name="name" placeholder="Enter your full name" required>
+            <input class="input" type="text" id="name" name="name" placeholder="Enter your full name" value="{{ form.name.value|default:'' }}" required>
           </div>
 
           <div class="input-group">
             <label for="username">Username</label>
-            <input class="input" type="text" id="username" name="username" placeholder="Choose a username" required>
+            <input class="input" type="text" id="username" name="username" placeholder="Choose a username" value="{{ form.username.value|default:'' }}" required>
           </div>
         </div>
 
         <div class="grid-2">
           <div class="input-group">
             <label for="email">Email</label>
-            <input class="input" type="email" id="email" name="email" placeholder="Enter your email" required>
+            <input class="input" type="email" id="email" name="email" placeholder="Enter your email (example@sd.com)" value="{{ form.email.value|default:'' }}" required>
           </div>
 
           <div class="input-group">
             <label for="age">Age</label>
-            <input class="input" type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
+            <input class="input" type="number" id="age" name="age" placeholder="Enter your age" min="13" max="120" value="{{ form.age.value|default:'' }}" required>
           </div>
         </div>
 
         <div class="input-group">
           <label for="phone">Phone Number</label>
-          <input class="input" type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+          <input class="input" type="tel" id="phone" name="phone" placeholder="Enter 10-digit phone number" pattern="\d{10}" maxlength="10" value="{{ form.phone.value|default:'' }}" required>
         </div>
 
         <div class="input-group">
           <label>Gender</label>
           <div class="gender-options">
             <label class="gender-pill">
-              <input type="radio" name="gender" value="male" required>
+              <input type="radio" name="gender" value="male" {% if form.gender.value == 'male' %}checked{% endif %} required>
               <span class="dot"></span> Male
             </label>
 
             <label class="gender-pill">
-              <input type="radio" name="gender" value="female">
+              <input type="radio" name="gender" value="female" {% if form.gender.value == 'female' %}checked{% endif %}>
               <span class="dot"></span> Female
             </label>
 
             <label class="gender-pill">
-              <input type="radio" name="gender" value="other">
+              <input type="radio" name="gender" value="other" {% if form.gender.value == 'other' %}checked{% endif %}>
               <span class="dot"></span> Other
             </label>
           </div>

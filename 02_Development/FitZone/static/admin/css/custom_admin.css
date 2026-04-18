@@ -57,6 +57,31 @@
     --duration: 0.25s;
 }
 
+html[data-theme="light"] {
+    --bg-deep: #f4f6fb;
+    --bg-surface: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-card-solid: #ffffff;
+    --bg-hover: rgba(15, 23, 42, 0.05);
+    --bg-active: rgba(249, 115, 22, 0.14);
+
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(15, 23, 42, 0.08);
+
+    --text-primary: #101828;
+    --text-secondary: #475467;
+    --text-muted: #667085;
+    --text-link: #2563eb;
+
+    --border: rgba(15, 23, 42, 0.12);
+    --border-subtle: rgba(15, 23, 42, 0.06);
+
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1);
+    --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.12);
+    --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.16);
+    --shadow-glow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
 /* ---------- Animations ---------- */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(18px); }
@@ -113,6 +138,13 @@ body::before {
         radial-gradient(ellipse 600px 400px at 50% 100%, rgba(249, 115, 22, 0.04), transparent 50%);
     pointer-events: none;
     z-index: 0;
+}
+
+html[data-theme="light"] body::before {
+    background:
+        radial-gradient(ellipse 900px 500px at 8% -5%, rgba(249, 115, 22, 0.08), transparent 60%),
+        radial-gradient(ellipse 700px 400px at 95% 5%, rgba(59, 130, 246, 0.08), transparent 60%),
+        radial-gradient(ellipse 600px 400px at 50% 100%, rgba(249, 115, 22, 0.05), transparent 50%);
 }
 
 a { color: var(--text-link); text-decoration: none; transition: color var(--duration) var(--ease); }
@@ -357,6 +389,10 @@ header#header {
     z-index: 900;
 }
 
+html[data-theme="light"] header#header {
+    background: rgba(255, 255, 255, 0.9);
+}
+
 .header-left {
     display: flex;
     align-items: center;
@@ -426,6 +462,47 @@ header#header {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all var(--duration) var(--ease);
+}
+
+.theme-toggle i {
+    color: var(--accent);
+    font-size: 0.9rem;
+}
+
+.theme-toggle:hover {
+    color: var(--text-primary);
+    border-color: var(--accent-muted);
+    transform: translateY(-1px);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, 0.35);
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .theme-toggle-label {
+        display: none;
+    }
+
+    .theme-toggle {
+        padding: 8px;
+    }
 }
 
 /* Clock widget */
