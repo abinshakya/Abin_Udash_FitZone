@@ -123,8 +123,16 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
     'login_logout_register.pipeline.set_google_profile_flags',
 )
+
+# Prevent OAuth callback errors (like missing/expired state) from raising debug
+# exceptions and return users to login flow instead.
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/'
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 

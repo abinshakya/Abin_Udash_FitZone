@@ -11,10 +11,29 @@ from django.utils import timezone
 from formtools.wizard.views import SessionWizardView
 from django import forms
 from django.core.files.storage import default_storage
+from django.urls import reverse
+from urllib.parse import urlparse
 import random
 import string
 import os
 from .forms import RegistrationForm
+
+
+def google_oauth_begin(request):
+    """Start Google OAuth on a canonical host and persist a session first."""
+    site_url = (getattr(settings, 'SITE_URL', '') or '').rstrip('/')
+    if site_url:
+        target_host = urlparse(site_url).netloc
+        if target_host and request.get_host() != target_host:
+            return redirect(f"{site_url}{reverse('google_oauth_begin')}")
+
+    # Ensure a session key exists before leaving for Google so state survives.
+    if not request.session.session_key:
+        request.session.save()
+    request.session['google_oauth_started'] = True
+    request.session.modified = True
+
+    return redirect('social:begin', 'google-oauth2')
 
 def register(request):
     form = RegistrationForm(request.POST or None)
