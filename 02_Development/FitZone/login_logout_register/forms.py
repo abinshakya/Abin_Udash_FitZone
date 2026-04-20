@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 class RegistrationForm(forms.Form):
     name = forms.CharField(
@@ -59,13 +61,24 @@ class RegistrationForm(forms.Form):
             raise forms.ValidationError('Username already exists.')
         return username
 
-    def clean_email(self):
-        email = self.cleaned_data['email'].strip().lower()
-        if not email.endswith('@sd.com'):
-            raise forms.ValidationError('Email must end with @sd.com.')
-        if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError('Email already exists.')
-        return email
+def clean_email(self):
+    email = self.cleaned_data.get('email', '').strip().lower()
+
+    # Check valid email format
+    try:
+        validate_email(email)
+    except ValidationError:
+        raise forms.ValidationError('Enter a valid email address.')
+
+    # Check if email ends with .com
+    if not email.endswith('.com'):
+        raise forms.ValidationError('Email must end with .com')
+
+    # Check for duplicate email (case-insensitive)
+    if User.objects.filter(email__iexact=email).exists():
+        raise forms.ValidationError('Email already exists.')
+
+    return email
 
     def clean_password(self):
         password = self.cleaned_data['password']

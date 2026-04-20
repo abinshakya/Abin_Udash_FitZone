@@ -31,6 +31,9 @@
             <a href="{% url 'admin:index' %}" class="nav-item {% if request.path == '/admin/' %}active{% endif %}">
                 <i class="fas fa-th-large"></i> <span>{% trans 'Dashboard' %}</span>
             </a>
+            <a href="{% url 'admin_reports' %}" class="nav-item {% if '/admin/reports/' in request.path %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> <span>{% trans 'Reports' %}</span>
+            </a>
             
             {% if request.user.is_superuser or request.user.is_staff %}
             <div class="sidebar-section-label">

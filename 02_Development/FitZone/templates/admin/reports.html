@@ -1,0 +1,173 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Reports | FitZone Admin{% endblock %}
+{% block bodyclass %}{{ block.super }} reports-dashboard{% endblock %}
+
+{% block content_title %}
+<h2 class="content-title">Project Reports</h2>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="welcome-banner">
+        <h2>Project Reports</h2>
+        <p>{{ range_label }}</p>
+    </div>
+
+    <div class="module" style="margin-bottom: 16px;">
+        <form method="get" id="report-filter-form" style="padding: 14px 16px; display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items:end;">
+            <div>
+                <label for="period"><strong>Report Type</strong></label>
+                <select name="period" id="period" style="width:100%; margin-top:6px;">
+                    <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>Monthly</option>
+                    <option value="yearly" {% if period == 'yearly' %}selected{% endif %}>Yearly</option>
+                    <option value="custom" {% if period == 'custom' %}selected{% endif %}>Custom Date</option>
+                </select>
+            </div>
+
+            <div data-filter="month">
+                <label for="month"><strong>Month</strong></label>
+                <select name="month" id="month" style="width:100%; margin-top:6px;">
+                    {% for item in month_options %}
+                    <option value="{{ item.value }}" {% if selected_month == item.value %}selected{% endif %}>{{ item.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div data-filter="year">
+                <label for="year"><strong>Year</strong></label>
+                <select name="year" id="year" style="width:100%; margin-top:6px;">
+                    {% for y in year_options %}
+                    <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div data-filter="custom">
+                <label for="start_date"><strong>Start Date</strong></label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date_value }}" style="width:100%; margin-top:6px;">
+            </div>
+
+            <div data-filter="custom">
+                <label for="end_date"><strong>End Date</strong></label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date_value }}" style="width:100%; margin-top:6px;">
+            </div>
+
+            <div>
+                <button type="submit" class="button default" style="width:100%;">Apply Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="dashboard-stats-grid">
+        {% for card in summary_cards %}
+        <div class="dashboard-stat-card">
+            <div class="dashboard-stat-icon {{ card.tone }}"><i class="fas {{ card.icon }}"></i></div>
+            <div>
+                <div class="dashboard-stat-label">{{ card.label }}</div>
+                <div class="dashboard-stat-value">
+                    {% if card.is_currency %}
+                        Rs. {{ card.value|floatformat:2 }}
+                    {% else %}
+                        {{ card.value }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="dashboard-charts-grid" style="margin-top:16px;">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-layer-group" style="color:var(--accent); margin-right:8px;"></i>Membership & User Stats</h3>
+            <table class="admin-report-table" style="width:100%; border-collapse: collapse;">
+                <tbody>
+                    {% for row in membership_user_rows %}
+                    <tr><td>{{ row.label }}</td><td><strong>{{ row.value }}</strong></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-calendar-check" style="color:var(--accent); margin-right:8px;"></i>Booking Status Summary</h3>
+            <table class="admin-report-table" style="width:100%; border-collapse: collapse;">
+                <tbody>
+                    {% for row in booking_rows %}
+                    <tr><td>{{ row.label }}</td><td><strong>{{ row.value }}</strong></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-money-check-alt" style="color:var(--accent); margin-right:8px;"></i>Payout Request Status</h3>
+            <table class="admin-report-table" style="width:100%; border-collapse: collapse;">
+                <tbody>
+                    {% for row in payout_rows %}
+                    <tr><td>{{ row.label }}</td><td><strong>{{ row.value }}</strong></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="module" style="margin-top:16px;">
+        <h2 style="padding: 12px 16px 0;">Recent Completed Payments</h2>
+        <div class="results" style="padding: 12px 16px 16px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Type</th>
+                        <th>Order</th>
+                        <th style="text-align:right;">Amount (Rs.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in recent_payments %}
+                    <tr>
+                        <td>{{ payment.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ payment.user.username }}</td>
+                        <td>{{ payment.get_payment_type_display }}</td>
+                        <td>{{ payment.purchase_order_id }}</td>
+                        <td style="text-align:right;">{{ payment.amount_in_rupees|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; padding:18px;">No completed payments in this date range.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const periodSelect = document.getElementById('period');
+    const monthField = document.querySelector('[data-filter="month"]');
+    const yearField = document.querySelector('[data-filter="year"]');
+    const customFields = document.querySelectorAll('[data-filter="custom"]');
+
+    function updateFields() {
+        const value = periodSelect.value;
+        const showMonthly = value === 'monthly';
+        const showYearly = value === 'yearly';
+        const showCustom = value === 'custom';
+
+        monthField.style.display = showMonthly ? 'block' : 'none';
+        yearField.style.display = (showMonthly || showYearly) ? 'block' : 'none';
+        customFields.forEach((field) => {
+            field.style.display = showCustom ? 'block' : 'none';
+        });
+    }
+
+    periodSelect.addEventListener('change', updateFields);
+    updateFields();
+})();
+</script>
+{% endblock %}

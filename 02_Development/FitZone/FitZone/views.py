@@ -1,14 +1,19 @@
 
 from django.shortcuts import render, redirect
+from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.cache import cache_control
 from django.core.mail import send_mail
 from django.conf import settings
-from django.db.models import Q
-from datetime import datetime, date
+from django.db.models import Q, Sum, Count
+from django.db.models.functions import Coalesce
+from datetime import datetime, date, time, timedelta
+import calendar
 import os
+from trainer.booking_notifications import process_booking_expiry_notifications
 
 def cancel_overdue_bookings(user):
     from notifications.models import UserNotification, TrainerNotification
@@ -154,6 +159,7 @@ def user_dashboard(request):
     
     # Auto-cancel overdue bookings (unpaid for 2+ days)
     cancel_overdue_bookings(request.user)
+    process_booking_expiry_notifications(user=request.user)
 
     # Get bookings requiring payment
     confirmed_bookings = TrainerBooking.objects.filter(
@@ -266,6 +272,7 @@ def trainer_client_dashboard(request):
     
     # Auto-cancel overdue bookings (unpaid for 2+ days)
     cancel_overdue_bookings(request.user)
+    process_booking_expiry_notifications(user=request.user)
 
     # Get bookings requiring payment
     confirmed_bookings = TrainerBooking.objects.filter(
@@ -324,6 +331,7 @@ def trainer_client_my_trainers(request):
         return redirect('trainer')
 
     now = timezone.now()
+    process_booking_expiry_notifications(user=request.user)
 
     running_trainers_qs = bookings.filter(
         status='confirmed',
@@ -464,3 +472,194 @@ def handler403(request, exception=None):
         HttpResponse: Rendered 403.html template
     """
     return render(request, '403.html', status=403)
+
+
+@staff_member_required
+def admin_reports(request):
+    from django.contrib.auth.models import User
+    from membership.models import UserMembership
+    from payment.models import KhaltiPayment, TrainerPaymentRequest
+    from trainer.models import TrainerBooking, TrainerRegistration
+
+    today = timezone.localdate()
+    period = request.GET.get('period', 'monthly').strip().lower()
+    selected_year = today.year
+    selected_month = today.month
+    custom_start = ''
+    custom_end = ''
+
+    if period == 'yearly':
+        try:
+            selected_year = int(request.GET.get('year', today.year))
+        except (TypeError, ValueError):
+            selected_year = today.year
+
+        start_date = date(selected_year, 1, 1)
+        end_date = date(selected_year, 12, 31)
+        range_label = f"Yearly Report: {selected_year}"
+    elif period == 'custom':
+        custom_start = request.GET.get('start_date', '').strip()
+        custom_end = request.GET.get('end_date', '').strip()
+
+        try:
+            start_date = date.fromisoformat(custom_start) if custom_start else (today - timedelta(days=29))
+        except ValueError:
+            start_date = today - timedelta(days=29)
+
+        try:
+            end_date = date.fromisoformat(custom_end) if custom_end else today
+        except ValueError:
+            end_date = today
+
+        if start_date > end_date:
+            start_date, end_date = end_date, start_date
+
+        range_label = f"Custom Report: {start_date.strftime('%b %d, %Y')} - {end_date.strftime('%b %d, %Y')}"
+    else:
+        period = 'monthly'
+        try:
+            selected_year = int(request.GET.get('year', today.year))
+        except (TypeError, ValueError):
+            selected_year = today.year
+
+        try:
+            selected_month = int(request.GET.get('month', today.month))
+        except (TypeError, ValueError):
+            selected_month = today.month
+
+        selected_month = max(1, min(selected_month, 12))
+        start_date = date(selected_year, selected_month, 1)
+        if selected_month == 12:
+            end_date = date(selected_year, 12, 31)
+        else:
+            end_date = date(selected_year, selected_month + 1, 1) - timedelta(days=1)
+
+        range_label = f"Monthly Report: {start_date.strftime('%B %Y')}"
+
+    start_dt = timezone.make_aware(datetime.combine(start_date, time.min))
+    end_dt = timezone.make_aware(datetime.combine(end_date, time.max))
+
+    completed_payments = KhaltiPayment.objects.filter(
+        status='Completed',
+        created_at__range=(start_dt, end_dt),
+    )
+
+    membership_payments = completed_payments.filter(payment_type='membership')
+    booking_payments = completed_payments.filter(payment_type='booking')
+
+    membership_revenue_paisa = membership_payments.aggregate(total=Coalesce(Sum('amount'), 0))['total']
+    booking_revenue_paisa = booking_payments.aggregate(total=Coalesce(Sum('amount'), 0))['total']
+    total_revenue_paisa = membership_revenue_paisa + booking_revenue_paisa
+
+    booking_ids_from_payments = booking_payments.exclude(booking__isnull=True).values_list('booking_id', flat=True)
+    bookings_created_in_range = TrainerBooking.objects.filter(created_at__range=(start_dt, end_dt))
+    bookings_paid_in_range = TrainerBooking.objects.filter(id__in=booking_ids_from_payments)
+    bookings_in_range = (bookings_created_in_range | bookings_paid_in_range).distinct()
+
+    booking_status_map = {key: 0 for key, _ in TrainerBooking.STATUS_CHOICES}
+    for row in bookings_in_range.values('status').annotate(total=Count('id')):
+        booking_status_map[row['status']] = row['total']
+
+    payout_requests_in_range = TrainerPaymentRequest.objects.filter(created_at__range=(start_dt, end_dt))
+    payout_status_map = {key: 0 for key, _ in TrainerPaymentRequest.STATUS_CHOICES}
+    for row in payout_requests_in_range.values('status').annotate(total=Count('id')):
+        payout_status_map[row['status']] = row['total']
+
+    payment_type_map = {key: 0 for key, _ in KhaltiPayment.PAYMENT_TYPE_CHOICES}
+    for row in completed_payments.values('payment_type').annotate(total=Count('id')):
+        payment_type_map[row['payment_type']] = row['total']
+
+    available_years = KhaltiPayment.objects.filter(status='Completed').dates('created_at', 'year', order='ASC')
+    if available_years:
+        year_options = [dt.year for dt in available_years][::-1]
+    else:
+        year_options = list(range(today.year, today.year - 5, -1))
+
+    month_options = [
+        {'value': idx, 'label': month_name}
+        for idx, month_name in enumerate(calendar.month_name)
+        if idx > 0
+    ]
+
+    summary_cards = [
+        {
+            'label': 'Total Revenue',
+            'value': round(total_revenue_paisa / 100, 2),
+            'icon': 'fa-wallet',
+            'tone': 'subs',
+            'is_currency': True,
+        },
+        {
+            'label': 'Membership Revenue',
+            'value': round(membership_revenue_paisa / 100, 2),
+            'icon': 'fa-id-card',
+            'tone': 'users',
+            'is_currency': True,
+        },
+        {
+            'label': 'Booking Revenue',
+            'value': round(booking_revenue_paisa / 100, 2),
+            'icon': 'fa-dumbbell',
+            'tone': 'tasks',
+            'is_currency': True,
+        },
+        {
+            'label': 'Completed Transactions',
+            'value': completed_payments.count(),
+            'icon': 'fa-check-circle',
+            'tone': 'users',
+            'is_currency': False,
+        },
+    ]
+
+    membership_user_rows = [
+        {'label': 'Memberships Sold', 'value': UserMembership.objects.filter(created_at__range=(start_dt, end_dt)).count()},
+        {'label': 'Active Memberships', 'value': UserMembership.objects.filter(is_active=True).count()},
+        {'label': 'New Users', 'value': User.objects.filter(date_joined__range=(start_dt, end_dt)).count()},
+        {'label': 'New Trainers', 'value': TrainerRegistration.objects.filter(submitted_at__range=(start_dt, end_dt)).count()},
+    ]
+
+    booking_rows = [
+        {'label': 'Total Bookings', 'value': bookings_in_range.count()},
+    ] + [
+        {'label': label, 'value': booking_status_map.get(key, 0)}
+        for key, label in TrainerBooking.STATUS_CHOICES
+    ]
+
+    payout_rows = [
+        {'label': label, 'value': payout_status_map.get(key, 0)}
+        for key, label in TrainerPaymentRequest.STATUS_CHOICES
+    ] + [
+        {'label': label, 'value': payment_type_map.get(key, 0)}
+        for key, label in KhaltiPayment.PAYMENT_TYPE_CHOICES
+    ]
+
+    report_context = {
+        'period': period,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+        'start_date_value': custom_start or start_date.isoformat(),
+        'end_date_value': custom_end or end_date.isoformat(),
+        'range_label': range_label,
+        'start_date': start_date,
+        'end_date': end_date,
+        'year_options': year_options,
+        'month_options': month_options,
+        'summary_cards': summary_cards,
+        'membership_user_rows': membership_user_rows,
+        'booking_rows': booking_rows,
+        'payout_rows': payout_rows,
+        'membership_revenue': round(membership_revenue_paisa / 100, 2),
+        'booking_revenue': round(booking_revenue_paisa / 100, 2),
+        'total_revenue': round(total_revenue_paisa / 100, 2),
+        'membership_payments_count': membership_payments.count(),
+        'booking_payments_count': booking_payments.count(),
+        'completed_transactions_count': completed_payments.count(),
+        'recent_payments': completed_payments.select_related('user', 'membership_plan', 'booking').order_by('-created_at')[:20],
+    }
+
+    context = admin.site.each_context(request)
+    context.update(report_context)
+    context['title'] = 'Project Reports'
+
+    return render(request, 'admin/reports.html', context)

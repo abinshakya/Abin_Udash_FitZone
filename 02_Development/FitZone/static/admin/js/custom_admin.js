@@ -138,8 +138,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* ---- Animated Counter (count-up) ---- */
     function animateCounter(el) {
-        const target = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10);
-        if (isNaN(target) || target === 0) return;
+        const original = (el.textContent || '').trim();
+        const numericMatch = original.match(/-?[\d,]+(?:\.\d+)?/);
+        if (!numericMatch) return;
+
+        const numericText = numericMatch[0].replace(/,/g, '');
+        const target = parseFloat(numericText);
+        if (Number.isNaN(target) || target === 0) return;
+
+        const prefix = original.slice(0, numericMatch.index);
+        const suffix = original.slice((numericMatch.index || 0) + numericMatch[0].length);
+        const decimalPlaces = (numericText.split('.')[1] || '').length;
 
         const duration = 1200;
         const startTime = performance.now();
@@ -149,7 +158,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const progress = Math.min(elapsed / duration, 1);
             // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.floor(eased * target).toLocaleString();
+            const current = eased * target;
+
+            if (decimalPlaces > 0) {
+                el.textContent = prefix + current.toLocaleString(undefined, {
+                    minimumFractionDigits: decimalPlaces,
+                    maximumFractionDigits: decimalPlaces,
+                }) + suffix;
+            } else {
+                el.textContent = prefix + Math.floor(current).toLocaleString() + suffix;
+            }
+
             if (progress < 1) requestAnimationFrame(step);
         }
 

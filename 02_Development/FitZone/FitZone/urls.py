@@ -22,6 +22,7 @@ from FitZone import views
 from login_logout_register import views as login_views
 
 urlpatterns = [
+    path('admin/reports/', views.admin_reports, name='admin_reports'),
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('social-auth/', include('social_django.urls', namespace='social')),
