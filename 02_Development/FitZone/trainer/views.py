@@ -22,6 +22,8 @@ from .models import TrainerRegistrationDocument, TrainerRegistration, TrainerPho
 from notifications.models import TrainerNotification, UserNotification
 from chat.models import ChatRoom, Message
 
+MAX_TRAINER_GALLERY_PHOTO_SIZE = 5 * 1024 * 1024
+
 
 def trainer(request):
     # Base queryset: all verified trainers
@@ -353,6 +355,10 @@ def upload_trainer_photo(request):
         caption = request.POST.get('caption', '')
         
         if photo_file:
+            if photo_file.size > MAX_TRAINER_GALLERY_PHOTO_SIZE:
+                messages.error(request, "Photo size must be 5MB or less.")
+                return redirect('trainer_settings')
+
             TrainerPhoto.objects.create(
                 trainer=registration,
                 photo=photo_file,

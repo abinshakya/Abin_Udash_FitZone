@@ -831,10 +831,21 @@
             </div>
             
             <script>
+              const MAX_TRAINER_PHOTO_SIZE_BYTES = 5 * 1024 * 1024;
+
               function handleFileSelect(input) {
                 const dropzone = document.getElementById('uploadDropzone');
                 const display = document.getElementById('fileNameDisplay');
                 if (input.files && input.files[0]) {
+                  if (input.files[0].size > MAX_TRAINER_PHOTO_SIZE_BYTES) {
+                    alert('Photo size must be 5MB or less.');
+                    input.value = '';
+                    display.innerText = 'Click or drag photo to select';
+                    dropzone.classList.remove('has-file');
+                    dropzone.querySelector('.upload-icon').className = 'fas fa-cloud-upload-alt upload-icon';
+                    return;
+                  }
+
                   display.innerText = input.files[0].name;
                   dropzone.classList.add('has-file');
                   dropzone.querySelector('.upload-icon').className = 'fas fa-check-circle upload-icon';

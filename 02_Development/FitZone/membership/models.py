@@ -45,6 +45,7 @@ class UserMembership(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     is_active = models.BooleanField(default=True)
+    expiry_warning_sent = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
