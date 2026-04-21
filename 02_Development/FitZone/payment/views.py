@@ -547,6 +547,41 @@ def request_payment(request):
                 pr.booking = selected_booking
                 pr.amount = payout_amount
                 pr.save()
+
+                admin_email = getattr(settings, 'ADMIN_EMAIL', None) or settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER
+                if admin_email:
+                    trainer_name = registration.user.get_full_name() or registration.user.username
+                    client_name = selected_booking.user.get_full_name() or selected_booking.user.username
+                    subject = f'New trainer payment request from {trainer_name}'
+                    message = (
+                        f'A trainer payment request has been submitted.\n\n'
+                        f'Trainer: {trainer_name}\n'
+                        f'Trainer Email: {registration.user.email or "Not provided"}\n'
+                        f'Client: {client_name}\n'
+                        f'Client Email: {selected_booking.user.email or "Not provided"}\n'
+                        f'Booking ID: {selected_booking.id}\n'
+                        f'Request Amount: ₹{payout_amount}\n'
+                        f'Bank Name: {pr.bank_name or "Not provided"}\n'
+                        f'Account Holder Name: {pr.account_holder_name or "Not provided"}\n'
+                        f'Account Number: {pr.account_number or "Not provided"}\n'
+                        f'Status: Pending\n\n'
+                        f'Please review the payment request in the admin dashboard.'
+                    )
+
+                    try:
+                        send_mail(
+                            subject=subject,
+                            message=message,
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=[admin_email],
+                            fail_silently=False,
+                        )
+                    except Exception:
+                        messages.warning(
+                            request,
+                            'Payment request was saved, but the admin notification email could not be sent.'
+                        )
+
                 messages.success(request, f"Payment request of ₹{payout_amount} submitted successfully! The admin will review it shortly.")
                 return redirect('request_payment')
         else:
